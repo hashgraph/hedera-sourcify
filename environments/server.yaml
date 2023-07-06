@@ -16,7 +16,10 @@ networks:
 services:
   server:
     <<: *project-base
-    image: ethereum/source-verify:server-${TAG}
+#    image: gcr.io/hedera-registry/hedera-sourcify:server-${TAG}
+    build:
+      context: ../
+      dockerfile: src/Dockerfile.server
     container_name: server-${TAG}
     ports:
       - "${SERVER_EXTERNAL_PORT}:${SERVER_PORT}"
