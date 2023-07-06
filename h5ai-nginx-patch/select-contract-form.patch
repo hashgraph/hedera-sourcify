@@ -1,0 +1,19 @@
+Subject: [PATCH] Get server URL from .env variable.
+---
+Index: select-contract-form/src/App.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/select-contract-form/src/App.js b/select-contract-form/src/App.js
+--- a/select-contract-form/src/App.js	(revision 35418954f6cd11023a2a644b5fb9db0e5cc7a981)
++++ b/select-contract-form/src/App.js	(date 1685693287982)
+@@ -22,7 +22,7 @@
+   useEffect(() => {
+     const getSourcifyChains = async () => {
+       const chainsArray = await (
+-        await fetch(`https://sourcify.dev/server/chains`)
++        await fetch(`${process.env.REACT_APP_SERVER_URL}/chains`)
+       ).json();
+       return chainsArray;
+     };
