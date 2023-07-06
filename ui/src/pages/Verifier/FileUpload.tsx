@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { AiFillFileAdd, AiOutlineGithub, AiOutlinePlus } from "react-icons/ai";
+import { AiFillFileAdd, AiOutlineGithub, AiOutlinePlus, AiOutlineFileSearch } from "react-icons/ai";
 import { FaEthereum } from "react-icons/fa";
 import { SiSolidity } from "react-icons/si";
 import { HiOutlineExclamation } from "react-icons/hi";
@@ -94,22 +94,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
           </Button>
           <Button
             type={
-              importMethodSelected === ImportMethods.ETHERSCAN
-                ? "primary"
-                : "secondary"
-            }
-            onClick={() => selectImportMethod(ImportMethods.ETHERSCAN)}
-            className="text-sm"
-          >
-            <>
-              <EtherscanLogo
-                light={importMethodSelected === ImportMethods.ETHERSCAN}
-              />
-              Import from Etherscan
-            </>
-          </Button>
-          <Button
-            type={
               importMethodSelected === ImportMethods.GITHUB
                 ? "primary"
                 : "secondary"
@@ -132,7 +116,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             className="text-sm"
           >
             <>
-              <FaEthereum className="inline align-middle mr-1" />
+              <AiOutlineFileSearch className="inline align-middle mr-1" />
               Import from Contract
             </>
           </Button>
