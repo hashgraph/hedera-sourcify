@@ -9,6 +9,7 @@ import {
   VERIFY_VALIDATED_URL,
   CREATE2_VERIFY_VALIDATED_URL,
   CREATE2_COMPILE_URL,
+  DOCS_URL,
 } from "../../constants";
 import { Context } from "../../Context";
 import {
@@ -70,7 +71,7 @@ const Verifier: React.FC = () => {
                     UI. See{" "}
                     <a
                       className="font-bold"
-                      href="https://docs.sourcify.dev/docs/api/#verification-api-v2---session-based"
+                      href={DOCS_URL}
                     >
                       docs
                     </a>{" "}
