@@ -257,6 +257,18 @@ const sourcifyChainsExtensions: SourcifyChainsExtensionsObject = {
     monitored: false,
     contractFetchAddress: "https://hashscan.io/mainnet/" + ETHERSCAN_SUFFIX,
   },
+  "296": {
+    // Hedera Testnet
+    supported: true,
+    monitored: false,
+    contractFetchAddress: "https://hashscan.io/testnet/" + ETHERSCAN_SUFFIX,
+  },
+  "297": {
+    // Hedera Previewnet
+    supported: true,
+    monitored: false,
+    contractFetchAddress: "https://hashscan.io/previewnet/" + ETHERSCAN_SUFFIX,
+  },
   "300": {
     // Turned off as seems to be shut down
     supported: false,
@@ -998,25 +1010,23 @@ export function getSortedChainsArray(
 
   const chainsArray = Object.values(chainMap);
   // Have Ethereum chains on top.
-  const ethereumChainIds = [1, 5, 11155111, 3, 4, 42];
-  const ethereumChains = ethereumChainIds.map((id) => {
-    // Use long form name for Ethereum netorks e.g. "Ethereum Testnet Goerli" instead of "Goerli"
-    chainMap[id].name = chainMap[id].title || chainMap[id].name;
-    return chainMap[id];
-  });
+  // const ethereumChainIds = [1, 5, 11155111, 3, 4, 42];
+  const ethereumChainIds = [295, 296, 297];
+  const etherumChains = ethereumChainIds.map((id) => chainMap[id]);
   // Others, sorted alphabetically
-  const otherChains = chainsArray
-    .filter((chain) => ![1, 5, 11155111, 3, 4, 42].includes(chain.chainId))
-    .sort((a, b) =>
-      getPrimarySortKey(a) > getPrimarySortKey(b)
-        ? 1
-        : getPrimarySortKey(b) > getPrimarySortKey(a)
-        ? -1
-        : 0
-    );
-
-  const sortedChains = ethereumChains.concat(otherChains);
-  return sortedChains;
+  // const otherChains = chainsArray
+  //   .filter((chain) => ![1, 5, 11155111, 3, 4, 42].includes(chain.chainId))
+  //   .sort((a, b) =>
+  //     getPrimarySortKey(a) > getPrimarySortKey(b)
+  //       ? 1
+  //       : getPrimarySortKey(b) > getPrimarySortKey(a)
+  //       ? -1
+  //       : 0
+  //   );
+  //
+  // const sortedChains = etherumChains.concat(otherChains);
+  // return sortedChains;
+  return etherumChains
 }
 
 /**
