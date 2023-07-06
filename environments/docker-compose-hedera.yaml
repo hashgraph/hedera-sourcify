@@ -1,0 +1,77 @@
+version: "3.7"
+x-project-repository-mount: &project-repository-mount
+  type: bind
+  source: $REPOSITORY_PATH
+
+x-project-base: &project-base
+  env_file:
+    - .env
+  restart: always
+  networks:
+    - source-verify
+
+networks:
+  source-verify:
+
+services:
+
+  repository:
+    <<: *project-base
+    #    image: gcr.io/hedera-registry/hedera-sourcify:repository-${TAG}
+    build:
+      context: ../h5ai-nginx # Point to the /h5ai-nginx folder
+      dockerfile: Dockerfile
+    container_name: repository-${TAG}
+    volumes:
+      - <<: *project-repository-mount
+        target: /data
+        read_only: true
+    ports:
+      - ${REPOSITORY_SERVER_EXTERNAL_PORT}:80
+
+  server:
+    <<: *project-base
+    #    image: gcr.io/hedera-registry/hedera-sourcify:server-${TAG}
+    build:
+      context: ../
+      dockerfile: src/Dockerfile.server
+    container_name: server-${TAG}
+    ports:
+      - "${SERVER_EXTERNAL_PORT}:${SERVER_PORT}"
+    volumes:
+      - <<: *project-repository-mount
+        target: /home/data/repository
+      - type: bind
+        source: $SOLC_REPO_HOST
+        target: $SOLC_REPO
+      - type: bind
+        source: $SOLJSON_REPO_HOST
+        target: $SOLJSON_REPO
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${SERVER_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+  ui:
+    <<: *project-base
+    #    image: gcr.io/hedera-registry/hedera-sourcify:ui-${TAG}
+    build:
+      context: ../ui
+      dockerfile: Dockerfile
+      # Pass SERVER_URL and REPOSITORY_SERVER_URL to be injected build time.
+      # Will be set in .env (see scripts/build_and_publish_docker_images.sh)
+      args:
+        - SERVER_URL=$SERVER_URL
+        - REPOSITORY_SERVER_URL=$REPOSITORY_SERVER_URL
+        - IPNS=$IPNS
+        - TAG=$TAG
+    container_name: ui-${TAG}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    ports:
+      - "${UI_EXTERNAL_PORT}:80"
+
