@@ -1,9 +1,9 @@
 export const REPOSITORY_SERVER_URL =
   process.env.REACT_APP_REPOSITORY_SERVER_URL;
 export const SERVER_URL = process.env.REACT_APP_SERVER_URL;
-export const DOCS_URL = "https://docs.sourcify.dev";
+export const DOCS_URL = "https://docs.hedera.com";
 export const PLAYGROUND_URL = "https://playground.sourcify.dev";
-
+export const HASHSCAN_URL = "https://hashscan-latest.hedera-devops.com/"
 export const REPOSITORY_SERVER_URL_FULL_MATCH = `${REPOSITORY_SERVER_URL}/contracts/full_match`;
 export const REPOSITORY_SERVER_URL_PARTIAL_MATCH = `${REPOSITORY_SERVER_URL}/contracts/partial_match`;
 export const IPFS_IPNS_GATEWAY_URL = `https://cloudflare-ipfs.com/ipns/${process.env.REACT_APP_IPNS}`;
