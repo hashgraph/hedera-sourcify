@@ -64,7 +64,6 @@ services:
       args:
         - SERVER_URL=$SERVER_URL
         - REPOSITORY_SERVER_URL=$REPOSITORY_SERVER_URL
-        - IPNS=$IPNS
         - TAG=$TAG
     container_name: ui-${TAG}
     healthcheck:
