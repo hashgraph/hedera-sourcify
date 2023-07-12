@@ -27,7 +27,7 @@ services:
         target: /data
         read_only: true
     ports:
-      - ${REPOSITORY_SERVER_EXTERNAL_PORT}:80
+      - "${REPOSITORY_SERVER_EXTERNAL_PORT}:80"
 
   server:
     <<: *project-base
@@ -74,3 +74,13 @@ services:
     ports:
       - "${UI_EXTERNAL_PORT}:80"
 
+  nginx-service:
+    container_name: nginx-container
+    image: nginx
+    restart: "unless-stopped"
+    volumes:
+      - ../nginx/conf/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ../../certificate:/etc/nginx/certificate
+    ports:
+      - "80:80"
+      - "443:443"
