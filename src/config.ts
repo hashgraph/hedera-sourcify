@@ -42,11 +42,7 @@ export default {
       process.env.NODE_ENV === "production" && process.env.TESTING !== "true", // Set Secure in the Set-Cookie header i.e. require https
   },
   corsAllowedOrigins: [
-    /^https?:\/\/(?:.+\.)?sourcify.simonvienot.fr$/, // sourcify.simonvienot.fr and subdomains
-    /^https?:\/\/(?:.+\.)?verify.simonvienot.fr$/, // verify.simonvienot.fr and subdomains
-    /^https?:\/\/vps-13e353e0.vps.ovh.net(?::\d+)?$/, // test VPS on any port
-    /^https?:\/\/vps-4403a704.vps.ovh.net(?::\d+)?$/, // test VPS on any port
-    new RegExp(`http:\/\/${new URL(process.env.SERVER_URL ?? "").hostname}:3000`),
+    new RegExp(`http:\/\/${new URL(process.env.SERVER_URL ?? "").hostname}(?::\d+)?`),
   ],
 };
 
