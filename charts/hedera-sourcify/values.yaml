@@ -1,0 +1,74 @@
+# Default values for hedera-sourcify.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# cadvisor:
+#   enabled: false
+
+fullnameOverride: ""
+
+global:
+  namespaceOverride: ""
+  podAnnotations: {}
+
+# grafana:
+#   enabled: false
+
+ipfs:
+  enabled: false
+
+labels: {}
+
+# loki:
+#   enabled: false
+
+# monitor:
+#   enabled: false
+
+nameOverride: hedera-sourcify
+
+networkPolicy:
+  enabled: false
+
+# nginx_exporter:
+#   enabled: false
+
+# node_exporter:
+#   enabled: false
+
+# prometheus:
+#   enabled: false
+
+# promtail:
+#   enabled: false
+
+repository:
+  enabled: true
+
+server:
+  enabled: true
+
+ui:
+  enabled: true
+
+# E2E test support
+# test:
+#   annotations:
+#     helm.sh/hook: test-success
+#     helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+#     helm.sh/hook-weight: "10"
+#   config:
+#   enabled: false
+#   env: {}
+#   image:
+#     pullPolicy: IfNotPresent
+#     registry: 
+#     repository: 
+#     tag: ""  # Defaults to the chart's app version
+#   resources:
+#     limits:
+#       cpu: 3
+#       memory: 4096Mi
+#     requests:
+#       cpu: 1
+#       memory: 2048Mi
