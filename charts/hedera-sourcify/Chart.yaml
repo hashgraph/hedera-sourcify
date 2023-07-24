@@ -1,0 +1,40 @@
+apiVersion: v2
+appVersion: "0.1.0-SNAPSHOT"
+dependencies:
+  - alias: repository
+    condition: repository.enabled
+    name: hedera-sourcify-repository
+    repository: file://../hedera-sourcify-repository
+    version: ">=0.1.0-0"
+  - alias: server
+    condition: server.enabled
+    name: hedera-sourcify-server
+    repository: file://../hedera-sourcify-server
+    version: ">=0.1.0-0"
+  - alias: ui
+    condition: ui.enabled
+    name: hedera-sourcify-ui
+    repository: file://../hedera-sourcify-ui
+    version: ">=0.1.0-0"
+description: Umbrella Helm chart deployment of the hashgraph/sourcify products
+home: https://github.com/hashgraph/hedera-sourcify
+icon: https://camo.githubusercontent.com/cca6b767847bb8ca5c7059481ba13a5fc81c5938/68747470733a2f2f7777772e6865646572612e636f6d2f6c6f676f2d6361706974616c2d686261722d776f72646d61726b2e6a7067
+keywords:
+  - blockchain
+  - dlt
+  - hedera
+  - hashgraph
+  - smart
+  - contracts
+  - verification
+  - verifier
+maintainers:
+  - name: Hedera Smart Contracts Team
+    email: engsmartcontracts@hedera.com
+  - name: Hedera Mirror Node Explorer Team
+    email: engsmartcontracts@hedera.com
+name: hedera-sourcify
+sources:
+  - https://github.com/hashgraph/hedera-sourcify
+type: application
+version: 0.1.0-SNAPSHOT
