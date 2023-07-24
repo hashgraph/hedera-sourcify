@@ -17,11 +17,11 @@ services:
 
   repository:
     <<: *project-base
-    #    image: gcr.io/hedera-registry/hedera-sourcify:repository-${TAG}
+    image: gcr.io/hedera-registry/source-verify:repository-latest
     build:
-      context: ../h5ai-nginx # Point to the /h5ai-nginx folder
+      context: ../h5ai-nginx
       dockerfile: Dockerfile
-    container_name: repository-${TAG}
+    container_name: repository-latest
     volumes:
       - <<: *project-repository-mount
         target: /data
@@ -31,11 +31,11 @@ services:
 
   server:
     <<: *project-base
-    #    image: gcr.io/hedera-registry/hedera-sourcify:server-${TAG}
+    image: gcr.io/hedera-registry/source-verify:server-latest
     build:
       context: ../
       dockerfile: src/Dockerfile.server
-    container_name: server-${TAG}
+    container_name: server-latest
     ports:
       - "${SERVER_EXTERNAL_PORT}:${SERVER_PORT}"
     volumes:
@@ -55,7 +55,7 @@ services:
 
   ui:
     <<: *project-base
-    #    image: gcr.io/hedera-registry/hedera-sourcify:ui-${TAG}
+    image: gcr.io/hedera-registry/source-verify:ui-latest
     build:
       context: ../ui
       dockerfile: Dockerfile
@@ -64,8 +64,8 @@ services:
       args:
         - SERVER_URL=$SERVER_URL
         - REPOSITORY_SERVER_URL=$REPOSITORY_SERVER_URL
-        - TAG=$TAG
-    container_name: ui-${TAG}
+        - TAG=latest
+    container_name: ui-latest
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -77,7 +77,7 @@ services:
   nginx-service:
     container_name: nginx-container
     image: nginx
-    restart: "unless-stopped"
+    restart: always
     volumes:
       - ../nginx/conf/nginx.conf:/etc/nginx/conf.d/default.conf
       - ../../certificate:/etc/nginx/certificate
