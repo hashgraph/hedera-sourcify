@@ -31,16 +31,16 @@ jobs:
           username: svienot
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Repository Image
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          context: ./h5ai-nginx
-          dockerfile: Dockerfile
-          platforms: |
-            linux/arm64
-            linux/amd64
-          tags: svienot/source-verify:repository-latest
+#      - name: Build and Push Repository Image
+#        uses: docker/build-push-action@v3
+#        with:
+#          push: true
+#          context: ./h5ai-nginx
+#          dockerfile: Dockerfile
+#          platforms: |
+#            linux/arm64
+#            linux/amd64
+#          tags: svienot/source-verify:repository-latest
 
       - name: Build and Push Server Image
         uses: docker/build-push-action@v3
