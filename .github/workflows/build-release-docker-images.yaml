@@ -6,17 +6,13 @@ defaults:
   run:
     shell: bash
 
-permissions:
-  id-token: write
-  contents: read
-
 env:
   LC_ALL: C.UTF-8
 
 jobs:
   deploy-docker-image:
     name: Deploy / Docker / Image
-    runs-on: [ self-hosted, Linux, explorer, standard, ephemeral ]
+    runs-on: Linux
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
