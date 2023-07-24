@@ -36,7 +36,7 @@ jobs:
 #        with:
 #          push: true
 #          context: ./h5ai-nginx
-#          dockerfile: Dockerfile
+#          file: Dockerfile
 #          platforms: |
 #            linux/arm64
 #            linux/amd64
@@ -47,7 +47,7 @@ jobs:
         with:
           push: true
           context: ./src
-          dockerfile: Dockerfile.server
+          file: Dockerfile.server
           platforms: |
             linux/arm64
             linux/amd64
@@ -58,7 +58,7 @@ jobs:
         with:
           push: true
           context: ./ui
-          dockerfile: Dockerfile
+          file: Dockerfile
           platforms: |
             linux/arm64
             linux/amd64
