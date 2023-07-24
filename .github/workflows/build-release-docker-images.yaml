@@ -46,8 +46,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          context: .
-          dockerfile: src/Dockerfile.server
+          context: ./src
+          dockerfile: Dockerfile.server
           platforms: |
             linux/arm64
             linux/amd64
