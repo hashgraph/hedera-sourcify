@@ -3,6 +3,9 @@ name: Release Docker Image to GitHub
 on:
   workflow_dispatch:
 
+permissions:
+  packages: write
+
 env:
   OWNER: hashgraph
   PACKAGE_NAME: source-verify
