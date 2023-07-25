@@ -37,6 +37,5 @@ jobs:
         with:
           context: ./ui
           file: ./ui/Dockerfile
-          platforms: linux/amd64, linux/arm64
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:ui-latest
