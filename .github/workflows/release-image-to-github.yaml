@@ -49,6 +49,6 @@ jobs:
         with:
           context: .
           file: ./src/Dockerfile.server
-          platforms: linux/amd64, linux/arm64
+#          platforms: linux/amd64, linux/arm64
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:server-latest
