@@ -17,7 +17,7 @@ services:
 
   repository:
     <<: *project-base
-    image: svienot/source-verify:repository-latest
+    image: ghcr.io/svienot/hedera-sourcify:repository-latest
     build:
       context: ../h5ai-nginx
       dockerfile: Dockerfile
@@ -31,7 +31,7 @@ services:
 
   server:
     <<: *project-base
-    image: svienot/source-verify:server-latest
+    image: ghcr.io/svienot/hedera-sourcify:server-latest
     build:
       context: ../
       dockerfile: src/Dockerfile.server
@@ -55,7 +55,7 @@ services:
 
   ui:
     <<: *project-base
-    image: svienot/source-verify:ui-latest
+    image: ghcr.io/svienot/hedera-sourcify:ui-latest
     build:
       context: ../ui
       dockerfile: Dockerfile
