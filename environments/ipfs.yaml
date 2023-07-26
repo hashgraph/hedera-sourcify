@@ -1,0 +1,32 @@
+version: "3.7"
+
+x-project-base: &project-base
+  env_file:
+    - .env
+  restart: always
+  networks:
+    - source-verify
+
+networks:
+  source-verify:
+
+services:
+  ipfs:
+    image: ethereum/source-verify:ipfs-${TAG}
+    container_name: ipfs-${TAG}
+    ports:
+      - "${IPFS_GW_EXTERNAL_PORT}:8080"
+      - "${IPFS_LIBP2P_EXTERNAL_PORT}:4001"
+      - "${IPFS_API_EXTERNAL_PORT}:5001"
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - source-verify
+    volumes:
+      - type: bind
+        source: $REPOSITORY_PATH
+        target: /repository
+      - type: bind
+        source: ../services/ipfs/ipfs-${TAG}.key
+        target: /sourcify/ipfs-${TAG}.key

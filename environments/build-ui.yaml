@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  ui:
+    image: ethereum/source-verify:ui-${TAG}
+    build:
+      context: ../ui
+      dockerfile: Dockerfile
+      # Pass SERVER_URL and REPOSITORY_SERVER_URL to be injected build time.
+      # Will be set in .env (see scripts/build_and_publish_docker_images.sh)
+      args:
+        - SERVER_URL=$SERVER_URL
+        - REPOSITORY_SERVER_URL=$REPOSITORY_SERVER_URL
+        - IPNS=$IPNS
+        - TAG=$TAG

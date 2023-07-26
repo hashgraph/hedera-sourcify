@@ -1,0 +1,285 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Server",
+      "program": "${workspaceFolder}/dist/server/server.js",
+      "envFile": "${workspaceFolder}/environments/.env",
+      "preLaunchTask": "npm: build:lerna",
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js"
+      ],
+      "env": {
+        // "DEBUG": "express:*" // Debug all express modules *
+      },
+      "smartStep": true,
+      "console": "integratedTerminal",
+      "outputCapture": "std",
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Server - without build",
+      "program": "${workspaceFolder}/dist/server/server.js",
+      "envFile": "${workspaceFolder}/environments/.env",
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js"
+      ],
+      "env": {
+        // "DEBUG": "express:*" // Debug all express modules *
+      },
+      "smartStep": true,
+      "console": "integratedTerminal",
+      "outputCapture": "std",
+    },
+    {
+      // Make sure the UI webserver is already running with `npm start`
+      "name": "UI",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceRoot}/ui/src",
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Monitor",
+      "program": "${workspaceFolder}/dist/monitor/monitor.js",
+      "envFile": "${workspaceFolder}/environments/.env",
+      "preLaunchTask": "npm: build:lerna",
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js"
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal",
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Monitor - without build",
+      "program": "${workspaceFolder}/dist/monitor/monitor.js",
+      "envFile": "${workspaceFolder}/environments/.env",
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js"
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal",
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha - All",
+      "program": "${workspaceFolder}/node_modules/.bin/lerna",
+      "env": {
+        "TESTING": "true",
+      },
+      "args": [
+        "run",
+        "test",
+        "--stream"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js"
+      ],
+      "smartStep": true,
+      "skipFiles": [
+        "<node_internals>/**",
+        "node_modules/**"
+      ],
+      "console": "integratedTerminal",
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha - Server",
+      "program": "${workspaceRoot}/node_modules/.bin/mocha",
+      "env": {
+        // "DEBUG": "express:*", // Debug all express modules *
+        "TESTING": "true",
+      },
+      "args": [
+        "${workspaceFolder}/test/server.js",
+        "--no-timeout",
+        // Run a single test when debugging
+        // "--grep=v0.6.12",
+        "--exit",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js",
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal",
+      // "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha - Etherscan",
+      "program": "${workspaceRoot}/node_modules/.bin/mocha",
+      "env": {
+        // "DEBUG": "express:*", // Debug all express modules *
+        "TESTING": "true",
+      },
+      "args": [
+        "${workspaceFolder}/test/etherscan.js",
+        "--no-timeout",
+        // Run a single test when debugging
+        // "--grep=v0.6.12",
+        "--exit",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js",
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal",
+      // "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha - Etherscan Instances",
+      "program": "${workspaceRoot}/node_modules/.bin/mocha",
+      "env": {
+        "TESTING": "true",
+      },
+      "args": [
+        "${workspaceFolder}/test/etherscan/etherscanInstances.js",
+        "--no-timeout",
+        // Run a single test when debugging
+        // "--grep=v0.6.12",
+        "--exit",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js",
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal",
+      // "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha - lib-sourcify",
+      "cwd": "${workspaceFolder}/packages/lib-sourcify",
+      "program": "./node_modules/.bin/mocha",
+      "env": {
+        // "DEBUG": "express:*", // Debug all express modules *
+        "TESTING": "true",
+      },
+      "args": [
+        "-r",
+        "ts-node/register",
+        "./test/**/*.spec.ts",
+        "--no-timeout",
+        // Run a single test when debugging
+        // "--grep=v0.6.12",
+        "--exit",
+      ],
+      "sourceMaps": true,
+      "smartStep": true,
+      "console": "integratedTerminal",
+      // "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha - Contract Call Decoder",
+      "cwd": "${workspaceFolder}/packages/contract-call-decoder",
+      "program": "./node_modules/ava/cli.js",
+      "env": {
+        "TESTING": "true",
+      },
+      "args": [
+      ],
+      "outFiles": [
+        "./**/*.js",
+        "${workspaceFolder}/packages/contract-call-decoder/build/**/*.js"
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal",
+      // "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha - Monitor",
+      "program": "${workspaceRoot}/node_modules/.bin/mocha",
+      "env": {
+        "TESTING": "true",
+      },
+      "args": [
+        "${workspaceFolder}/test/monitor.js",
+        "--no-timeout"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js",
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha - Chains",
+      "program": "${workspaceRoot}/node_modules/.bin/mocha",
+      "env": {
+        "TESTING": "true",
+        // "NEW_CHAIN_ID": "11155111"
+      },
+      "args": [
+        "${workspaceFolder}/test/chains/chain-tests.js",
+        "--no-timeout",
+        // Run a single test when debugging
+        // "--grep=Optimism",
+        "--exit",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js"
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha - Source Fetcher",
+      "program": "${workspaceRoot}/node_modules/.bin/mocha",
+      "env": {
+        "TESTING": "true",
+      },
+      "args": [
+        "${workspaceFolder}/test/sourceFetcher.js",
+        "--no-timeout",
+        // Run a single test when debugging
+        // "--grep=fallback",
+        "--exit",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/packages/**/build/**/*.js"
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+  ]
+}
