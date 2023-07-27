@@ -23,7 +23,7 @@ fullnameOverride: ""
 
 image:
   # update to forked image
-  repository: ethereum/source-verify
+  repository: ghcr.io/svienot/hedera-sourcify
   tag: repository-latest
 
 imagePullSecrets: []
