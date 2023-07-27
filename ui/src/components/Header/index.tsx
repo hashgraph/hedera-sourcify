@@ -5,7 +5,7 @@ import ReactTooltip from "react-tooltip";
 import { ReactComponent as Matrix } from "../../assets/icons/matrix.svg";
 import { ReactComponent as Twitter } from "../../assets/icons/twitter.svg";
 import logoText from "../../assets/logo-rounded.svg";
-import { DOCS_URL, PLAYGROUND_URL } from "../../constants";
+import { DOCS_URL, HASHSCAN_URL } from "../../constants";
 
 const Header = () => {
   const [showNav, setShowNav] = useState(false);
@@ -24,7 +24,7 @@ const Header = () => {
         <Link to="/" className="flex items-center">
           <img src={logoText} alt="Sourcify logo" className="max-h-10" />
           <span className="ml-3 text-gray-700 font-vt323 text-2xl">
-            sourcify.eth
+            Hedera
           </span>
         </Link>
       </div>
@@ -63,46 +63,11 @@ const Header = () => {
           </a>
           <a
             className="link-underline mx-2 my-2 md:mx-6 hover:text-ceruleanBlue-500"
-            href={PLAYGROUND_URL}
+            href={HASHSCAN_URL}
           >
-            Playground
+            HashScan
           </a>
-          <div className="flex items-center ml-2">
-            <iframe
-              src="https://ghbtns.com/github-btn.html?user=ethereum&repo=sourcify&type=star&count=true&size=large"
-              // frameborder="0"
-              scrolling="0"
-              width="135"
-              height="30"
-              title="GitHub"
-              className=""
-            ></iframe>
-          </div>
         </nav>
-        {/* Icons */}
-        <div className="flex items-center ml-2 mt-6 md:mt-0">
-          <a
-            className="px-2 hover-to-fill"
-            href="https://twitter.com/sourcifyeth"
-            data-tip="Twitter"
-          >
-            <Twitter className="h-[1.4rem] w-auto fill-gray-700 500" />
-          </a>
-          <a
-            className="pl-2 hover-to-fill"
-            href="https://matrix.to/#/#ethereum_source-verify:gitter.im"
-            data-tip="Matrix chat"
-          >
-            <Matrix className="h-6 w-auto fill-gray-700 hover:fill-ceruleanBlue-500" />
-          </a>
-        </div>
-        {/* <Link
-          className="link-underline ml-2 mb-2 mt-6 md:mt-2 md:ml-6 hover:text-ceruleanBlue-500"
-          to="/status"
-          data-tip="Server status: working"
-        >
-          <span className="inline md:hidden">Server status: </span> ✅
-        </Link> */}
       </div>
     </header>
   );

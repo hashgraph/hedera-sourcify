@@ -7,6 +7,7 @@ import { logger } from "./common/loggerLoki";
 dotenv.config({ path: path.resolve(__dirname, "..", "environments/.env") });
 
 const setRepositoryPath = () => {
+  logger.warn(`using hostname: ${new URL(process.env.SERVER_URL ?? "").hostname}`)
   if (process.env.MOCK_REPOSITORY) return process.env.MOCK_REPOSITORY;
   if (process.env.REPOSITORY_PATH)
     return path.resolve(__dirname, process.env.REPOSITORY_PATH);
@@ -41,11 +42,7 @@ export default {
       process.env.NODE_ENV === "production" && process.env.TESTING !== "true", // Set Secure in the Set-Cookie header i.e. require https
   },
   corsAllowedOrigins: [
-    /^https?:\/\/(?:.+\.)?sourcify.dev$/, // sourcify.dev and subdomains
-    /^https?:\/\/(?:.+\.)?sourcify.eth$/, // sourcify.eth and subdomains
-    /^https?:\/\/(?:.+\.)?sourcify.eth.link$/, // sourcify.eth.link and subdomains
-    /^https?:\/\/(?:.+\.)?ipfs.dweb.link$/, // dweb links used by Brave browser etc.
-    process.env.NODE_ENV === "development" && /^https?:\/\/localhost(?::\d+)?$/, // localhost on any port
+    new RegExp(`http:\/\/${new URL(process.env.SERVER_URL ?? "").hostname}(?::\d+)?`),
   ],
 };
 
