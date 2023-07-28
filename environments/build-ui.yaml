@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   ui:
-    image: ethereum/source-verify:ui-${TAG}
+    image: ghcr.io/hashgraph/hedera-sourcify:ui-${TAG}
     build:
       context: ../ui
       dockerfile: Dockerfile

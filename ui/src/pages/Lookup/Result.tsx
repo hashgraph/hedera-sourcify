@@ -10,8 +10,9 @@ import { Link } from "react-router-dom";
 import ReactTooltip from "react-tooltip";
 import Button from "../../components/Button";
 import {
-  REPOSITORY_SERVER_URL_FULL_MATCH,
-  REPOSITORY_SERVER_URL_PARTIAL_MATCH,
+    DOCS_URL,
+    REPOSITORY_SERVER_URL_FULL_MATCH,
+    REPOSITORY_SERVER_URL_PARTIAL_MATCH,
 } from "../../constants";
 import { Context } from "../../Context";
 import { CheckAllByAddressResult } from "../../types";
@@ -64,7 +65,7 @@ const PerfectMatchInfoText = (
     A perfect match indicates the Solidity source code does not deviate a single
     byte from the source code when deployed. <br /> See{" "}
     <a
-      href="https://docs.sourcify.dev/docs/full-vs-partial-match"
+      href={DOCS_URL}
       className="underline cursor"
     >
       docs
@@ -78,7 +79,7 @@ const PartialMatchInfoText = (
     to the deployed contract but some aspects of the source code might differ
     from the original source code. <br /> See{" "}
     <a
-      href="https://docs.sourcify.dev/docs/full-vs-partial-match"
+      href={DOCS_URL}
       className="underline cursor"
     >
       docs
@@ -200,7 +201,7 @@ const InfoText = (isCreate2Verified: boolean) => (
     Sourcify verification means a matching Solidity source code of the <br />{" "}
     contract is available on the Sourcify repo. <br /> See{" "}
     <a
-      href="https://docs.sourcify.dev/docs/full-vs-partial-match"
+      href={DOCS_URL}
       className="underline cursor"
     >
       docs
@@ -210,7 +211,7 @@ const InfoText = (isCreate2Verified: boolean) => (
       <p className="mt-3">
         This contract was verified with the{" "}
         <a
-          href="https://docs.sourcify.dev/docs/create2"
+          href={DOCS_URL}
           className="underline cursor"
         >
           create2 verification

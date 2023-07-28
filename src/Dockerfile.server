@@ -8,6 +8,9 @@ COPY packages ./packages
 COPY src ./src
 COPY *.json ./
 COPY openapi.yaml ./openapi.yaml
+
+RUN npm config set fetch-retry-mintimeout 20000
+RUN npm config set fetch-retry-maxtimeout 120000
 RUN npm install && npx lerna bootstrap --ci && npx lerna run build
 
 CMD ["npm", "run", "server:start"]

@@ -13,7 +13,16 @@ x-project-base: &project-base
 services:
   ui:
     <<: *project-base
-    image: ethereum/source-verify:ui-${TAG}
+    #    image: gcr.io/hedera-registry/hedera-sourcify:ui-${TAG}
+    build:
+      context: ../ui
+      dockerfile: Dockerfile
+      # Pass SERVER_URL and REPOSITORY_SERVER_URL to be injected build time.
+      # Will be set in .env (see scripts/build_and_publish_docker_images.sh)
+      args:
+        - SERVER_URL=$SERVER_URL
+        - REPOSITORY_SERVER_URL=$REPOSITORY_SERVER_URL
+        - TAG=$TAG
     container_name: ui-${TAG}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
