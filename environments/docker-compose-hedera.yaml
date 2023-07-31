@@ -17,7 +17,7 @@ services:
 
   repository:
     <<: *project-base
-    image: ghcr.io/hashgraph/hedera-sourcify:repository-${TAG}
+    image: ghcr.io/hashgraph/hedera-sourcify:repository-latest
     build:
       context: ../h5ai-nginx
       dockerfile: Dockerfile
