@@ -1,30 +1,65 @@
-&nbsp;
+<div align="center">
 
-<p align="center">
-  &nbsp;
-  <a href="https://sourcify.dev"><img src="https://raw.githubusercontent.com/sourcifyeth/assets/master/logo-assets-svg/logoText.svg" alt="sourcify logo" role="presentation"></a>
-</p>
+# Hedera Sourcify
 
-[![codecov](https://codecov.io/gh/ethereum/sourcify/branch/staging/graph/badge.svg?token=eN6XDAwWfV&flag=server)](https://codecov.io/gh/ethereum/sourcify)
+</div>
 
-Sourcify ([sourcify.dev](https://sourcify.dev)) is a Solidity source code and [metadata](https://docs.sourcify.dev/docs/metadata/) verification tool.
+## Overview
 
-The project aims to serve as an infrastructure for other tools with an [open repository](https://docs.sourcify.dev/docs/repository/) of verified contracts as well as an [API](https://docs.sourcify.dev/docs/api/) and other services. The goal is to make contract interactions on the blockchain safer and more user friendly with open sourced contract codes, contract ABI, and [NatSpec](https://docs.soliditylang.org/en/latest/natspec-format.html) comments available via the contract metadata.
+Tools for verifying Hedera smart contracts using standard open source libraries.
 
-_ℹ️ [This monorepo](https://github.com/ethereum/sourcify) contains the main services and the verification UI. The [sourcifyeth Github organization](https://github.com/sourcifyeth) contains all other auxiliary services and components._
+## Build
 
-## Documentation
+### Prerequisites
 
-For more details refer to [docs.sourcify.dev](https://docs.sourcify.dev/docs/intro/)
+Install:
+- [node](https://nodejs.org/en/about/)
+- [npm](https://www.npmjs.com/)
+- [Docker](https://docs.docker.com/engine/reference/commandline/docker/)
 
-## Questions?
+### Steps
 
-🔍 Check out docs [F.A.Q.](https://docs.sourcify.dev/docs/faq/) and use search in docs.
+From the root of the project workspace:
 
-💬 Chat with us on [Gitter](https://gitter.im/ethereum/source-verify) or [Matrix chat](https://matrix.to/#/#ethereum_source-verify:gitter.im)
+1. Run `./scripts/hedera-apply-patch.sh`. (Run only once) this will patch the `h5ai-nginx` submodule.
+2. Run `npm ci`. This will create populate and link `node_modules`.
+3. `cp environments/.env.dev.hedera  environments/.env`
+4. Make sure the following variables defined in `.env` point to directories which exist on the file system: `REPOSITORY_PATH, SOLC_REPO, SOLJSON_REPO`
+5. Run `npx lerna bootstrap && npx lerna run build`. This will build the server and ui as well as needed libraries.
+6. Run `docker-compose -f environments/docker-compose-hedera.yaml build repository`. This will build the docker image for the repository service.
 
-🐦 Follow us and help us spread the word on [Twitter](https://twitter.com/SourcifyEth).
+## Run
 
-## Adding a new chain
+6. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository`. This will start repository service. 
+7. Run `npm run server:start`. This will start the server.
+7. In a different terminal, run `cd ui; npm run start`. This will start and bring up the UI.
 
-If you'd like to add a new chain support to Sourcify please follow the [chain support instructions](https://docs.sourcify.dev/docs/chain-support/) in docs.
+## Sanity check the configuration
+
+This assumes the default ports (per .env.dev.hedera) are used:
+
+1. `Open http://localhost:10000`. This should open the Repository select-contract-form. The options available for the Chain should be the 3 Hedera networks (mainnet, testnet, previewnet).
+2. `Open http://localhost:5555/files/contracts/296`. This should return a JSON value containing the addresses of all contracts verified on testnet.
+3. `Open http://localhost:3000`. This should bring up the Verifier page.
+
+## Support
+
+If you have a question on how to use the product, please see our
+[support guide](https://github.com/hashgraph/.github/blob/main/SUPPORT.md).
+
+## Contributing
+
+Contributions are welcome. Please see the
+[contributing guide](https://github.com/hashgraph/.github/blob/main/CONTRIBUTING.md)
+to see how you can get involved.
+
+## Code of Conduct
+
+This project is governed by the
+[Contributor Covenant Code of Conduct](https://github.com/hashgraph/.github/blob/main/CODE_OF_CONDUCT.md). By
+participating, you are expected to uphold this code of conduct. Please report unacceptable behavior
+to [oss@hedera.com](mailto:oss@hedera.com).
+
+## License
+
+[TBD](LICENSE)
