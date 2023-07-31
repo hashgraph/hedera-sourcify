@@ -1,4 +1,4 @@
-Subject: [PATCH] New h5ai-nginx patch using $SERVER_URL environment variable.
+Subject: [PATCH] Update h5ai-nginx-patch
 ---
 Index: select-contract-form/src/App.js
 IDEA additional info:
@@ -7,7 +7,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/select-contract-form/src/App.js b/select-contract-form/src/App.js
 --- a/select-contract-form/src/App.js	(revision 35418954f6cd11023a2a644b5fb9db0e5cc7a981)
-+++ b/select-contract-form/src/App.js	(date 1690324009508)
++++ b/select-contract-form/src/App.js	(date 1690569628259)
 @@ -21,8 +21,11 @@
  
    useEffect(() => {
@@ -21,6 +21,23 @@ diff --git a/select-contract-form/src/App.js b/select-contract-form/src/App.js
        ).json();
        return chainsArray;
      };
+Index: entrypoint.sh
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/entrypoint.sh b/entrypoint.sh
+--- a/entrypoint.sh	(revision 35418954f6cd11023a2a644b5fb9db0e5cc7a981)
++++ b/entrypoint.sh	(date 1690569628252)
+@@ -6,5 +6,8 @@
+ # Start php fpm
+ /etc/init.d/php7.4-fpm start
+ 
++# Patch index.html to insert config parameter in the global window object
++sed -i "s@<script></script>@<script>window.configs={SERVER_URL:\"${SERVER_URL}\"}</script>@" /redirects/index.html
++
+ # Start nginx
+ nginx -g "daemon off;"
 Index: select-contract-form/public/index.html
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
@@ -28,7 +45,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/select-contract-form/public/index.html b/select-contract-form/public/index.html
 --- a/select-contract-form/public/index.html	(revision 35418954f6cd11023a2a644b5fb9db0e5cc7a981)
-+++ b/select-contract-form/public/index.html	(date 1690364604997)
++++ b/select-contract-form/public/index.html	(date 1690560773072)
 @@ -40,6 +40,12 @@
        Learn how to configure a non-root public URL by running `npm run build`.
      -->
@@ -42,26 +59,3 @@ diff --git a/select-contract-form/public/index.html b/select-contract-form/publi
    </head>
    <body>
      <noscript>You need to enable JavaScript to run this app.</noscript>
-Index: entrypoint.sh
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/entrypoint.sh b/entrypoint.sh
---- a/entrypoint.sh	(revision 35418954f6cd11023a2a644b5fb9db0e5cc7a981)
-+++ b/entrypoint.sh	(date 1690364767702)
-@@ -6,5 +6,14 @@
- # Start php fpm
- /etc/init.d/php7.4-fpm start
- 
-+# Patch index.html to insert config parameter in the global window object
-+CONFIG_STRING='\
-+    <script> \
-+      window.configs = { \
-+        "SERVER_URL":"'"${SERVER_URL}"'", \
-+      } \
-+    </script>'
-+sed -i "s@<script></script>@${CONFIG_STRING}@" /redirects/index.html
-+
- # Start nginx
- nginx -g "daemon off;"
