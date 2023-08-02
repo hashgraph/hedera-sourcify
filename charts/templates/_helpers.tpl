@@ -75,6 +75,14 @@ app: {{ .Chart.Name }}-monitor
 {{- end }}
 
 {{/*
+Selector labels for the ui deployment.
+*/}}
+{{- define "sourcify.ui.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "sourcify.name" . }}-ui
+app: {{ .Chart.Name }}-ui
+{{- end }}
+
+{{/*
 Create the sourcify-repository name of the service account to use
 */}}
 {{- define "sourcify.repository.serviceAccountName" -}}
@@ -104,5 +112,16 @@ Create the sourcify-monitor name of the service account to use
 {{- default (include "sourcify.fullname" .) .Values.monitor.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.monitor.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the sourcify-ui name of the service account to use
+*/}}
+{{- define "sourcify.ui.serviceAccountName" -}}
+{{- if .Values.ui.serviceAccount.create }}
+{{- default (include "sourcify.fullname" .) .Values.ui.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.ui.serviceAccount.name }}
 {{- end }}
 {{- end }}
