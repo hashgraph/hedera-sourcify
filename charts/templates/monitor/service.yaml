@@ -13,4 +13,4 @@ spec:
       protocol: TCP
       name: https
   selector:
-    {{- include "sourcify.selectorLabels" . | nindent 4 }}
+    {{- include "sourcify.monitor.selectorLabels" . | nindent 4 }}

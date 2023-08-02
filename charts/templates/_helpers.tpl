@@ -55,7 +55,6 @@ Selector labels for the repository deployment.
 */}}
 {{- define "sourcify.repository.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "sourcify.name" . }}-repository
-app.kubernetes.io/instance: {{ .Release.Name }}
 app: {{ .Chart.Name }}-repository
 {{- end }}
 
@@ -64,7 +63,15 @@ Selector labels for the server deployment.
 */}}
 {{- define "sourcify.server.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "sourcify.name" . }}-server
-app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ .Chart.Name }}-server
+{{- end }}
+
+{{/*
+Selector labels for the monitor deployment.
+*/}}
+{{- define "sourcify.monitor.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "sourcify.name" . }}-monitor
+app: {{ .Chart.Name }}-monitor
 {{- end }}
 
 {{/*
@@ -86,5 +93,16 @@ Create the souricfy-server name of the service account to use
 {{- default (include "sourcify.fullname" .) .Values.server.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.server.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the sourcify-monitor name of the service account to use
+*/}}
+{{- define "sourcify.monitor.serviceAccountName" -}}
+{{- if .Values.monitor.serviceAccount.create }}
+{{- default (include "sourcify.fullname" .) .Values.monitor.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.monitor.serviceAccount.name }}
 {{- end }}
 {{- end }}

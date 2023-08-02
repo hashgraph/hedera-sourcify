@@ -1,15 +1,16 @@
+{{- if .Values.sourcify.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "ui.fullname" . }}
+  name: {{ template "sourcify.fullname" . }}-ui
   labels:
-    {{- include "ui.labels" . | nindent 4 }}
+    {{- include "sourcify.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.ui.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - port: {{ .Values.ui.service.port }}
+      targetPort: https
       protocol: TCP
-      name: http
+      name: https
   selector:
-    {{- include "ui.selectorLabels" . | nindent 4 }}
+    {{- include "sourcify.ui.selectorLabels" . | nindent 4 }}

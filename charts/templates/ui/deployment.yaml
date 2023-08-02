@@ -1,61 +1,71 @@
+{{- if .Values.ui.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ui.fullname" . }}
+  name: {{ template "sourcify.name" . }}-ui
   labels:
-    {{- include "ui.labels" . | nindent 4 }}
+    {{- include "sourcify.ui.labels" . | nindent 4 }}
+  {{- if .Values.ui.annotations }}
+  annotations:
+  {{ toYaml .Values.ui.annotations | indent 4 }}
+  {{- end }}    
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if not .Values.ui.autoscaling.enabled }}
+  replicas: {{ .Values.ui.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "ui.selectorLabels" . | nindent 6 }}
+    {{- include "sourcify.ui.labels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- if .Values.ui.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml .Values.ui.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
         {{- include "ui.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "ui.serviceAccountName" . }}
+      serviceAccountName: {{ template "sourcify.ui.serviceAccountName" . }}
+      {{- if .Values.ui.podSecurityContext}}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.ui.podSecurityContext | nindent 8 }}
+      {{- end }}  
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-ui
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- toYaml .Values.ui,securityContext | nindent 12 }}
+          image: "{{ .Values.image.ui }}:{{ .Values.image.ui.tag | default "ui-latest" }}"
+          imagePullPolicy: {{ .Values.image.ui.pullPolicy }}
           ports:
-            - name: http
-              containerPort: 80
+            - name: https
+              containerPort: 443
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
-              port: http
+              port: https
           readinessProbe:
             httpGet:
               path: /
-              port: http
+              port: https
+          {{- if .Values.ui.resources }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
+            {{- toYaml .Values.ui.resources | nindent 12 }}
+          {{- end }}
+      {{- if .Values.ui.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml .Values.ui.nodeSelector | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- if .Values.ui.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml .Values.ui.affinity | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- if .Values.ui.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml .Values.ui.tolerations | nindent 8 }}
       {{- end }}
+{{- end -}}
