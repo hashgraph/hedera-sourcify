@@ -1,9 +1,10 @@
+{{/* Which service or services need ingress support?  I think it might be only ingress */}}
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "repository.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
-{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
-  {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
+{{- $fullName := include "sourcify.fullname"-server . -}}
+{{- $svcPort := .Values.server.service.port -}}
+{{- if and .Values.server.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.server.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.server.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
   {{- end }}
 {{- end }}
 {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
@@ -17,18 +18,18 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "repository.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+    {{- include "sourcify.server.labels" . | nindent 4 }}
+  {{- if .Values.server.ingress.annotations }}
   annotations:
-    {{- toYaml . | nindent 4 }}
+    {{- toYaml .Values.server.ingress.annotations | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.ingress.className }}
+  {{- if and .Values.server.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.server.ingress.className }}
   {{- end }}
-  {{- if .Values.ingress.tls }}
+  {{- if .Values.server.ingress.tls }}
   tls:
-    {{- range .Values.ingress.tls }}
+    {{- range .Values.server.ingress.tls }}
     - hosts:
         {{- range .hosts }}
         - {{ . | quote }}
@@ -37,7 +38,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
+    {{- range .Values.server.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:

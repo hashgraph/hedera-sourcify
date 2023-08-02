@@ -60,12 +60,31 @@ app: {{ .Chart.Name }}-repository
 {{- end }}
 
 {{/*
-Create the name of the service account to use
+Selector labels for the server deployment.
+*/}}
+{{- define "sourcify.server.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "sourcify.name" . }}-server
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Create the sourcify-repository name of the service account to use
 */}}
 {{- define "sourcify.repository.serviceAccountName" -}}
 {{- if .Values.repository.serviceAccount.create }}
 {{- default (include "sourcify.fullname" .) .Values.repository.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.repository.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the souricfy-server name of the service account to use
+*/}}
+{{- define "sourcify.server.serviceAccountName" -}}
+{{- if .Values.server.serviceAccount.create }}
+{{- default (include "sourcify.fullname" .) .Values.server.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.server.serviceAccount.name }}
 {{- end }}
 {{- end }}
