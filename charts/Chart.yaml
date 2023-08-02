@@ -1,0 +1,5 @@
+apiVersion: v2
+description: Helm chart of [hashgraph/hedera-sourcify](https://github.com/hashgraph/hedera-sourcify) repository service.
+name: sourcify
+type: application
+version: 0.1.0

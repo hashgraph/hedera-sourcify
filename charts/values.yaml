@@ -1,0 +1,102 @@
+nameoOverride: ""
+fullnameOverride: ""
+imagePullSecrets: []
+image:
+  repository: "ghcr.io/hashgraph/hedera-sourcify"
+
+repository:
+  ## Deploy sourcify repository
+  enabled: true
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+  replicaCount: 2
+  annotations: {}
+  podAnnotations: {}
+  podSecurityContext: {}
+  service:
+    type: "ClusterIP"
+    port: 443
+  image:
+    tag: "repository-latest"
+    pullPolicy: "IfNotPresent"
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "repository"
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: ""
+        paths: []
+    tls: []
+
+server:
+  ## Deploy sourcify server
+  enabled: true
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+  replicaCount: 2
+  annotations: {}
+  podAnnotations: {}
+  podSecurityContext: {}
+  service:
+    type: "ClusterIP"
+    port: 443
+  image:
+    tag: "server-latest"
+    pullPolicy: "IfNotPresent"
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "server"
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: ""
+        paths: []
+    tls: []
+
+monitor:
+  ## Deploy sourcify monitor
+  enabled: false
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+  replicaCount: 2
+  annotations: {}
+  podAnnotations: {}
+  podSecurityContext: {}
+  service:
+    type: "ClusterIP"
+    port: 443
+  image:
+    tag: "monitor-latest"
+    pullPolicy: "IfNotPresent"
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "monitor"
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []

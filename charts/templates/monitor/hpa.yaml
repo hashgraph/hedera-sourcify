@@ -1,0 +1,28 @@
+{{- if and .Values.monitor.enabled .Values.monitor.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "sourcify.name" . }}-monitor
+  labels:
+    {{- include "sourcify.monitor.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "sourcify.name" . }}-monitor
+  minReplicas: {{ .Values.monitor.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.monitor.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.monitor.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.monitor.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.monitor.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.monitor.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}
