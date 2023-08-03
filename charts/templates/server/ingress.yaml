@@ -1,6 +1,5 @@
-{{/* Which service or services need ingress support?  I think it might be only ingress */}}
-{{- if .Values.ingress.enabled -}}
-{{- $fullName := include "sourcify.fullname"-server . -}}
+{{- if .Values.server.ingress.enabled -}}
+{{- $fullName := printf "%s-%s" "sourcify.fullname" "server" -}}
 {{- $svcPort := .Values.server.service.port -}}
 {{- if and .Values.server.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.server.ingress.annotations "kubernetes.io/ingress.class") }}

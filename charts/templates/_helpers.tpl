@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart. This chart is suffixed with -repository which means subtract 11 from 63 available characters.
 */}}
-{{- define "sourcify.repository.name" -}}
+{{- define "sourcify.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 52 | trimSuffix "-" }}
 {{- end }}
 
@@ -35,51 +35,39 @@ Common labels
 */}}
 {{- define "sourcify.labels" -}}
 helm.sh/chart: {{ include "sourcify.chart" . }}
-{{ include "sourcify.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-{{/*
-Selector labels
-*/}}
-{{- define "sourcify.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "sourcify.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
 
 {{/*
 Selector labels for the repository deployment.
 */}}
 {{- define "sourcify.repository.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "sourcify.name" . }}-repository
-app: {{ .Chart.Name }}-repository
+app.kubernetes.io/name: {{ printf "%s-%s" .Chart.Name "repository" }}
 {{- end }}
 
 {{/*
 Selector labels for the server deployment.
 */}}
 {{- define "sourcify.server.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "sourcify.name" . }}-server
-app: {{ .Chart.Name }}-server
+app.kubernetes.io/name: {{ printf "%s-%s" .Chart.Name "server" }}
 {{- end }}
 
 {{/*
 Selector labels for the monitor deployment.
 */}}
 {{- define "sourcify.monitor.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "sourcify.name" . }}-monitor
-app: {{ .Chart.Name }}-monitor
+app.kubernetes.io/name: {{ printf "%s-%s" .Chart.Name "monitor" }}
 {{- end }}
 
 {{/*
 Selector labels for the ui deployment.
 */}}
 {{- define "sourcify.ui.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "sourcify.name" . }}-ui
-app: {{ .Chart.Name }}-ui
+app.kubernetes.io/name: {{ printf "%s-%s" .Chart.Name "ui" }}
 {{- end }}
 
 {{/*

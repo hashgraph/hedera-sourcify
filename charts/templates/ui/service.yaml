@@ -1,4 +1,4 @@
-{{- if .Values.sourcify.enabled }}
+{{- if .Values.ui.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -14,3 +14,4 @@ spec:
       name: https
   selector:
     {{- include "sourcify.ui.selectorLabels" . | nindent 4 }}
+{{- end }}

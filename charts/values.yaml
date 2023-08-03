@@ -100,3 +100,38 @@ monitor:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+
+ui:
+  ## Deploy sourcify ui
+  enabled: true
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+  replicaCount: 2
+  annotations: {}
+  podAnnotations: {}
+  podSecurityContext: {}
+  service:
+    type: "ClusterIP"
+    port: 443
+  image:
+    tag: "ui-latest"
+    pullPolicy: "IfNotPresent"
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "ui"
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: ""
+        paths: []
+    tls: []

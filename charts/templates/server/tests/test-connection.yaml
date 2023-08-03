@@ -1,9 +1,10 @@
+{{- if .Values.server.enabled }}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "repository.fullname" . }}-test-connection"
+  name: "{{ include "sourcify.fullname" . }}-server-test-connection"
   labels:
-    {{- include "repository.labels" . | nindent 4 }}
+    {{- include "sourcify.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -11,5 +12,6 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "repository.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ include "sourcify.fullname" . }}:{{ .Values.server.service.port }}']
   restartPolicy: Never
+{{- end }}  

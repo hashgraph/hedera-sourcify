@@ -4,7 +4,8 @@ kind: Deployment
 metadata:
   name: {{ template "sourcify.name" . }}-ui
   labels:
-    {{- include "sourcify.ui.labels" . | nindent 4 }}
+    {{- include "sourcify.labels" . | nindent 4 }}
+    {{- include "sourcify.ui.selectorLabels" . | nindent 4 }}
   {{- if .Values.ui.annotations }}
   annotations:
   {{ toYaml .Values.ui.annotations | indent 4 }}
@@ -15,7 +16,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-    {{- include "sourcify.ui.labels" . | nindent 6 }}
+    {{- include "sourcify.ui.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- if .Values.ui.podAnnotations }}
@@ -23,7 +24,7 @@ spec:
         {{- toYaml .Values.ui.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "ui.selectorLabels" . | nindent 8 }}
+        {{- include "sourcify.ui.selectorLabels" . | nindent 8 }}
     spec:
       {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -37,9 +38,9 @@ spec:
       containers:
         - name: {{ .Chart.Name }}-ui
           securityContext:
-            {{- toYaml .Values.ui,securityContext | nindent 12 }}
-          image: "{{ .Values.image.ui }}:{{ .Values.image.ui.tag | default "ui-latest" }}"
-          imagePullPolicy: {{ .Values.image.ui.pullPolicy }}
+            {{- toYaml .Values.ui.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.ui.image.tag | default "ui-latest" }}"
+          imagePullPolicy: {{ .Values.ui.image.pullPolicy }}
           ports:
             - name: https
               containerPort: 443

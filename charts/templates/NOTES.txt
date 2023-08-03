@@ -1,0 +1,4 @@
+{{ $.Chart.Name }} has been installed.  Check its status by running:
+kubectl get deployments -l "helm.sh/chart: {{ include "sourcify.chart" . }}" --all-namespaces
+
+Visit https://github.com/hashgraph/hedera-sourcify for up-to-date information about the Hedera Hashgraph sourcify project
