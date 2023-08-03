@@ -1,0 +1,17 @@
+{{- if .Values.repository.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "sourcify.fullname" . }}-repository
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.repository.service.type }}
+  ports:
+    - port: {{ .Values.repository.service.port }}
+      targetPort: https
+      protocol: TCP
+      name: https
+  selector:
+    {{- include "sourcify.repository.selectorLabels" . | nindent 4 }}
+{{- end }}
