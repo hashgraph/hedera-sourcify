@@ -7,29 +7,45 @@ image:
 repository:
   ## Deploy sourcify repository
   enabled: true
+
+  ## Confiure repository for autoscailing
   autoscaling:
     enabled: false
     minReplicas: 1
     maxReplicas: 10
     targetCPUUtilizationPercentage: 80
+
+  ## Set repository replica count
   replicaCount: 2
+
+  ## repository annotations and deployment configurations
   annotations: {}
-  podAnnotations: {}
-  podSecurityContext: {}
-  service:
-    type: "ClusterIP"
-    port: 443
-  image:
-    tag: "repository-latest"
-    pullPolicy: "IfNotPresent"
-  serviceAccount:
-    create: true
-    annotations: {}
-    name: "repository"
   resources: {}
   nodeSelector: {}
   affinity: {}
   tolerations: []
+
+  ## Annotations and securityContext for repository pods
+  podAnnotations: {} 
+  podSecurityContext: {}
+
+  ## Repository service configuration
+  service:
+    type: "ClusterIP"
+    port: 443
+
+  ## Repository image configuration, image repository is defined in the global image section above
+  image:
+    tag: "repository-latest"
+    pullPolicy: "IfNotPresent"
+
+  ## Repository serviceAccount creation and configuration
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "repository"
+
+  ## Repository ingress creation and configuration
   ingress:
     enabled: false
     className: ""
@@ -42,29 +58,45 @@ repository:
 server:
   ## Deploy sourcify server
   enabled: true
+
+  ## Confiure server for autoscailing
   autoscaling:
     enabled: false
     minReplicas: 1
     maxReplicas: 10
     targetCPUUtilizationPercentage: 80
+
+  ## Set server replica count
   replicaCount: 2
+
+  ## server annotations and deployment configurations
   annotations: {}
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+
+  ## Annotations and securityContext for server pods
   podAnnotations: {}
   podSecurityContext: {}
+
+  ## Server service configuration
   service:
     type: "ClusterIP"
     port: 443
+
+  ## Server image configuration, image repository is defined in the global image section above
   image:
     tag: "server-latest"
     pullPolicy: "IfNotPresent"
+
+  ## Server serviceAccount creation and configuration
   serviceAccount:
     create: true
     annotations: {}
     name: "server"
-  resources: {}
-  nodeSelector: {}
-  affinity: {}
-  tolerations: []
+
+  ## Server ingress creation and configuration
   ingress:
     enabled: false
     className: ""
@@ -73,60 +105,49 @@ server:
       - host: ""
         paths: []
     tls: []
-
-monitor:
-  ## Deploy sourcify monitor
-  enabled: false
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 10
-    targetCPUUtilizationPercentage: 80
-  replicaCount: 2
-  annotations: {}
-  podAnnotations: {}
-  podSecurityContext: {}
-  service:
-    type: "ClusterIP"
-    port: 443
-  image:
-    tag: "monitor-latest"
-    pullPolicy: "IfNotPresent"
-  serviceAccount:
-    create: true
-    annotations: {}
-    name: "monitor"
-  resources: {}
-  nodeSelector: {}
-  affinity: {}
-  tolerations: []
 
 ui:
   ## Deploy sourcify ui
   enabled: true
+
+  ## Confiure ui for autoscailing
   autoscaling:
     enabled: false
     minReplicas: 1
     maxReplicas: 10
     targetCPUUtilizationPercentage: 80
+
+  ## Set ui replica count
   replicaCount: 2
+
+  ## UI annotations and deployment configurations
   annotations: {}
-  podAnnotations: {}
-  podSecurityContext: {}
-  service:
-    type: "ClusterIP"
-    port: 443
-  image:
-    tag: "ui-latest"
-    pullPolicy: "IfNotPresent"
-  serviceAccount:
-    create: true
-    annotations: {}
-    name: "ui"
   resources: {}
   nodeSelector: {}
   affinity: {}
   tolerations: []
+
+  ## Annotations and securityContext for ui pods
+  podAnnotations: {}
+  podSecurityContext: {}
+
+  ## UI service configuration
+  service:
+    type: "ClusterIP"
+    port: 443
+
+  ## UI image configuration, image repository is defined in the global image section above
+  image:
+    tag: "ui-latest"
+    pullPolicy: "IfNotPresent"
+
+  ## UI serviceAccount creation and configuration
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "ui"
+
+  ## UI ingress creation and configuration
   ingress:
     enabled: false
     className: ""
@@ -135,3 +156,48 @@ ui:
       - host: ""
         paths: []
     tls: []
+
+
+monitor:
+  ## Deploy sourcify monitor
+  enabled: false
+
+  ## Confiure monitor for autoscailing
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+
+  ## Set monitor replica count
+  replicaCount: 2
+
+  ## monitor annotations and deployment configurations
+  annotations: {}
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+
+  ## Annotations and securityContext for monitor pods
+  podAnnotations: {}
+  podSecurityContext: {}
+
+  ## Monitor service configuration
+  service:
+    type: "ClusterIP"
+    port: 443
+
+  ## Monitor image configuration, image repository is defined in the global image section above
+  image:
+    tag: "monitor-latest"
+    pullPolicy: "IfNotPresent"
+
+  ## Monitor serviceAccount creation and configuration
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "monitor"
+
+
+
