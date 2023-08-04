@@ -21,12 +21,11 @@ Install:
 
 From the root of the project workspace:
 
-1. Run `./scripts/hedera-apply-patch.sh`. (Run only once) this will patch the `h5ai-nginx` submodule.
-2. Run `npm ci`. This will create populate and link `node_modules`.
-3. `cp environments/.env.dev.hedera  environments/.env`
-4. Make sure the following variables defined in `.env` point to directories which exist on the file system: `REPOSITORY_PATH, SOLC_REPO, SOLJSON_REPO`
-5. Run `npx lerna bootstrap && npx lerna run build`. This will build the server and ui as well as needed libraries.
-6. Run `docker-compose -f environments/docker-compose-hedera.yaml build repository`. This will build the docker image for the repository service.
+1. Run `npm ci`. This will create populate and link `node_modules`.
+2. `cp environments/.env.dev.hedera  environments/.env`
+3. Make sure the following variables defined in `.env` point to directories which exist on the file system: `REPOSITORY_PATH, SOLC_REPO, SOLJSON_REPO`
+4. Run `npx lerna bootstrap && npx lerna run build`. This will build the server and ui as well as needed libraries.
+5. Run `docker-compose -f environments/docker-compose-hedera.yaml build repository`. This will build the docker image for the repository service.
 
 ## Run
 
