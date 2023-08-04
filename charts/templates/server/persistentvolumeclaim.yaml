@@ -1,0 +1,20 @@
+{{- if and .Values.server.enabled .Values.server.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "sourcify.name" . }}-server-pvc
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+    {{- include "sourcify.server.selectorLabels" . | nindent 4 }}
+  {{- if .Values.server.annotations }}
+  annotations:
+  {{ toYaml .Values.server.annotations | indent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+  - {{ .Values.server.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.server.persistence.size }}
+  storageClassName: {{ .Values.server.persistence.storageClassName }}
+  {{- end }}

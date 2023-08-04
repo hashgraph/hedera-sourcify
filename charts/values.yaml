@@ -106,6 +106,16 @@ server:
         paths: []
     tls: []
 
+  ## Server persistent volume configuration
+  persistence:
+    enabled: false
+    ## Server persistent volume size
+    size: 100Gi
+    ## Server persistent volume storage class
+    storageClass: "standard"
+    ## Server persistent volume access mode
+    accessMode: "ReadWriteOnce"
+
 ui:
   ## Deploy sourcify ui
   enabled: true

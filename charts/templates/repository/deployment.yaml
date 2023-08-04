@@ -57,6 +57,10 @@ spec:
           resources:
             {{- toYaml .Values.repository.resources | nindent 12 }}
           {{- end }}
+          volumeMount:
+            - name: {{ template "sourcify.name" . }}-server-pvc
+              mountPath: /data
+              readOnly: true        
       {{- if .Values.repository.nodeSelector }}
       nodeSelector:
         {{- toYaml .Values.repository.nodeSelector | nindent 8 }}
@@ -69,4 +73,9 @@ spec:
       tolerations:
         {{- toYaml .Values.repository.tolerations | nindent 8 }}
       {{- end }}
+      {{- if .Values.server.persistence.enabled }}
+      volumes:
+        - name: {{ .Chart.Name }}-server
+          persistentVolumeClaim:
+            claimName: {{ template "sourcify.name" . }}-server-pvc      {{- end }}      
 {{- end -}}
