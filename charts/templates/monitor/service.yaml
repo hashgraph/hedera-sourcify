@@ -1,0 +1,17 @@
+{{- if .Values.monitor.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "sourcify.fullname" . }}-monitor
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.monitor.service.type }}
+  ports:
+    - port: {{ .Values.monitor.service.port }}
+      targetPort: https
+      protocol: TCP
+      name: https
+  selector:
+    {{- include "sourcify.monitor.selectorLabels" . | nindent 4 }}
+{{- end }}    

@@ -1,0 +1,17 @@
+{{- if .Values.repository.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "sourcify.fullname" . }}-repo-test-connection"
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "sourcify.fullname" . }}:{{ .Values.repository.service.port }}']
+  restartPolicy: Never
+{{- end }}  

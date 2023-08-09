@@ -1,0 +1,213 @@
+nameoOverride: ""
+fullnameOverride: ""
+imagePullSecrets: []
+image:
+  repository: "ghcr.io/hashgraph/hedera-sourcify"
+
+repository:
+  ## Deploy sourcify repository
+  enabled: true
+
+  ## Confiure repository for autoscailing
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+
+  ## Set repository replica count
+  replicaCount: 1
+
+  ## repository annotations and deployment configurations
+  annotations: {}
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+
+  ## Annotations and securityContext for repository pods
+  podAnnotations: {} 
+  podSecurityContext: {}
+
+  ## Repository service configuration
+  service:
+    type: "ClusterIP"
+    port: 443
+
+  ## Repository image configuration, image repository is defined in the global image section above
+  image:
+    tag: "repository-latest"
+    pullPolicy: "IfNotPresent"
+
+  ## Repository serviceAccount creation and configuration
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "repository"
+
+  ## Repository ingress creation and configuration
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: ""
+        paths: []
+    tls: []
+
+server:
+  ## Deploy sourcify server
+  enabled: true
+
+  ## Confiure server for autoscailing
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+
+  ## Set server replica count
+  replicaCount: 1
+
+  ## server annotations and deployment configurations
+  annotations: {}
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+
+  ## Annotations and securityContext for server pods
+  podAnnotations: {}
+  podSecurityContext: {}
+
+  ## Server service configuration
+  service:
+    type: "ClusterIP"
+    port: 443
+
+  ## Server image configuration, image repository is defined in the global image section above
+  image:
+    tag: "server-latest"
+    pullPolicy: "IfNotPresent"
+
+  ## Server serviceAccount creation and configuration
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "server"
+
+  ## Server ingress creation and configuration
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: ""
+        paths: []
+    tls: []
+
+  ## Server persistent volume configuration
+  persistence:
+    enabled: false
+    ## Server persistent volume size
+    size: 100Gi
+    ## Server persistent volume storage class
+    storageClass: "standard"
+    ## Server persistent volume access mode
+    accessMode: "ReadWriteOnce"
+
+ui:
+  ## Deploy sourcify ui
+  enabled: true
+
+  ## Confiure ui for autoscailing
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+
+  ## Set ui replica count
+  replicaCount: 1
+
+  ## UI annotations and deployment configurations
+  annotations: {}
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+
+  ## Annotations and securityContext for ui pods
+  podAnnotations: {}
+  podSecurityContext: {}
+
+  ## UI service configuration
+  service:
+    type: "ClusterIP"
+    port: 443
+
+  ## UI image configuration, image repository is defined in the global image section above
+  image:
+    tag: "ui-latest"
+    pullPolicy: "IfNotPresent"
+
+  ## UI serviceAccount creation and configuration
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "ui"
+
+  ## UI ingress creation and configuration
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: ""
+        paths: []
+    tls: []
+
+
+monitor:
+  ## Deploy sourcify monitor
+  enabled: false
+
+  ## Confiure monitor for autoscailing
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+
+  ## Set monitor replica count
+  replicaCount: 1
+
+  ## monitor annotations and deployment configurations
+  annotations: {}
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+
+  ## Annotations and securityContext for monitor pods
+  podAnnotations: {}
+  podSecurityContext: {}
+
+  ## Monitor service configuration
+  service:
+    type: "ClusterIP"
+    port: 443
+
+  ## Monitor image configuration, image repository is defined in the global image section above
+  image:
+    tag: "monitor-latest"
+    pullPolicy: "IfNotPresent"
+
+  ## Monitor serviceAccount creation and configuration
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "monitor"
+
+
+
