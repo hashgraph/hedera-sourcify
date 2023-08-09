@@ -16,7 +16,7 @@ repository:
     targetCPUUtilizationPercentage: 80
 
   ## Set repository replica count
-  replicaCount: 2
+  replicaCount: 1
 
   ## repository annotations and deployment configurations
   annotations: {}
@@ -67,7 +67,7 @@ server:
     targetCPUUtilizationPercentage: 80
 
   ## Set server replica count
-  replicaCount: 2
+  replicaCount: 1
 
   ## server annotations and deployment configurations
   annotations: {}
@@ -128,7 +128,7 @@ ui:
     targetCPUUtilizationPercentage: 80
 
   ## Set ui replica count
-  replicaCount: 2
+  replicaCount: 1
 
   ## UI annotations and deployment configurations
   annotations: {}
@@ -180,7 +180,7 @@ monitor:
     targetCPUUtilizationPercentage: 80
 
   ## Set monitor replica count
-  replicaCount: 2
+  replicaCount: 1
 
   ## monitor annotations and deployment configurations
   annotations: {}
