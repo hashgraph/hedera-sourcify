@@ -20,3 +20,8 @@ RUN npm run build
 FROM nginx:alpine
 COPY --from=builder /home/node/app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy entrypoint
+COPY ui-entrypoint.sh /docker-entrypoint.d/
+RUN chmod +x /docker-entrypoint.d/ui-entrypoint.sh
+
