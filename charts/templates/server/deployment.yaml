@@ -26,7 +26,7 @@ spec:
       labels:
         {{- include "sourcify.server.selectorLabels" . | nindent 8 }}
     spec:
-      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -37,8 +37,10 @@ spec:
       {{- end }}  
       containers:
         - name: {{ .Chart.Name }}-server
+          {{- with .Values.server.securityContext  }}
           securityContext:
-            {{- toYaml .Values.server.securityContext | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}  
           image: "{{ .Values.image.repository }}:{{ .Values.server.image.tag | default "server-latest" }}"
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           ports:
