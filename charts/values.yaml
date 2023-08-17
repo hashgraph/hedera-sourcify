@@ -55,6 +55,9 @@ repository:
         paths: []
     tls: []
 
+  config:
+    url: localhost    
+
 server:
   ## Deploy sourcify server
   enabled: true

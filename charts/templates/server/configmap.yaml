@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-%s-%s" "sourcify.name" "config" "server"}}
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+    {{- include "sourcify.server.selectorLabels" . | nindent 4 }}
+data:
+  REPOSITORY_PATH: {{ template "sourcify.fullname" . }}-repository # Repository service name in the same namespace
+  SERVER_PORT: {{ .Values.server.service.port }}
+  REPOSITORY_SERVER_URL: {{ .Values.repository.config.url }}
