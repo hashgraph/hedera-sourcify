@@ -1,3 +1,4 @@
+{{- if .Values.server.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -8,4 +9,5 @@ metadata:
 data:
   REPOSITORY_PATH: {{ template "sourcify.fullname" . }}-repository # Repository service name in the same namespace
   SERVER_PORT: {{ .Values.server.service.port }}
-  REPOSITORY_SERVER_URL: {{ .Values.repository.config.url }}
+  SERVER_URL: {{ .Values.repository.config.url }}
+{{- end }}
