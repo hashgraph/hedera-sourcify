@@ -45,14 +45,6 @@ spec:
             - name: https
               containerPort: 443
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: https
-          readinessProbe:
-            httpGet:
-              path: /
-              port: https
           {{- if .Values.repository.resources }}
           resources:
             {{- toYaml .Values.repository.resources | nindent 12 }}

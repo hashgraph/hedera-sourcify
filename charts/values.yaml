@@ -32,7 +32,7 @@ repository:
   ## Repository service configuration
   service:
     type: "ClusterIP"
-    port: 443
+    port: 80
 
   ## Repository image configuration, image repository is defined in the global image section above
   image:
@@ -83,7 +83,7 @@ server:
   ## Server service configuration
   service:
     type: "ClusterIP"
-    port: 443
+    port: 5555
 
   ## Server image configuration, image repository is defined in the global image section above
   image:
