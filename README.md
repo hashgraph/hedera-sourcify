@@ -60,15 +60,18 @@ or build the images locally.
 
 ### Build steps
 
-1. `cp environments/.env.docker.hedera  environments/.env`
-2. Run `docker-compose -f environments/build-ui.yaml build`.
-3. Run `docker-compose -f environments/build-server.yaml build`.
-4. Run `docker-compose -f environments/build-repository.yaml build`.
+1. Run `docker-compose -f environments/build-ui.yaml build`.
+2. Run `docker-compose -f environments/build-server.yaml build`.
+3. Run `docker-compose -f environments/build-repository.yaml build`.
 
 ### Run
 
-1. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
-2. `Open http://localhost:1234` to bring up the Verifier page.
+1. `cp environments/.env.docker.hedera  environments/.env`
+2. Adjust the configuration as follows:
+    * Replace all occurences of `localhost` by the fully qualified hostname if not running locally
+    * Use port 5555 instead of 5000 if running on a Mac
+3. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
+4. `Open http://localhost:1234` to bring up the Verifier page.
 
 ### Stop
 
