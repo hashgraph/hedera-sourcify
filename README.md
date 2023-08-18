@@ -32,7 +32,7 @@ From the root of the project workspace:
 
 ### Run
 
-* Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository`. This will start repository service.
+* Run `docker-compose -f environments/repository.yaml up -d`. This will start repository service.
 * Run `npm run server:start`. This will start the server.
 * In a different terminal, run `cd ui; npm run start`. This will start and bring up the UI.
 
@@ -63,7 +63,7 @@ or build the images locally.
 1. `cp environments/.env.docker.hedera  environments/.env`
 2. Run `docker-compose -f environments/build-ui.yaml build`.
 3. Run `docker-compose -f environments/build-server.yaml build`.
-4. Run `docker-compose -f environments/build-repository.yaml build.
+4. Run `docker-compose -f environments/build-repository.yaml build`.
 
 ### Run
 
