@@ -1,6 +1,23 @@
+declare global {
+  interface Window {
+    // adding custom properties
+    configs: {
+      REPOSITORY_SERVER_URL: string,
+      SERVER_URL: string,
+    }
+  }
+}
+
 export const REPOSITORY_SERVER_URL =
-  process.env.REACT_APP_REPOSITORY_SERVER_URL;
-export const SERVER_URL = process.env.REACT_APP_SERVER_URL;
+  window.configs?.REPOSITORY_SERVER_URL?.length > 0
+    ? window.configs.REPOSITORY_SERVER_URL
+    : process.env.REACT_APP_REPOSITORY_SERVER_URL
+
+export const SERVER_URL =
+  window.configs?.SERVER_URL?.length > 0
+    ? window.configs.SERVER_URL
+    : process.env.REACT_APP_SERVER_URL
+
 export const DOCS_URL = "https://docs.hedera.com";
 export const PLAYGROUND_URL = "https://playground.sourcify.dev";
 export const HASHSCAN_URL = "https://hashscan-latest.hedera-devops.com/"
