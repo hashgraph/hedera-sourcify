@@ -32,24 +32,31 @@ From the root of the project workspace:
 
 ### Run
 
-6. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository`. This will start repository service. 
-7. Run `npm run server:start`. This will start the server.
-7. In a different terminal, run `cd ui; npm run start`. This will start and bring up the UI.
+* Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository`. This will start repository service.
+* Run `npm run server:start`. This will start the server.
+* In a different terminal, run `cd ui; npm run start`. This will start and bring up the UI.
 
 ### Sanity check the configuration
 
 This assumes the default ports (per .env.dev.hedera) are used:
 
-1. `Open http://localhost:10000`. This should open the Repository select-contract-form. The options available for the Chain should be the 3 Hedera networks (mainnet, testnet, previewnet).
-2. `Open http://localhost:5555/chains`. This should return a JSON value containing the 3 Hedera networks
-3. `Open http://localhost:5555/files/contracts/296`. This should return a JSON value containing the addresses of all contracts verified on testnet (or report error "_Contracts have not been found!_" if nothing has been verified yet)
-4. `Open http://localhost:3000`. This should bring up the Verifier page.
+* `Open http://localhost:10000`. This should open the Repository select-contract-form. The options available for the Chain should be the 3 Hedera networks (mainnet, testnet, previewnet).
+* `Open http://localhost:5555/chains`. This should return a JSON value containing the 3 Hedera networks
+* `Open http://localhost:5555/files/contracts/296`. This should return a JSON value containing the addresses of all contracts verified on testnet (or report error "_Contracts have not been found!_" if nothing has been verified yet)
+* `Open http://localhost:3000`. This should bring up the Verifier page.
 
 ## Use Docker images
 
-Pre-built docker images can be pulled from the GitHub container repository.
-You may need to authenticate to the GitHub container registry at `ghcr.io` using a personal access token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
-Then follow Run step below.
+You can either use pre-built Docker images from the GitHub container repository 
+or build the images locally.
+
+### Pulling pre-built images
+
+* You may need to authenticate to the GitHub container registry at `ghcr.io` using a personal access token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
+* Run `docker pull ghcr.io/hashgraph/hedera-sourcify:ui-latest`
+* Run `docker pull ghcr.io/hashgraph/hedera-sourcify:server-latest`
+* Run `docker pull ghcr.io/hashgraph/hedera-sourcify:repository-latest`
+* Then follow _Run_ step below.
 
 ### Build steps
 
@@ -60,8 +67,8 @@ Then follow Run step below.
 
 ### Run
 
-- Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
-- `Open http://localhost:1234` to bring up the Verifier page.
+1. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
+2. `Open http://localhost:1234` to bring up the Verifier page.
 
 ### Stop
 
