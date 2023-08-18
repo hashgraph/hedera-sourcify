@@ -8,14 +8,17 @@
 
 Tools for verifying Hedera smart contracts using standard open source libraries.
 
-## Build
-
-### Prerequisites
+## Prerequisites
 
 Install:
 - [node](https://nodejs.org/en/about/)
 - [npm](https://www.npmjs.com/)
 - [Docker](https://docs.docker.com/engine/reference/commandline/docker/)
+
+Make sure the repository submodule h5ai-nginx is present:
+- `git submodule update --init --recursive`
+
+## Local build for development
 
 ### Steps
 
@@ -23,23 +26,46 @@ From the root of the project workspace:
 
 1. Run `npm ci`. This will create populate and link `node_modules`.
 2. `cp environments/.env.dev.hedera  environments/.env`
-3. Make sure the following variables defined in `.env` point to directories which exist on the file system: `REPOSITORY_PATH, SOLC_REPO, SOLJSON_REPO`
+3. Make sure the following variables defined in `.env` point to directories which exist on the file system: `REPOSITORY_PATH, SOLC_REPO, SOLJSON_REPO` (paths relative to the environments/ directory)
 4. Run `npx lerna bootstrap && npx lerna run build`. This will build the server and ui as well as needed libraries.
-5. Run `docker-compose -f environments/docker-compose-hedera.yaml build repository`. This will build the docker image for the repository service.
+5. Run `docker-compose -f environments/build-repository.yaml build`. This will build the docker image for the repository service.
 
-## Run
+### Run
 
 6. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository`. This will start repository service. 
 7. Run `npm run server:start`. This will start the server.
 7. In a different terminal, run `cd ui; npm run start`. This will start and bring up the UI.
 
-## Sanity check the configuration
+### Sanity check the configuration
 
 This assumes the default ports (per .env.dev.hedera) are used:
 
 1. `Open http://localhost:10000`. This should open the Repository select-contract-form. The options available for the Chain should be the 3 Hedera networks (mainnet, testnet, previewnet).
-2. `Open http://localhost:5555/files/contracts/296`. This should return a JSON value containing the addresses of all contracts verified on testnet.
-3. `Open http://localhost:3000`. This should bring up the Verifier page.
+2. `Open http://localhost:5555/chains`. This should return a JSON value containing the 3 Hedera networks
+3. `Open http://localhost:5555/files/contracts/296`. This should return a JSON value containing the addresses of all contracts verified on testnet (or report error "_Contracts have not been found!_" if nothing has been verified yet)
+4. `Open http://localhost:3000`. This should bring up the Verifier page.
+
+## Use Docker images
+
+Pre-built docker images can be pulled from the GitHub container repository.
+You may need to authenticate to the GitHub container registry at `ghcr.io` using a personal access token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
+Then follow Run step below.
+
+### Build steps
+
+1. `cp environments/.env.docker.hedera  environments/.env`
+2. Run `docker-compose -f environments/build-ui.yaml build`.
+3. Run `docker-compose -f environments/build-server.yaml build`.
+4. Run `docker-compose -f environments/build-repository.yaml build.
+
+### Run
+
+- Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
+- `Open http://localhost:1234` to bring up the Verifier page.
+
+### Stop
+
+- Run `docker-compose -f environments/docker-compose-hedera.yaml down`
 
 ## Support
 
