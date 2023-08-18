@@ -77,6 +77,13 @@ or build the images locally.
 
 - Run `docker-compose -f environments/docker-compose-hedera.yaml down`
 
+## Test
+
+### Basic non-regression server test
+
+1. Run `npm run server:start`.
+2. Run `npm run test:hedera`.
+
 ## Support
 
 If you have a question on how to use the product, please see our

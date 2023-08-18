@@ -32,7 +32,8 @@
     "cov:html": "c8 report --reporter=html",
     "cov:lcov": "c8 report --reporter=lcov",
     "cov:send": "run-s cov:lcov && codecov -F server -f coverage/lcov.info",
-    "cov:check": "c8 report && c8 check-coverage --lines 100 --functions 100 --branches 100"
+    "cov:check": "c8 report && c8 check-coverage --lines 100 --functions 100 --branches 100",
+    "test:hedera": "mocha test/hedera/test-server.js --exit"
   },
   "keywords": [
     "ethereum",
@@ -50,6 +51,7 @@
   "dependencies": {
     "@ethereum-sourcify/bytecode-utils": "*",
     "@ethereum-sourcify/lib-sourcify": "*",
+    "@hashgraph/sdk": "^2.31.0",
     "@types/node-fetch": "^2.5.7",
     "abitype": "0.8.0",
     "bunyan": "^1.8.12",

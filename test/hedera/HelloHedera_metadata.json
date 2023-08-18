@@ -1,0 +1,89 @@
+{
+  "compiler": {
+    "version": "0.8.7+commit.e28d00a7"
+  },
+  "language": "Solidity",
+  "output": {
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "message_",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "get_message",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "kill",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "message_",
+            "type": "string"
+          }
+        ],
+        "name": "set_message",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ],
+    "devdoc": {
+      "kind": "dev",
+      "methods": {},
+      "version": 1
+    },
+    "userdoc": {
+      "kind": "user",
+      "methods": {},
+      "version": 1
+    }
+  },
+  "settings": {
+    "compilationTarget": {
+      "contracts/HelloHedera.sol": "HelloHedera"
+    },
+    "evmVersion": "london",
+    "libraries": {},
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    },
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "remappings": []
+  },
+  "sources": {
+    "contracts/HelloHedera.sol": {
+      "keccak256": "0x72078cd9baf282e8e2cde2a3314f04a5e9144ae8e5d4a226565293782c1e427f",
+      "urls": [
+        "bzz-raw://5a3bce5036583328e895330ca89fa00b75b51c5bc2e1a3b4e34d5f2922053de9",
+        "dweb:/ipfs/QmYXeK74LZynfSa4ATCu5VPuRcQ7NLezPxwKqTycdaaRaB"
+      ]
+    }
+  },
+  "version": 1
+}
