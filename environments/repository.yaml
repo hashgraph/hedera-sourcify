@@ -20,10 +20,7 @@ networks:
 services:
   repository:
     <<: *project-base
-#    image: gcr.io/hedera-registry/hedera-sourcify:repository-${TAG}
-    build:
-      context: ../h5ai-nginx # Point to the /h5ai-nginx folder
-      dockerfile: Dockerfile
+    image: ghcr.io/hashgraph/hedera-sourcify:repository-${TAG}
     container_name: repository-${TAG}
     volumes:
       - <<: *project-repository-mount
