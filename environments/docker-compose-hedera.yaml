@@ -18,9 +18,6 @@ services:
   repository:
     <<: *project-base
     image: ghcr.io/hashgraph/hedera-sourcify:repository-latest
-    build:
-      context: ../h5ai-nginx
-      dockerfile: Dockerfile
     container_name: repository-latest
     volumes:
       - <<: *project-repository-mount
@@ -32,9 +29,6 @@ services:
   server:
     <<: *project-base
     image: ghcr.io/hashgraph/hedera-sourcify:server-latest
-    build:
-      context: ../
-      dockerfile: src/Dockerfile.server
     container_name: server-latest
     ports:
       - "${SERVER_EXTERNAL_PORT}:${SERVER_PORT}"
@@ -56,15 +50,6 @@ services:
   ui:
     <<: *project-base
     image: ghcr.io/hashgraph/hedera-sourcify:ui-latest
-    build:
-      context: ../ui
-      dockerfile: Dockerfile
-      # Pass SERVER_URL and REPOSITORY_SERVER_URL to be injected build time.
-      # Will be set in .env (see scripts/build_and_publish_docker_images.sh)
-      args:
-        - SERVER_URL=$SERVER_URL
-        - REPOSITORY_SERVER_URL=$REPOSITORY_SERVER_URL
-        - TAG=latest
     container_name: ui-latest
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]

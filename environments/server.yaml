@@ -16,10 +16,7 @@ networks:
 services:
   server:
     <<: *project-base
-#    image: gcr.io/hedera-registry/hedera-sourcify:server-${TAG}
-    build:
-      context: ../
-      dockerfile: src/Dockerfile.server
+    image: ghcr.io/hashgraph/hedera-sourcify:server-${TAG}
     container_name: server-${TAG}
     ports:
       - "${SERVER_EXTERNAL_PORT}:${SERVER_PORT}"
