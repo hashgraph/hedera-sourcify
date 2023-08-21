@@ -4,9 +4,80 @@ imagePullSecrets: []
 image:
   repository: "ghcr.io/hashgraph/hedera-sourcify"
 
+serverRepository:
+  ## Deploy sourcify server-repository
+  enabled: true
+
+  ## Confiure server-repository for autoscailing
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+
+  ## Set server-repository replica count
+  replicaCount: 1
+
+  ## server-repository annotations and deployment configurations
+  annotations: {}
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+
+  ## Annotations and securityContext for server-repository pods
+  podAnnotations: {}
+  podSecurityContext: {}
+
+  ## server-repository service configuration
+  service:
+    type: "ClusterIP"
+    port: 443
+
+  ## server-repository image configuration, image repository is defined in the global image section above
+  image:
+    server:
+      tag: "server-latest"
+    repository:
+      tag: "repository-latest"  
+    pullPolicy: "IfNotPresent"
+
+  ## server-repository serviceAccount creation and configuration
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "server-repository"
+
+  ## server-repository ingress creation and configuration
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: ""
+        paths: []
+    tls: []
+
+  ## server-repository persistent volume configuration
+  persistence:
+    enabled: false
+    ## server-repository persistent volume size
+    size: 100Gi
+    ## server-repository persistent volume storage class
+    storageClass: "standard"
+    ## server-repository persistent volume access mode
+    accessMode: "ReadWriteOnce"
+
+
+    ##############################
+    ##############################
+    ##############################
+    ##############################
+
+
 repository:
   ## Deploy sourcify repository
-  enabled: true
+  enabled: false
 
   ## Confiure repository for autoscailing
   autoscaling:
@@ -57,7 +128,7 @@ repository:
 
 server:
   ## Deploy sourcify server
-  enabled: true
+  enabled: false
 
   ## Confiure server for autoscailing
   autoscaling:

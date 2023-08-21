@@ -1,0 +1,109 @@
+{{- if .Values.serverRepository.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "sourcify.name" . }}-
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+    {{- include "sourcify.serverRepository.selectorLabels" . | nindent 4 }}
+  {{- if .Values.serverRepository.annotations }}
+  annotations:
+  {{ toYaml .Values.serverRepository.annotations | indent 4 }}
+  {{- end }}    
+spec:
+  {{- if not .Values.serverRepository.autoscaling.enabled }}
+  replicas: {{ .Values.serverRepository.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+    {{- include "sourcify.serverRepository.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- if .Values.serverRepository.podAnnotations }}
+      annotations:
+        {{- toYaml .Values.serverRepository.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "sourcify.serverRepository.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "sourcify.serverRepository.serviceAccountName" . }}
+      {{- if .Values.serverRepository.podSecurityContext}}
+      securityContext:
+        {{- toYaml .Values.serverRepository.podSecurityContext | nindent 8 }}
+      {{- end }}  
+      containers:
+        - name: {{ .Chart.Name }}-server
+          securityContext:
+            {{- toYaml .Values.serverRepository.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.server.tag | default "server-latest" }}"
+          imagePullPolicy: {{ .Values.serverRepository.image.pullPolicy }}
+          ports:
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: https
+          readinessProbe:
+            httpGet:
+              path: /
+              port: https
+          {{- if .Values.serverRepository.resources }}
+          resources:
+            {{- toYaml .Values.serverRepository.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: {{ template "sourcify.name" . }}--pvc
+              mountPath: /usr/etc/hedera
+        - name: {{ .Chart.Name }}-repository
+          securityContext:
+            {{- toYaml .Values.repository.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.repository.tag | default "repository-latest" }}"
+          imagePullPolicy: {{ .Values.repository.image.pullPolicy }}
+          ports:
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: https
+          readinessProbe:
+            httpGet:
+              path: /
+              port: https
+          {{- if .Values.repository.resources }}
+          resources:
+            {{- toYaml .Values.repository.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: {{ template "sourcify.name" . }}-server-pvc
+              mountPath: /data
+              readOnly: true                
+      {{- if .Values.serverRepository.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.serverRepository.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serverRepository.affinity }}
+      affinity:
+        {{- toYaml .Values.serverRepository.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serverRepository.tolerations }}
+      tolerations:
+        {{- toYaml .Values.serverRepository.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serverRepository.persistence.enabled }}
+      volumes:
+        - name: {{ .Chart.Name }}
+          persistentVolumeClaim:
+            claimName: {{ template "sourcify.name" . }}--pvc
+        {{- else }}
+        - name: {{ .Chart.Name }}
+          emptyDir: {}
+      {{- end }}
+{{- end -}}
