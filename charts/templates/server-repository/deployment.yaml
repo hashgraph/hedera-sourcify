@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "sourcify.name" . }}-
+  name: {{ template "sourcify.name" . }}
   labels:
     {{- include "sourcify.labels" . | nindent 4 }}
     {{- include "sourcify.serverRepository.selectorLabels" . | nindent 4 }}
@@ -26,7 +26,7 @@ spec:
       labels:
         {{- include "sourcify.serverRepository.selectorLabels" . | nindent 8 }}
     spec:
-      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -42,23 +42,23 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.server.tag | default "server-latest" }}"
           imagePullPolicy: {{ .Values.serverRepository.image.pullPolicy }}
           ports:
-            - name: https
-              containerPort: 443
+            - name: serviceport
+              containerPort: {{ .Values.serverRepository.service.server.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
-              port: https
+              port: serviceport
           readinessProbe:
             httpGet:
               path: /
-              port: https
+              port: serviceport
           {{- if .Values.serverRepository.resources }}
           resources:
             {{- toYaml .Values.serverRepository.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: {{ template "sourcify.name" . }}--pvc
+            - name: {{ template "sourcify.name" . }}-pv
               mountPath: /usr/etc/hedera
         - name: {{ .Chart.Name }}-repository
           securityContext:
@@ -66,23 +66,23 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.repository.tag | default "repository-latest" }}"
           imagePullPolicy: {{ .Values.repository.image.pullPolicy }}
           ports:
-            - name: https
-              containerPort: 443
+            - name: repositoryport
+              containerPort: {{ .Values.serverRepository.service.repository.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
-              port: https
+              port: repositoryport
           readinessProbe:
             httpGet:
               path: /
-              port: https
+              port: repositoryport
           {{- if .Values.repository.resources }}
           resources:
             {{- toYaml .Values.repository.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: {{ template "sourcify.name" . }}-server-pvc
+            - name: {{ template "sourcify.name" . }}-pv
               mountPath: /data
               readOnly: true                
       {{- if .Values.serverRepository.nodeSelector }}
@@ -101,7 +101,7 @@ spec:
       volumes:
         - name: {{ .Chart.Name }}
           persistentVolumeClaim:
-            claimName: {{ template "sourcify.name" . }}--pvc
+            claimName: {{ template "sourcify.name" . }}-pvc
         {{- else }}
         - name: {{ .Chart.Name }}
           emptyDir: {}

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ template "sourcify.name" . }}-serverRepository-pvc
+  name: {{ template "sourcify.name" . }}-pvc
   labels:
     {{- include "sourcify.labels" . | nindent 4 }}
     {{- include "sourcify.serverRepository.selectorLabels" . | nindent 4 }}

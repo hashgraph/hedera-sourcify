@@ -31,8 +31,12 @@ serverRepository:
 
   ## server-repository service configuration
   service:
-    type: "ClusterIP"
-    port: 443
+    server:
+      type: "ClusterIP"
+      port: 5555
+    repository:
+      type: "ClusterIP"
+      port: 10000
 
   ## server-repository image configuration, image repository is defined in the global image section above
   image:

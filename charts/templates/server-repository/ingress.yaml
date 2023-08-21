@@ -1,5 +1,5 @@
 {{- if .Values.serverRepository.ingress.enabled -}}
-{{- $fullName := printf "%s-%s" "sourcify.fullname" "serverRepository" -}}
+{{- $fullName := printf "%s-%s" "sourcify.fullname" "serverrepository" -}}
 {{- $svcPort := .Values.serverRepository.service.port -}}
 {{- if and .Values.serverRepository.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.serverRepository.ingress.annotations "kubernetes.io/ingress.class") }}
