@@ -62,28 +62,23 @@ serverRepository:
         paths: []
     tls: []
 
-  ## server-repository persistent volume configuration
+  ## server-repository persistent volume claim configuration
   persistence:
     enabled: false
     ## server-repository persistent volume size
     size: 100Gi
-    ## server-repository persistent volume storage class
-    storageClass: "standard"
+    ## server-repository persistent volume storage class - setting nil based on best practices [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#writing-portable-configuration)
+    storageClass: "nil"
     ## server-repository persistent volume access mode
     accessMode: "ReadWriteOnce"
-    ### Optionally set a unique volume type with settings
-    type: |-
-      gcePersistentDisk:
-        fsType: ext4
-        pdName: sourcify-volume
-        readOnly: false      
 
-
-    ##############################
-    ##############################
-    ##############################
-    ##############################
-
+  ## Configurations for the server-repository containers
+  config:
+    REPOSITORY_PATH: "/data"
+    SERVER_URL: "http://sourcify-server:5555"
+    REPOSITORY_SERVER_URL: "http://sourcify-repository"
+    TESTING: true
+    NODE_ENV: "development"
 
 repository:
   ## Deploy sourcify repository

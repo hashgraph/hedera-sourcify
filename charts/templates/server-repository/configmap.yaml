@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "sourcify.name" . }}
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+    {{- include "sourcify.serverRepository.selectorLabels" . | nindent 4 }}
+  {{- if .Values.serverRepository.annotations }}
+  annotations:
+  {{ toYaml .Values.serverRepository.annotations | indent 4 }}
+  {{- end }}    
+data:
+  REPOSITORY_PATH: {{ .Values.serverRepository.config.REPOSITORY_PATH }}
+  SERVER_URL: {{ .Values.serverRepository.config.SERVER_URL }}
+  REPOSITORY_SERVER_URL: {{ .Values.serverRepository.config.REPOSITORY_SERVER_URL }}
+  SERVER_PORT: {{ .Values.serverRepository.service.server.port | quote }}
+  SERVER_EXTERNAL_PORT: {{ .Values.serverRepository.service.server.port | quote }}
+  REPOSITORY_SERVER_PORT: {{ .Values.serverRepository.service.repository.port | quote }}
+  REPOSITORY_SERVER_EXTERNAL_PORT: {{ .Values.serverRepository.service.repository.port | quote }}
+  TESTING: {{ .Values.serverRepository.config.TESTING | quote }}
+  NODE_ENV: {{ .Values.serverRepository.config.NODE_ENV | default "development" }}
