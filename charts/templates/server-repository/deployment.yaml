@@ -45,20 +45,12 @@ spec:
             - name: serviceport
               containerPort: {{ .Values.serverRepository.service.server.port }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: serviceport
-          readinessProbe:
-            httpGet:
-              path: /
-              port: serviceport
           {{- if .Values.serverRepository.resources }}
           resources:
             {{- toYaml .Values.serverRepository.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: {{ template "sourcify.name" . }}-pv
+            - name: {{ .Chart.Name }}
               mountPath: /usr/etc/hedera
         - name: {{ .Chart.Name }}-repository
           securityContext:
@@ -69,20 +61,12 @@ spec:
             - name: repositoryport
               containerPort: {{ .Values.serverRepository.service.repository.port }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: repositoryport
-          readinessProbe:
-            httpGet:
-              path: /
-              port: repositoryport
           {{- if .Values.repository.resources }}
           resources:
             {{- toYaml .Values.repository.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: {{ template "sourcify.name" . }}-pv
+            - name: {{ .Chart.Name }}
               mountPath: /data
               readOnly: true                
       {{- if .Values.serverRepository.nodeSelector }}

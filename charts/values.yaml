@@ -71,6 +71,12 @@ serverRepository:
     storageClass: "standard"
     ## server-repository persistent volume access mode
     accessMode: "ReadWriteOnce"
+    ### Optionally set a unique volume type with settings
+    type: |-
+      gcePersistentDisk:
+        fsType: ext4
+        pdName: sourcify-volume
+        readOnly: false      
 
 
     ##############################

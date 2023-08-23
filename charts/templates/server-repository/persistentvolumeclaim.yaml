@@ -16,5 +16,5 @@ spec:
   resources:
     requests:
       storage: {{ .Values.serverRepository.persistence.size }}
-  storageClassName: {{ .Values.serverRepository.persistence.storageClassName }}
+  storageClassName: {{ .Values.serverRepository.persistence.storageClassName | default "nil" }}
   {{- end }}
