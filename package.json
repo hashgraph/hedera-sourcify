@@ -15,6 +15,7 @@
     "test": "TESTING=true DOTENV_CONFIG_PATH=./environments/.env c8 --reporter=none mocha -r dotenv/config --exit",
     "test:monitor": "TESTING=true DOTENV_CONFIG_PATH=./environments/.env mocha test/monitor.js --exit",
     "test:server": "TESTING=true DOTENV_CONFIG_PATH=./environments/.env mocha -r dotenv/config test/server.js --exit",
+    "test:hedera": "mocha test/test-server.js --exit",
     "test:chains": "TESTING=true mocha test/chains/chain-tests.js --reporter mochawesome --reporter-options reportDir=chain-tests-report,reportFilename=report --exit",
     "lint": "eslint . --ext .ts",
     "lint-tests": "eslint ./test --ext .js",
@@ -32,8 +33,7 @@
     "cov:html": "c8 report --reporter=html",
     "cov:lcov": "c8 report --reporter=lcov",
     "cov:send": "run-s cov:lcov && codecov -F server -f coverage/lcov.info",
-    "cov:check": "c8 report && c8 check-coverage --lines 100 --functions 100 --branches 100",
-    "test:hedera": "mocha test/hedera/test-server.js --exit"
+    "cov:check": "c8 report && c8 check-coverage --lines 100 --functions 100 --branches 100"
   },
   "keywords": [
     "ethereum",
@@ -54,6 +54,7 @@
     "@hashgraph/sdk": "^2.31.0",
     "@types/node-fetch": "^2.5.7",
     "abitype": "0.8.0",
+    "axios": "^1.4.0",
     "bunyan": "^1.8.12",
     "commander": "^9.0.0",
     "cors": "^2.8.5",
