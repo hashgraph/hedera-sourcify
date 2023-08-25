@@ -269,6 +269,12 @@ const sourcifyChainsExtensions: SourcifyChainsExtensionsObject = {
     monitored: false,
     contractFetchAddress: "https://hashscan.io/previewnet/" + ETHERSCAN_SUFFIX,
   },
+  "298": {
+    // Hedera Local
+    supported: true,
+    monitored: false,
+    contractFetchAddress: "https://hashscan.io/local/" + ETHERSCAN_SUFFIX,
+  },
   "300": {
     // Turned off as seems to be shut down
     supported: false,
@@ -1011,7 +1017,7 @@ export function getSortedChainsArray(
   const chainsArray = Object.values(chainMap);
   // Have Ethereum chains on top.
   // const ethereumChainIds = [1, 5, 11155111, 3, 4, 42];
-  const ethereumChainIds = [295, 296, 297];
+  const ethereumChainIds = [295, 296, 297, 298];
   const etherumChains = ethereumChainIds.map((id) => chainMap[id]);
   // Others, sorted alphabetically
   // const otherChains = chainsArray
