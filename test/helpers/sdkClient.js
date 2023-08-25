@@ -14,9 +14,12 @@ class SdkClient {
     } else if (network === 'testnet') {
       this.client = Client.forTestnet()
       this.chainId = 296
-    } else {
+    } else if (network === 'previewnet'){
       this.client = Client.forPreviewnet()
       this.chainId = 297
+    } else { // local
+      this.client = Client.forLocalNode()
+      this.chainId = 298
     }
     this.client.setOperator(accountId, privateKey)
     this.client.setDefaultMaxTransactionFee(new Hbar(100))
