@@ -51,6 +51,7 @@
   "dependencies": {
     "@ethereum-sourcify/bytecode-utils": "*",
     "@ethereum-sourcify/lib-sourcify": "*",
+    "@hashgraph/hedera-local": "^2.12.1",
     "@hashgraph/sdk": "^2.31.0",
     "@types/node-fetch": "^2.5.7",
     "abitype": "0.8.0",
