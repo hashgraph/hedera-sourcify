@@ -3,6 +3,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ printf "%s-%s" .Chart.Name "server" }}
+{{- if .Values.serverRepository.service.server.annotations }}
+  annotations:
+{{- toYaml .Values.serverRepository.service.server.annotations | nindent 4 }}
+{{- end }}  
   labels:
     {{- include "sourcify.labels" . | nindent 4 }}
 spec:
@@ -20,13 +24,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name:  {{ printf "%s-%s" .Chart.Name "repository" }}
+{{- if .Values.serverRepository.service.repository.annotations }}
+  annotations:
+{{- toYaml .Values.serverRepository.service.repository.annotations | nindent 4 }}
+{{- end }}  
   labels:
     {{- include "sourcify.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.serverRepository.service.type }}
   ports:
     - port: {{ .Values.serverRepository.service.repository.port }}
-      targetPort: http
+      targetPort: repositoryport
       protocol: TCP
       name: repositoryport
   selector:

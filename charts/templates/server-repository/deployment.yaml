@@ -41,6 +41,9 @@ spec:
             {{- toYaml .Values.serverRepository.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.server.tag | default "server-latest" }}"
           imagePullPolicy: {{ .Values.serverRepository.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "sourcify.name" . }}
           ports:
             - name: serviceport
               containerPort: {{ .Values.serverRepository.service.server.port }}
@@ -57,6 +60,9 @@ spec:
             {{- toYaml .Values.repository.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.repository.tag | default "repository-latest" }}"
           imagePullPolicy: {{ .Values.repository.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "sourcify.name" . }}          
           ports:
             - name: repositoryport
               containerPort: {{ .Values.serverRepository.service.repository.port }}
