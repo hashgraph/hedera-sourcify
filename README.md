@@ -81,10 +81,9 @@ or build the images locally.
 
 ### Basic non-regression server test
 
-1. `cp test/.env.test.hedera test/.env`
-2. Edit `test/.env` and provide account ID and private key to use to create a contract on testnet
-3. Run `npm run server:start`.
-4. Run `npm run test:hedera`.
+1. Make sure the variables HEDERA_NETWORK, OPERATOR_ACCOUNT_ID and OPERATOR_KEY are defined in `environments/.env`
+2. Run `npm run server:start`
+3. Run `npm run test:hedera`
 
 ## Support
 

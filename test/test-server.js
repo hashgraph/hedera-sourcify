@@ -4,7 +4,7 @@ const {describe, it} = require("mocha");
 const {expect} = require("chai");
 const SdkClient = require("./helpers/sdkClient");
 const fs = require("fs");
-require('dotenv').config({path: './test/.env'});
+require('dotenv').config({path: './environments/.env'});
 
 describe('Basic non-regression of hedera-sourcify server', function () {
 
