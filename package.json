@@ -27,6 +27,7 @@
     "monitor": "rimraf ./dist && tsc && node ./dist/monitor/monitor.js",
     "server:build": "npm run clean && npm run build",
     "server:start": "node ./dist/server/server.js",
+    "local-node:start": "hedera start --network local -d",
     "update-chains": "node --experimental-fetch scripts/updateChains.mjs && prettier --write src/chains.json",
     "test:unit": "TESTING=true DOTENV_CONFIG_PATH=./environments/.env c8 --silent mocha -r dotenv/config  --exit",
     "cov": "run-s -c build test:unit cov:html cov:lcov && open-cli coverage/index.html",
