@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import { ContextProvider } from "./Context";
-import LandingPage from "./pages/LandingPage";
 import Lookup from "./pages/Lookup";
 import Verifier from "./pages/Verifier";
 
