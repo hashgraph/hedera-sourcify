@@ -27,6 +27,9 @@ jobs:
       - name: Provide environment variables
         run: cp environments/.env.dev.hedera environments/.env
 
+      - name: Build hedera-sourcify server
+        run: npx lerna bootstrap && npx lerna run build
+
       - name: Start Hedera Local Node
         run: npm run local-node:start
 
