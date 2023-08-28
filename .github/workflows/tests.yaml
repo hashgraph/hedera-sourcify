@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Provide environment variables
-        run: cp environments/.en.dev.hedera environments/.env
+        run: cp environments/.env.dev.hedera environments/.env
 
       - name: Start Hedera Local Node
         run: npm run local-node:start
