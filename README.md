@@ -77,6 +77,15 @@ or build the images locally.
 
 - Run `docker-compose -f environments/docker-compose-hedera.yaml down`
 
+## Test
+
+### Basic non-regression server test
+
+1. Make sure the variables HEDERA_NETWORK, OPERATOR_ACCOUNT_ID and OPERATOR_KEY are defined in `environments/.env`
+2. Run `hedera start --network local -d`
+2. Run `npm run server:start`
+3. Run `npm run test:hedera`
+
 ## Support
 
 If you have a question on how to use the product, please see our

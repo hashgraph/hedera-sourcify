@@ -101,5 +101,26 @@
         "standard": "none"
       }
     ]
+  },
+  {
+    "name": "Hedera Local",
+    "chain": "Hedera",
+    "icon": "hedera",
+    "rpc": ["http://localhost:7546"],
+    "features": [{ "name": "EIP155" }, { "name": "EIP1559" }],
+    "faucets": ["https://portal.hedera.com"],
+    "nativeCurrency": { "name": "hbar", "symbol": "HBAR", "decimals": 18 },
+    "infoURL": "https://hedera.com",
+    "shortName": "hedera-local",
+    "chainId": 298,
+    "networkId": 298,
+    "slip44": 3030,
+    "explorers": [
+      {
+        "name": "HashScan",
+        "url": "http://localhost:8080/devnet/dashboard",
+        "standard": "none"
+      }
+    ]
   }
 ]
