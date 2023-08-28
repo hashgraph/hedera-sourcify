@@ -273,7 +273,7 @@ const sourcifyChainsExtensions: SourcifyChainsExtensionsObject = {
     // Hedera Local
     supported: true,
     monitored: false,
-    contractFetchAddress: "https://hashscan.io/local/" + ETHERSCAN_SUFFIX,
+    contractFetchAddress: "http://localhost:8080/devnet/" + ETHERSCAN_SUFFIX,
   },
   "300": {
     // Turned off as seems to be shut down

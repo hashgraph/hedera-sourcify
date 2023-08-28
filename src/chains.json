@@ -118,7 +118,7 @@
     "explorers": [
       {
         "name": "HashScan",
-        "url": "https://hashscan.io/localnode/dashboard",
+        "url": "http://localhost:8080/devnet/dashboard",
         "standard": "none"
       }
     ]
