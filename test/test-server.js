@@ -14,7 +14,7 @@ describe('Basic non-regression of hedera-sourcify server', function () {
   it('Should return correct verification status for newly created contract', async function () {
 
     // Grab Hedera network, account ID and private key from .env file
-    const network = process.env.HEDERA_NETWORK ?? 'previewnet'
+    const network = process.env.HEDERA_NETWORK ?? 'local'
     const accountId = process.env.OPERATOR_ACCOUNT_ID
     const privateKey = process.env.OPERATOR_KEY
     if (!accountId || !privateKey) {
