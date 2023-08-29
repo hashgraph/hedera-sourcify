@@ -26,10 +26,13 @@ spec:
       labels:
         {{- include "sourcify.ui.selectorLabels" . | nindent 8 }}
     spec:
-      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      envFrom:
+        - configMapRef:
+            name: {{ printf "%s-%s" .Chart.Name "ui"  }}
       serviceAccountName: {{ template "sourcify.ui.serviceAccountName" . }}
       {{- if .Values.ui.podSecurityContext}}
       securityContext:
@@ -42,17 +45,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.ui.image.tag | default "ui-latest" }}"
           imagePullPolicy: {{ .Values.ui.image.pullPolicy }}
           ports:
-            - name: https
-              containerPort: 443
+            - name: http
+              containerPort: 80
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: https
-          readinessProbe:
-            httpGet:
-              path: /
-              port: https
           {{- if .Values.ui.resources }}
           resources:
             {{- toYaml .Values.ui.resources | nindent 12 }}

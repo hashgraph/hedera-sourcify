@@ -48,9 +48,9 @@ spec:
             - name: serviceport
               containerPort: {{ .Values.serverRepository.service.server.port }}
               protocol: TCP
-          {{- if .Values.serverRepository.resources }}
+          {{- if .Values.serverRepository.server.resources }}
           resources:
-            {{- toYaml .Values.serverRepository.resources | nindent 12 }}
+            {{- toYaml .Values.serverRepository.server.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
             - name: {{ .Chart.Name }}
@@ -67,9 +67,9 @@ spec:
             - name: repositoryport
               containerPort: {{ .Values.serverRepository.service.repository.port }}
               protocol: TCP
-          {{- if .Values.repository.resources }}
+          {{- if .Values.serverRepository.repository.resources }}
           resources:
-            {{- toYaml .Values.repository.resources | nindent 12 }}
+            {{- toYaml .Values.serverRepository.repository.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
             - name: {{ .Chart.Name }}

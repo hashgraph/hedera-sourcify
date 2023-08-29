@@ -5,13 +5,17 @@ metadata:
   name: {{ template "sourcify.fullname" . }}-ui
   labels:
     {{- include "sourcify.labels" . | nindent 4 }}
+{{- if .Values.ui.service.annotations }}
+  annotations:
+{{- toYaml .Values.ui.service.annotations | nindent 4 }}
+{{- end }}      
 spec:
   type: {{ .Values.ui.service.type }}
   ports:
     - port: {{ .Values.ui.service.port }}
-      targetPort: https
+      targetPort: http
       protocol: TCP
-      name: https
+      name: http
   selector:
     {{- include "sourcify.ui.selectorLabels" . | nindent 4 }}
 {{- end }}
