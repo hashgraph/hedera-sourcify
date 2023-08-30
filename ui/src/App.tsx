@@ -22,21 +22,21 @@ function App() {
 
   return (
     <div className="flex min-h-screen text-gray-800 bg-gray-50">
-        <ContextProvider>
-            <HashRouter>
-                { loading
-                    ? (<div>Loading…</div>)
-                    : (
+        { loading
+            ? (<div>Loading…</div>)
+            : (
+                <ContextProvider>
+                    <HashRouter>
                         <Routes>
                             <Route path="/verifier" element={<Verifier />} />
                             <Route path="/lookup" element={<Lookup />} />
                             <Route path="/lookup/:address" element={<Lookup />} />
                             <Route path="/" element={<Verifier />} />
                         </Routes>
-                    )
-                }
-            </HashRouter>
-        </ContextProvider>
+                    </HashRouter>
+                </ContextProvider>
+            )
+        }
     </div>
   );
 }
