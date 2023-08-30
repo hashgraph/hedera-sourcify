@@ -7,6 +7,7 @@ server.log
 ui/node_modules/
 ui/dist/
 ui/.cache/
+ui/docker-config.json
 source-verify.dab
 dist/
 **/.env

@@ -13,6 +13,9 @@ describe('Basic non-regression of hedera-sourcify server', function () {
 
   it('Should return correct verification status for newly created contract', async function () {
 
+    let health = await axios.get(`${SERVER_URL}/health`)
+    console.log(`health: ${JSON.stringify(health.data)}`)
+
     // Grab Hedera network, account ID and private key from .env file
     const network = process.env.HEDERA_NETWORK ?? 'local'
     const accountId = process.env.OPERATOR_ACCOUNT_ID
@@ -36,14 +39,15 @@ describe('Basic non-regression of hedera-sourcify server', function () {
       "HelloHedera.sol"
     );
     const contractAddress = contractId.toSolidityAddress()
-    // console.log("Deployed contract Address is " + contractAddress);
+    console.log("Deployed contract Address is " + contractAddress);
 
     // Make call to Sourcify to check that contract is not verified
     const checkUrl = `${SERVER_URL}/check-by-addresses?addresses=${contractAddress}&chainIds=${chainId}`
 
     let response = await axios.get(checkUrl)
-    // console.log(`verification status for contract ${response.data[0].address} is: ${response.data[0].status}`);
+    console.log(`verification status for contract ${response.data[0].address} is: ${response.data[0].status}`);
     expect(response.data[0].status).to.equal('false');
+
 
     // Make call to Sourcify to submit contract verification
     const solidityFileContent = fs.readFileSync("./test/hello-hedera/HelloHedera.sol");
@@ -59,12 +63,12 @@ describe('Basic non-regression of hedera-sourcify server', function () {
     }
 
     response = await axios.post(`${SERVER_URL}/verify`, verificationData)
-    // console.log(`verification response: ${JSON.stringify(response.data)}`);
+    console.log(`verification response: ${JSON.stringify(response.data)}`);
     expect(response.data.result[0].status).to.equal('perfect');
 
     // Make call to Sourcify to check that contract is now verified
     response = await axios.get(checkUrl)
-    // console.log(`verification status for contract ${response.data[0].address} is: ${response.data[0].status}`);
+    console.log(`verification status for contract ${response.data[0].address} is: ${response.data[0].status}`);
     expect(response.data[0].status).to.equal('perfect');
 
     return Promise.resolve();

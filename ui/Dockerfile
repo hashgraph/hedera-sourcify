@@ -1,9 +1,6 @@
 FROM node:16-alpine AS builder
 
 # To be injected by create-react-app on build time 
-ARG SERVER_URL
-ARG REPOSITORY_SERVER_URL
-ARG IPNS
 ARG TAG
 
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
