@@ -1,5 +1,5 @@
   {
-    "SERVER_URL": "http://localhost:5556",
+    "SERVER_URL": "http://localhost:5555",
     "REPOSITORY_SERVER_URL": "http://localhost:10000",
     "HASHSCAN_URL": "https://hashscan-latest.hedera-devops.com"
   }
