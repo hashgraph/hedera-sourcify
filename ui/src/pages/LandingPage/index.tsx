@@ -27,8 +27,6 @@ import Button from "../../components/Button";
 import Header from "../../components/Header";
 import {
   DOCS_URL,
-  IPFS_IPNS_GATEWAY_URL,
-  REPOSITORY_SERVER_URL_FULL_MATCH,
 } from "../../constants";
 import ChartSection from "./ChartSection";
 import sourceCode from "./Contract.sol";
@@ -37,6 +35,7 @@ import metadata from "./metadata.json";
 import PoweredBySourcify from "./PoweredBySourcify";
 import ToolsPlugin from "./ToolsPlugin";
 import { Context } from "../../Context";
+import {configuration} from "../../utils/Configuration";
 
 AOS.init({
   duration: 800,
@@ -174,7 +173,7 @@ const LandingPage = () => {
                     alt="eth icon"
                   />
                   <a
-                    href={`${REPOSITORY_SERVER_URL_FULL_MATCH}/5/0x00878Ac0D6B8d981ae72BA7cDC967eA0Fae69df4`}
+                    href={`${configuration.repositoryServerUrlFullMatch}/5/0x00878Ac0D6B8d981ae72BA7cDC967eA0Fae69df4`}
                     className="link-underline break-all"
                   >
                     <b>Ethereum Görli</b> <br />
@@ -231,7 +230,7 @@ const LandingPage = () => {
               <p className="text-lg mt-4">
                 Sourcify's code is fully open-sourced. The repository of
                 verified contracts is completely public and decentralized by
-                being served over <A href={IPFS_IPNS_GATEWAY_URL}>IPFS</A>.
+                being served over <A href={configuration.ipfsIpnsGatewayUrl}>IPFS</A>.
               </p>
             </div>
           </div>
@@ -569,7 +568,7 @@ const LandingPage = () => {
               <FooterItem href="https://docs.sourcify.dev">
                 Documentation
               </FooterItem>
-              <FooterItem href={IPFS_IPNS_GATEWAY_URL}>
+              <FooterItem href={configuration.ipfsIpnsGatewayUrl}>
                 Contract Repository (IPFS)
               </FooterItem>
               <FooterItem href="https://github.com/sourcifyeth/assets">

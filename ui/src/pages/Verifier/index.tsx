@@ -3,12 +3,6 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import Header from "../../components/Header";
 import Toast from "../../components/Toast";
 import {
-  ADD_FILES_URL,
-  RESTART_SESSION_URL,
-  SESSION_DATA_URL,
-  VERIFY_VALIDATED_URL,
-  CREATE2_VERIFY_VALIDATED_URL,
-  CREATE2_COMPILE_URL,
   DOCS_URL,
 } from "../../constants";
 import { Context } from "../../Context";
@@ -23,6 +17,7 @@ import {
 } from "../../types";
 import CheckedContractsView from "./CheckedContractsView";
 import FileUpload from "./FileUpload";
+import {configuration} from "../../utils/Configuration";
 
 const UI_MAX_FILE_SIZE = 30 * 1024 * 1024;
 
@@ -119,7 +114,7 @@ const Verifier: React.FC = () => {
       ) {
         const formData = new FormData();
         formData.append("files", file);
-        await fetchAndUpdate(ADD_FILES_URL, {
+        await fetchAndUpdate(configuration.addFilesUrl, {
           method: "POST",
           body: formData,
         });
@@ -128,7 +123,7 @@ const Verifier: React.FC = () => {
       }
     }
     if (Object.keys(jsonBody.files).length > 0) {
-      await fetchAndUpdate(ADD_FILES_URL, {
+      await fetchAndUpdate(configuration.addFilesUrl, {
         method: "POST",
         body: JSON.stringify(jsonBody),
         headers: { "Content-Type": "application/json" },
@@ -137,7 +132,7 @@ const Verifier: React.FC = () => {
   };
 
   const restartSession = async () => {
-    await fetch(RESTART_SESSION_URL, {
+    await fetch(configuration.restartSessionUrl, {
       credentials: "include",
       method: "POST",
     });
@@ -154,7 +149,7 @@ const Verifier: React.FC = () => {
    */
   const verifyCheckedContract = async (sendable: VerificationInput) => {
     console.log("Verifying checkedContract " + sendable.verificationId);
-    return fetchAndUpdate(VERIFY_VALIDATED_URL, {
+    return fetchAndUpdate(configuration.verifyValidatedUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -174,7 +169,7 @@ const Verifier: React.FC = () => {
     sendable: Create2VerificationInput
   ) => {
     console.log("Verifying create2 checkedContract " + sendable.verificationId);
-    return fetchAndUpdate(CREATE2_VERIFY_VALIDATED_URL, {
+    return fetchAndUpdate(configuration.create2VerifyValidatedUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -190,7 +185,7 @@ const Verifier: React.FC = () => {
    */
   const verifyCreate2Compile = async (verificationId: string) => {
     console.log("Compiling create2 checkedContract " + verificationId);
-    return fetchAndUpdate(CREATE2_COMPILE_URL, {
+    return fetchAndUpdate(configuration.create2CompiledUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -200,7 +195,7 @@ const Verifier: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchAndUpdate(SESSION_DATA_URL);
+    fetchAndUpdate(configuration.sessionDataUrl);
   }, [fetchAndUpdate]);
 
   return (

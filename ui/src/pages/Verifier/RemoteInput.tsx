@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Input from "../../components/Input";
-import { ADD_FILES_URL } from "../../constants";
 import { SessionResponse } from "../../types";
+import {configuration} from "../../utils/Configuration";
 
 type RemoteInputProps = {
   fetchAndUpdate: (
@@ -32,7 +32,7 @@ const RemoteInput = ({
     } catch (_) {
       return setError("Enter a valid URL");
     }
-    fetchAndUpdate(ADD_FILES_URL + "?url=" + zipUrl, {
+    fetchAndUpdate(configuration.addFilesUrl + "?url=" + zipUrl, {
       method: "POST",
     }).finally(() => {
       setIsLoading(false);

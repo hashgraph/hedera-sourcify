@@ -11,9 +11,9 @@ import {
 } from "recharts";
 import AppIconName from "../../components/AppIconName";
 import LoadingOverlay from "../../components/LoadingOverlay";
-import { REPOSITORY_SERVER_URL } from "../../constants";
 import { Context } from "../../Context";
 import featured from "../../featured";
+import {configuration} from "../../utils/Configuration";
 
 type statsType = {
   [key: string]: {
@@ -135,7 +135,7 @@ const Featured = () => {
 const ChartSection = () => {
   const [stats, setStats] = useState<statsType>();
   useEffect(() => {
-    fetch(`${REPOSITORY_SERVER_URL}/stats.json`)
+    fetch(`${configuration.repositoryServerUrl}/stats.json`)
       .then((res) => res.json())
       .then((json) => setStats(json));
   }, []);

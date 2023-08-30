@@ -11,12 +11,11 @@ import ReactTooltip from "react-tooltip";
 import Button from "../../components/Button";
 import {
     DOCS_URL,
-    REPOSITORY_SERVER_URL_FULL_MATCH,
-    REPOSITORY_SERVER_URL_PARTIAL_MATCH,
 } from "../../constants";
 import { Context } from "../../Context";
 import { CheckAllByAddressResult } from "../../types";
 import { isBrowser } from "react-device-detect";
+import {configuration} from "../../utils/Configuration";
 
 type ResultProp = {
   response: CheckAllByAddressResult;
@@ -36,8 +35,8 @@ const generateUrl = (
 ) => {
   const REPO_URL =
     status === "partial"
-      ? REPOSITORY_SERVER_URL_PARTIAL_MATCH
-      : REPOSITORY_SERVER_URL_FULL_MATCH;
+      ? configuration.repositoryServerUrlPartialMatch
+      : configuration.repositoryServerUrlFullMatch;
   if (type === URL_TYPE.REMIX)
     return `https://remix.ethereum.org/?#activate=sourcify&call=sourcify//fetchAndSave//${address}//${chainId}`;
   return `${REPO_URL}/${chainId}/${address}/`;

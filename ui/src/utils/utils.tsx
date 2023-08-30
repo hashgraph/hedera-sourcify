@@ -1,4 +1,4 @@
-import { REPOSITORY_SERVER_URL } from "../constants";
+import {configuration} from "./Configuration";
 
 export const generateRepoLink = (
   chainId: string | number,
@@ -8,5 +8,5 @@ export const generateRepoLink = (
   let matchPath;
   if (matchStatus === "perfect") matchPath = "full_match";
   if (matchStatus === "partial") matchPath = "partial_match";
-  return `${REPOSITORY_SERVER_URL}/contracts/${matchPath}/${chainId}/${address}`;
+  return `${configuration.repositoryServerUrl}/contracts/${matchPath}/${chainId}/${address}`;
 };

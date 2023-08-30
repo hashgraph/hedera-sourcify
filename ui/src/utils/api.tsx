@@ -1,5 +1,5 @@
-import { SERVER_URL } from "../constants";
 import { Chain, CheckAllByAddressResult } from "../types";
+import {configuration} from "./Configuration";
 
 type ChainIdsResponse = {
   chainId: string;
@@ -17,7 +17,7 @@ export const checkAllByAddresses = async (
   chainIds: string
 ): Promise<CheckAllByAddressResult[]> => {
   const response = await fetch(
-    `${SERVER_URL}/checkAllByAddresses?addresses=${addresses}&chainIds=${chainIds}`,
+    `${configuration.serverUrl}/checkAllByAddresses?addresses=${addresses}&chainIds=${chainIds}`,
     {
       method: "GET",
     }
@@ -41,6 +41,7 @@ export const checkAllByAddresses = async (
  *
  */
 export const getSourcifyChains = async (): Promise<Chain[]> => {
-  const chainsArray = await (await fetch(`${SERVER_URL}/chains`)).json();
+    console.log(`getSourcifyChains - configuration.serverUrl: ${configuration.serverUrl}`)
+    const chainsArray = await (await fetch(`${configuration.serverUrl}/chains`)).json();
   return chainsArray;
 };

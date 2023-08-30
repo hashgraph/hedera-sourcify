@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import Input from "../../components/Input";
 import ChainSelect from "../../components/ChainSelect";
-import { ADD_FILES_FROM_CONTRACT_URL } from "../../constants";
 import { SessionResponse } from "../../types";
 import { SelectedOptionValue } from "react-select-search";
+import {configuration} from "../../utils/Configuration";
 
 type EtherscanInputProps = {
   fetchAndUpdate: (
@@ -47,7 +47,7 @@ const ContractInput = ({
     formData.append("address", address);
     formData.append("chainId", chainId);
 
-    fetchAndUpdate(ADD_FILES_FROM_CONTRACT_URL, {
+    fetchAndUpdate(configuration.addFilesFromContractUrl, {
       method: "POST",
       body: formData,
     }).finally(() => {
