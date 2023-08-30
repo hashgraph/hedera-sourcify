@@ -23,7 +23,7 @@ function App() {
   return (
     <div className="flex min-h-screen text-gray-800 bg-gray-50">
         { loading
-            ? (<div>Loading…</div>)
+            ? (<div></div>)
             : (
                 <ContextProvider>
                     <HashRouter>

@@ -69,6 +69,12 @@ export class Configuration {
 
     public readConfig = async (): Promise<void> =>  {
 
+        // await new Promise<void>((resolve, reject) => {
+        //     setTimeout(() => {
+        //         resolve()
+        //     }, 8000)
+        // })
+        //
         console.log(`Trying to read config at ${Configuration.CONFIGURATION_URL}`)
         const response = await axios.get<unknown>(Configuration.CONFIGURATION_URL)
         const configData = JSON.parse(JSON.stringify(response.data))
@@ -93,11 +99,6 @@ export class Configuration {
         this._create2CompiledUrl = `${this._serverUrl}/session/verify/create2/compile`;
         this._restartSessionUrl = `${this._serverUrl}/session/clear`;
 
-        // await new Promise<void>((resolve, reject) => {
-        //     setTimeout(() => {
-        //         resolve()
-        //     }, 3000)
-        // })
     }
 }
 
