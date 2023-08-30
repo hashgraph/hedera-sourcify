@@ -4,7 +4,6 @@ export class Configuration {
 
     public static CONFIGURATION_URL = `${window.location.origin}/config.json`
 
-    private _initialized: boolean
     private _serverUrl: string | undefined;
     private _repositoryServerUrl: string | undefined;
     private _repositoryServerUrlFullMatch: string | undefined;
@@ -19,15 +18,6 @@ export class Configuration {
     private _create2VerifyValidatedUrl: string | undefined;
     private _create2CompiledUrl: string | undefined;
     private _restartSessionUrl: string | undefined;
-
-    constructor() {
-        this._initialized = false
-        this.readConfig()
-    }
-
-    get initialized() {
-        return this._initialized;
-    }
 
     private _verifyFromEtherscan: string | undefined;
 
@@ -77,39 +67,37 @@ export class Configuration {
         return this._serverUrl ?? ""
     }
 
-    public readConfig = () => {
+    public readConfig = async (): Promise<void> =>  {
 
         console.log(`Trying to read config at ${Configuration.CONFIGURATION_URL}`)
-        axios.get<unknown>(Configuration.CONFIGURATION_URL)
-            .then((response) => {
-                console.log(`Got config: ${JSON.stringify(response.data)}`)
+        const response = await axios.get<unknown>(Configuration.CONFIGURATION_URL)
+        const configData = JSON.parse(JSON.stringify(response.data))
 
-                const configData = JSON.parse(JSON.stringify(response.data))
-                this._serverUrl = configData.SERVER_URL
-                this._repositoryServerUrl = configData.REPOSITORY_SERVER_URL
-                this._hashScanUrl = configData.HASHSCAN_URL
+        this._serverUrl = configData.SERVER_URL
+        this._repositoryServerUrl = configData.REPOSITORY_SERVER_URL
+        this._hashScanUrl = configData.HASHSCAN_URL
 
-                this._repositoryServerUrlFullMatch = `${this._repositoryServerUrl}/contracts/full_match`
-                this._repositoryServerUrlPartialMatch = `${this._repositoryServerUrl}/contracts/partial_match`
-                this._ipfsIpnsGatewayUrl = `https://cloudflare-ipfs.com/ipns/${configData.IPNS}`
+        this._repositoryServerUrlFullMatch = `${this._repositoryServerUrl}/contracts/full_match`
+        this._repositoryServerUrlPartialMatch = `${this._repositoryServerUrl}/contracts/partial_match`
+        this._ipfsIpnsGatewayUrl = `https://cloudflare-ipfs.com/ipns/${configData.IPNS}`
 
-                // SESSION API
-                this._sessionDataUrl = `${this._serverUrl}/session/data`;
-                this._addFilesUrl = `${this._serverUrl}/session/input-files`;
-                this._addSolcJsonUrl = `${this._serverUrl}/session/input-solc-json`;
-                this._addFilesFromContractUrl = `${this._serverUrl}/session/input-contract`;
-                this._verifyValidatedUrl = `${this._serverUrl}/session/verify-validated`;
-                this._verifyFromEtherscan = `${this._serverUrl}/session/verify/etherscan`;
+        // SESSION API
+        this._sessionDataUrl = `${this._serverUrl}/session/data`;
+        this._addFilesUrl = `${this._serverUrl}/session/input-files`;
+        this._addSolcJsonUrl = `${this._serverUrl}/session/input-solc-json`;
+        this._addFilesFromContractUrl = `${this._serverUrl}/session/input-contract`;
+        this._verifyValidatedUrl = `${this._serverUrl}/session/verify-validated`;
+        this._verifyFromEtherscan = `${this._serverUrl}/session/verify/etherscan`;
 
-                this._create2VerifyValidatedUrl = `${this._serverUrl}/session/verify/create2`;
-                this._create2CompiledUrl = `${this._serverUrl}/session/verify/create2/compile`;
-                this._restartSessionUrl = `${this._serverUrl}/session/clear`;
+        this._create2VerifyValidatedUrl = `${this._serverUrl}/session/verify/create2`;
+        this._create2CompiledUrl = `${this._serverUrl}/session/verify/create2/compile`;
+        this._restartSessionUrl = `${this._serverUrl}/session/clear`;
 
-                this._initialized = true
-            })
-            .catch((reason) => {
-                console.warn(`Failed to read config: ${reason}`)
-            })
+        // await new Promise<void>((resolve, reject) => {
+        //     setTimeout(() => {
+        //         resolve()
+        //     }, 3000)
+        // })
     }
 }
 
