@@ -7,7 +7,6 @@ server.log
 ui/node_modules/
 ui/dist/
 ui/.cache/
-ui/docker-config.json
 source-verify.dab
 dist/
 **/.env
@@ -24,3 +23,5 @@ logs
 chain-tests-report/
 coverage
 !src/server/controllers/repository
+environments/docker-config.json
+

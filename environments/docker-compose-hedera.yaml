@@ -58,7 +58,7 @@ services:
       retries: 10
     volumes:
       - type: bind
-        source: ../ui/docker-config.json
+        source: ./docker-config.json
         target: /usr/share/nginx/html/config.json
     ports:
       - "${UI_EXTERNAL_PORT}:80"

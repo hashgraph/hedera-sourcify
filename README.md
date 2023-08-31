@@ -56,7 +56,7 @@ or build the images locally.
 2. Adjust the configuration in `environments/.env` as follows:
     * Replace all occurrences of `localhost` by the fully qualified hostname if not running locally
     * Use port 5555 instead of 5000 if running on a Mac
-3. `cp ui/example-docker-config.json  ui/docker-config.json`
+3. `cp environments/example-docker-config.json  environments/docker-config.json`
     * Adjust the URLs in `docker-config.json` as needed
 4. You may need to authenticate to the GitHub container registry at `ghcr.io` using a personal access token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
 
