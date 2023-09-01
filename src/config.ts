@@ -1,13 +1,11 @@
 /* eslint-disable no-useless-escape */
 import * as dotenv from "dotenv";
 import path from "path";
-import { SourcifyEventManager } from "./common/SourcifyEventManager/SourcifyEventManager";
 import { logger } from "./common/loggerLoki";
 
 dotenv.config({ path: path.resolve(__dirname, "..", "environments/.env") });
 
 const setRepositoryPath = () => {
-  logger.warn(`using hostname: ${new URL(process.env.SERVER_URL ?? "").hostname}`)
   if (process.env.MOCK_REPOSITORY) return process.env.MOCK_REPOSITORY;
   if (process.env.REPOSITORY_PATH)
     return path.resolve(__dirname, process.env.REPOSITORY_PATH);
@@ -42,7 +40,7 @@ export default {
       process.env.NODE_ENV === "production" && process.env.TESTING !== "true", // Set Secure in the Set-Cookie header i.e. require https
   },
   corsAllowedOrigins: [
-    new RegExp(`^https?:\/\/${process.env.UI_DOMAIN_NAME}(?::\d+)?`),
+    new RegExp(`^https?:\/\/(?:.+\\.)?${process.env.UI_DOMAIN_NAME}(?::\d+)?`),                     // domain defined by UI_DOMAIN_NAME and subdomains
   ],
 };
 

@@ -36,30 +36,17 @@ type ChainName = "eth" | "polygon" | "arb" | "opt";
 
 const LOCAL_CHAINS: SourcifyChain[] = [
   new SourcifyChain({
-    name: "Ganache Localhost",
-    shortName: "Ganache",
-    chainId: 1337,
+    name: "Hedera Local",
+    shortName: "hedera-local",
+    chainId: 298,
     faucets: [],
-    infoURL: "localhost",
-    nativeCurrency: { name: "localETH", symbol: "localETH", decimals: 18 },
-    network: "testnet",
-    networkId: 1337,
-    rpc: [`http://localhost:8545`],
+    infoURL: "https://hedera.com",
+    nativeCurrency: { "name": "hbar", "symbol": "HBAR", "decimals": 18 },
+    network: "Hedera",
+    networkId: 298,
+    rpc: ["http://localhost:7546"],
     supported: true,
-    monitored: true,
-  }),
-  new SourcifyChain({
-    name: "Hardhat Network Localhost",
-    shortName: "Hardhat Network",
-    chainId: 31337,
-    faucets: [],
-    infoURL: "localhost",
-    nativeCurrency: { name: "localETH", symbol: "localETH", decimals: 18 },
-    network: "testnet",
-    networkId: 31337,
-    rpc: [`http://localhost:8545`],
-    supported: true,
-    monitored: true,
+    monitored: false,
   }),
 ];
 
@@ -268,12 +255,6 @@ const sourcifyChainsExtensions: SourcifyChainsExtensionsObject = {
     supported: true,
     monitored: false,
     contractFetchAddress: "https://hashscan.io/previewnet/" + ETHERSCAN_SUFFIX,
-  },
-  "298": {
-    // Hedera Local
-    supported: true,
-    monitored: false,
-    contractFetchAddress: "http://localhost:8080/devnet/" + ETHERSCAN_SUFFIX,
   },
   "300": {
     // Turned off as seems to be shut down
@@ -1011,28 +992,26 @@ export function getSortedChainsArray(
   chainMap: SourcifyChainMap
 ): SourcifyChain[] {
   function getPrimarySortKey(chain: any) {
-    return chain.name || chain.title;
+    return chain.chainId;
   }
 
   const chainsArray = Object.values(chainMap);
   // Have Ethereum chains on top.
   // const ethereumChainIds = [1, 5, 11155111, 3, 4, 42];
-  const ethereumChainIds = [295, 296, 297, 298];
-  const etherumChains = ethereumChainIds.map((id) => chainMap[id]);
+  const ethereumChainIds: number[] = [];
+  const ethereumChains = ethereumChainIds.map((id) => chainMap[id]);
   // Others, sorted alphabetically
-  // const otherChains = chainsArray
-  //   .filter((chain) => ![1, 5, 11155111, 3, 4, 42].includes(chain.chainId))
-  //   .sort((a, b) =>
-  //     getPrimarySortKey(a) > getPrimarySortKey(b)
-  //       ? 1
-  //       : getPrimarySortKey(b) > getPrimarySortKey(a)
-  //       ? -1
-  //       : 0
-  //   );
-  //
-  // const sortedChains = etherumChains.concat(otherChains);
-  // return sortedChains;
-  return etherumChains
+  const otherChains = chainsArray
+    .filter((chain) => ![1, 5, 11155111, 3, 4, 42].includes(chain.chainId))
+    .sort((a, b) =>
+      getPrimarySortKey(a) > getPrimarySortKey(b)
+        ? 1
+        : getPrimarySortKey(b) > getPrimarySortKey(a)
+        ? -1
+        : 0
+    );
+  const sortedChains = ethereumChains.concat(otherChains);
+  return sortedChains;
 }
 
 /**

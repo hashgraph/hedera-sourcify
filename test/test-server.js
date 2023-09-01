@@ -8,7 +8,7 @@ require('dotenv').config({path: './environments/.env'});
 
 describe('Basic non-regression of hedera-sourcify server', function () {
 
-  const SERVER_URL = process.env.SERVER_URL ?? "http://localhost:5555"
+  const SERVER_URL = process.env.SERVER_URL ?? "http://localhost:5000"
   this.timeout(20000) // Overwrite Mocha timeout of 2sec -> 20sec
 
   it('Should return correct verification status for newly created contract', async function () {
