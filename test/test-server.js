@@ -13,9 +13,9 @@ describe('Basic non-regression of hedera-sourcify server', function () {
 
   it('Should return correct verification status for newly created contract', async function () {
 
-    // console.log(`Contacting server at URL: ${SERVER_URL}`)
+    console.log(`Contacting server at URL: ${SERVER_URL}`)
     let health = await axios.get(`${SERVER_URL}/health`)
-    // console.log(`Server health: ${JSON.stringify(health.data)}`)
+    console.log(`Server health: ${JSON.stringify(health.data)}`)
 
     // Grab Hedera network, account ID and private key from .env file
     const network = process.env.HEDERA_NETWORK ?? 'local'
@@ -40,7 +40,7 @@ describe('Basic non-regression of hedera-sourcify server', function () {
       "HelloHedera.sol"
     );
     const contractAddress = contractId.toSolidityAddress()
-    // console.log("Deployed contract Address is " + contractAddress);
+    console.log("Deployed contract Address is " + contractAddress);
 
     // Make call to Sourcify to check that contract is not verified
     const checkUrl = `${SERVER_URL}/check-by-addresses?addresses=${contractAddress}&chainIds=${chainId}`
