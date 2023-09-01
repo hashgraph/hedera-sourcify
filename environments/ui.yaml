@@ -20,5 +20,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 10
+    volumes:
+      - type: bind
+        source: ./docker-config.json
+        target: /usr/share/nginx/html/config.json
     ports:
       - "${UI_EXTERNAL_PORT}:80"

@@ -3,7 +3,8 @@ import { HiMenu } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import ReactTooltip from "react-tooltip";
 import logoText from "../../assets/logo-rounded.svg";
-import { DOCS_URL, HASHSCAN_URL } from "../../constants";
+import { DOCS_URL } from "../../constants";
+import {configuration} from "../../utils/Configuration";
 
 const Header = () => {
   const [showNav, setShowNav] = useState(false);
@@ -61,7 +62,7 @@ const Header = () => {
           </a>
           <a
             className="link-underline mx-2 my-2 md:mx-6 hover:text-ceruleanBlue-500"
-            href={HASHSCAN_URL}
+            href={configuration.hashScanUrl}
           >
             HashScan
           </a>

@@ -23,3 +23,5 @@ logs
 chain-tests-report/
 coverage
 !src/server/controllers/repository
+environments/docker-config.json
+

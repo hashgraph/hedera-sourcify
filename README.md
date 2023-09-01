@@ -18,6 +18,9 @@ Install:
 Make sure the repository submodule h5ai-nginx is present:
 - `git submodule update --init --recursive`
 
+Apply the Hedera patch to the `h5ai-nginx` submodule (execute this only once).
+- `./scripts/hedera-apply-patch.sh`.
+
 ## Local build for development
 
 ### Steps
@@ -50,28 +53,33 @@ This assumes the default ports (per .env.dev.hedera) are used:
 You can either use pre-built Docker images from the GitHub container repository 
 or build the images locally.
 
+### Set-up
+
+1. `cp environments/.env.docker.hedera  environments/.env`
+2. Adjust the configuration in `environments/.env` as follows:
+    * Replace all occurrences of `localhost` by the fully qualified hostname if not running locally
+    * Use port 5555 instead of 5000 if running on a Mac
+3. `cp environments/example-docker-config.json  environments/docker-config.json`
+    * Adjust the URLs in `docker-config.json` as needed
+4. You may need to authenticate to the GitHub container registry at `ghcr.io` using a personal access token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
+
 ### Pulling pre-built images
 
-* You may need to authenticate to the GitHub container registry at `ghcr.io` using a personal access token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
 * Run `docker pull ghcr.io/hashgraph/hedera-sourcify:ui-latest`
 * Run `docker pull ghcr.io/hashgraph/hedera-sourcify:server-latest`
 * Run `docker pull ghcr.io/hashgraph/hedera-sourcify:repository-latest`
 * Then follow _Run_ step below.
 
-### Build steps
+### Build images
 
-1. Run `docker-compose -f environments/build-ui.yaml build`.
-2. Run `docker-compose -f environments/build-server.yaml build`.
-3. Run `docker-compose -f environments/build-repository.yaml build`.
+1. Run `docker-compose -f environments/build-ui.yaml build`
+2. Run `docker-compose -f environments/build-server.yaml build`
+3. Run `docker-compose -f environments/build-repository.yaml build`
 
 ### Run
 
-1. `cp environments/.env.docker.hedera  environments/.env`
-2. Adjust the configuration as follows:
-    * Replace all occurences of `localhost` by the fully qualified hostname if not running locally
-    * Use port 5555 instead of 5000 if running on a Mac
-3. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
-4. `Open http://localhost:1234` to bring up the Verifier page.
+1. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
+2. `Open http://localhost:1234` to bring up the Verifier page.
 
 ### Stop
 
@@ -83,8 +91,8 @@ or build the images locally.
 
 1. Make sure the variables HEDERA_NETWORK, OPERATOR_ACCOUNT_ID and OPERATOR_KEY are defined in `environments/.env`
 2. Run `hedera start --network local -d`
-2. Run `npm run server:start`
-3. Run `npm run test:hedera`
+3. Run `npm run server:start`
+4. Run `npm run test:hedera`
 
 ## Support
 

@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import Input from "../../components/Input";
 import ChainSelect from "../../components/ChainSelect";
-import { VERIFY_FROM_ETHERSCAN } from "../../constants";
 import { SessionResponse } from "../../types";
 import { Context } from "../../Context";
 import { isAddress } from "@ethersproject/address";
 import { SelectSearchProps, SelectedOptionValue } from "react-select-search";
+import {configuration} from "../../utils/Configuration";
 
 type EtherscanInputProps = {
   fetchAndUpdate: (
@@ -54,7 +54,7 @@ const EtherscanInput = ({
     formData.append("address", address);
     formData.append("chainId", chainId);
 
-    fetchAndUpdate(VERIFY_FROM_ETHERSCAN, {
+    fetchAndUpdate(configuration.verifyFromEtherscan, {
       method: "POST",
       body: formData,
     }).finally(() => {

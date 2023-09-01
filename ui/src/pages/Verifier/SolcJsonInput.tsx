@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { ADD_SOLC_JSON_URL } from "../../constants";
 import { SessionResponse } from "../../types";
 import SelectSearch, {
   SelectSearchProps,
@@ -7,6 +6,7 @@ import SelectSearch, {
 } from "react-select-search";
 import { fuzzySearch } from "react-select-search";
 import InputToggle from "../../components/InputToggle";
+import {configuration} from "../../utils/Configuration";
 
 const SOLC_VERSIONS_LIST_URL =
   "https://raw.githubusercontent.com/ethereum/solc-bin/gh-pages/bin/list.txt";
@@ -59,7 +59,7 @@ const SolcJsonInput = ({
     formData.append("files", selectedFile);
     formData.append("compilerVersion", chosenCompilerVersion);
 
-    fetchAndUpdate(ADD_SOLC_JSON_URL, {
+    fetchAndUpdate(configuration.addSolcJsonUrl, {
       method: "POST",
       body: formData,
     }).finally(() => {

@@ -26,5 +26,8 @@ services:
       - <<: *project-repository-mount
         target: /data
         read_only: true
+      - type: bind
+        source: ./docker-config.json
+        target: /redirects/config.json
     ports:
       - ${REPOSITORY_SERVER_EXTERNAL_PORT}:80

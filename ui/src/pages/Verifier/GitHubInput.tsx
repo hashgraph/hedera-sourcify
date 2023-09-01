@@ -3,9 +3,9 @@ import GitHubBranchSelect, {
   GitHubBranchSelectError,
 } from "../../components/GitHubBranchSelect";
 import Input from "../../components/Input";
-import { ADD_FILES_URL } from "../../constants";
 import { SessionResponse } from "../../types";
 import { SelectSearchProps, SelectedOptionValue } from "react-select-search";
+import {configuration} from "../../utils/Configuration";
 
 let timeoutId: any;
 
@@ -51,7 +51,7 @@ const GitHubInput = ({
     } catch (_) {
       return setError("Enter a valid URL");
     }
-    fetchAndUpdate(ADD_FILES_URL + "?url=" + zipUrl, {
+    fetchAndUpdate(configuration.addFilesUrl + "?url=" + zipUrl, {
       method: "POST",
     }).finally(() => {
       setIsLoading(false);
