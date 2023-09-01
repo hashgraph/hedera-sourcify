@@ -29,6 +29,7 @@ From the root of the project workspace:
 
 1. Run `npm ci`. This will create populate and link `node_modules`.
 2. `cp environments/.env.dev.hedera  environments/.env`
+   * Adjust `environments/.env` to use port 5555 instead of 5000 if running on a Mac
 3. Make sure the following variables defined in `.env` point to directories which exist on the file system: `REPOSITORY_PATH, SOLC_REPO, SOLJSON_REPO` (paths relative to the environments/ directory)
 4. Run `npx lerna bootstrap && npx lerna run build`. This will build the server and ui as well as needed libraries.
 5. Run `docker-compose -f environments/build-repository.yaml build`. This will build the docker image for the repository service.
