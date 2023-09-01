@@ -42,7 +42,7 @@ export default {
       process.env.NODE_ENV === "production" && process.env.TESTING !== "true", // Set Secure in the Set-Cookie header i.e. require https
   },
   corsAllowedOrigins: [
-    new RegExp(`^https?:\/\/${process.env.UI_DOMAIN_NAME}(?::\d+)?`),
+    new RegExp(`^https?:\/\/(?:.+\\.)?${process.env.UI_DOMAIN_NAME}(?::\d+)?`),                     // domain defined by UI_DOMAIN_NAME and subdomains
   ],
 };
 
