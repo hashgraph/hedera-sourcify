@@ -992,7 +992,7 @@ export function getSortedChainsArray(
   chainMap: SourcifyChainMap
 ): SourcifyChain[] {
   function getPrimarySortKey(chain: any) {
-    return chain.name || chain.title;
+    return chain.chainId;
   }
 
   const chainsArray = Object.values(chainMap);
