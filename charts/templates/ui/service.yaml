@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "sourcify.fullname" . }}-ui
+  name: {{ printf "%s-%s" .Chart.Name "ui" }}
   labels:
     {{- include "sourcify.labels" . | nindent 4 }}
 {{- if .Values.ui.service.annotations }}

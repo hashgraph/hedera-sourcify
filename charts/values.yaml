@@ -248,7 +248,7 @@ ui:
     SERVER_URL: "http://sourcify-server:5555"
     REPOSITORY_SERVER_URL: "http://sourcify-repository"
     TESTING: true
-    NODE_ENV: "development"        
+    NODE_ENV: "development"    
 
 
 monitor:
@@ -291,6 +291,8 @@ monitor:
     create: true
     annotations: {}
     name: "monitor"
+
+
 
 
 
