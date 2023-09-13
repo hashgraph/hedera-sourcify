@@ -9,8 +9,6 @@ metadata:
   annotations:
   {{ toYaml .Values.ui.annotations | indent 4 }}
   {{- end }}    
-data:
-  SERVER_URL: {{ .Values.ui.config.SERVER_URL }}
-  REPOSITORY_SERVER_URL: {{ .Values.ui.config.REPOSITORY_SERVER_URL }}
-  TESTING: {{ .Values.ui.config.TESTING | quote }}
-  NODE_ENV: {{ .Values.ui.config.NODE_ENV | default "development" }}
+data: 
+  config.json: |-
+   {{- .Values.ui.config | toJson  | squote | nindent 4 }}
