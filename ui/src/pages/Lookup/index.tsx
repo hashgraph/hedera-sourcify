@@ -84,6 +84,9 @@ const Lookup = () => {
             <Field loading={loading} handleRequest={handleRequest} />
           )}
         </div>
+        <div className="text-center text-xs italic mx-2 mt-1 text-gray-400">
+          <a href="https://hashscan.io/terms-of-service.html">See Terms of Service</a>
+        </div>
       </div>
     </div>
   );
