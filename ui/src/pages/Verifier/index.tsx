@@ -245,9 +245,9 @@ const Verifier: React.FC = () => {
           verifyCreate2Compile={verifyCreate2Compile}
         />
       </div>
-      <div className="text-xs italic mx-2 mt-1 text-gray-400">
-        Once a contract is verified it can't be removed from the Sourcify
-        repository.
+      <div className="text-center text-xs italic mx-2 mt-1 text-gray-400">
+        <p>Note: Once a contract is verified it can't be removed from the repository.</p>
+        <a href="https://hashscan.io/terms-of-service.html">See Terms of Service</a>
       </div>
     </div>
   );
