@@ -2,9 +2,7 @@ import bytes from "bytes";
 import { useCallback, useContext, useEffect, useState } from "react";
 import Header from "../../components/Header";
 import Toast from "../../components/Toast";
-import {
-  DOCS_URL,
-} from "../../constants";
+import { DOCS_URL, TERMS_OF_SERVICE_URL } from "../../constants";
 import { Context } from "../../Context";
 import {
   Create2VerificationInput,
@@ -247,7 +245,7 @@ const Verifier: React.FC = () => {
       </div>
       <div className="text-center text-xs italic mx-2 mt-1 text-gray-400">
         <p>Note: Once a contract is verified it can't be removed from the repository.</p>
-        <a href="https://hashscan.io/terms-of-service.html">See Terms of Service</a>
+        <a href={TERMS_OF_SERVICE_URL}>See Terms of Service</a>
       </div>
     </div>
   );
