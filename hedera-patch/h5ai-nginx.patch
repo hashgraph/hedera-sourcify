@@ -1,4 +1,4 @@
-Subject: [PATCH] h5ai-nginx patch
+Subject: [PATCH] h5ai-nginx gets value of SERVER_URL from config.json file.
 ---
 Index: select-contract-form/src/App.js
 IDEA additional info:
@@ -7,7 +7,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/select-contract-form/src/App.js b/select-contract-form/src/App.js
 --- a/select-contract-form/src/App.js	(revision 453a6681ef93a7a43ee339b5301743e27d7a3b62)
-+++ b/select-contract-form/src/App.js	(date 1693490213100)
++++ b/select-contract-form/src/App.js	(date 1695221204280)
 @@ -2,6 +2,7 @@
  import { useEffect, useRef, useState } from "react";
  import { Alert, Button, Card, Form, Spinner } from "react-bootstrap";
@@ -16,12 +16,13 @@ diff --git a/select-contract-form/src/App.js b/select-contract-form/src/App.js
  
  function App() {
    const [selectedMatch, setSelectedMatch] = useState("full_match");
-@@ -20,10 +21,14 @@
+@@ -20,13 +21,26 @@
    ];
  
    useEffect(() => {
 +    const getConfig = async () => {
 +      const configUrl = `${window.location.origin}/select-contract/config.json`
++      console.log(`Trying to read config from: ${configUrl}`)
 +      const response = await axios.get(configUrl)
 +      return JSON.parse(JSON.stringify(response.data))
 +    }
@@ -29,11 +30,25 @@ diff --git a/select-contract-form/src/App.js b/select-contract-form/src/App.js
 -      const serverUrl = window.configs?.SERVER_URL?.length > 0
 -          ? window.configs.SERVER_URL
 -          : "https://sourcify.dev/server"
+-      const chainsArray = await (
+-        await fetch(`${serverUrl}/chains`)
+-      ).json();
 +      const config = await (await getConfig())
 +      const serverUrl = config.SERVER_URL
-       const chainsArray = await (
-         await fetch(`${serverUrl}/chains`)
-       ).json();
++      let chainsArray
++      if (serverUrl !== undefined && serverUrl.toString().length > 0) {
++        console.log(`Using SERVER_URL: ${serverUrl}`)
++        console.log(`Trying to retrieve supported chains from: ${serverUrl}/chains`)
++        chainsArray = await (
++          await fetch(`${serverUrl}/chains`)
++        ).json();
++      } else {
++        console.warn(`SERVER_URL is not defined in config.json`)
++        chainsArray = []
++      }
+       return chainsArray;
+     };
+     getSourcifyChains()
 Index: select-contract-form/package.json
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
@@ -41,7 +56,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/select-contract-form/package.json b/select-contract-form/package.json
 --- a/select-contract-form/package.json	(revision 453a6681ef93a7a43ee339b5301743e27d7a3b62)
-+++ b/select-contract-form/package.json	(date 1693489764150)
++++ b/select-contract-form/package.json	(date 1695221204280)
 @@ -6,6 +6,7 @@
      "@testing-library/jest-dom": "^5.11.4",
      "@testing-library/react": "^11.1.0",
@@ -57,10 +72,10 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/select-contract-form/public/config.json b/select-contract-form/public/config.json
 new file mode 100644
---- /dev/null	(date 1693489764154)
-+++ b/select-contract-form/public/config.json	(date 1693489764154)
+--- /dev/null	(date 1695221304211)
++++ b/select-contract-form/public/config.json	(date 1695221304211)
 @@ -0,0 +1,3 @@
 +  {
-+    "SERVER_URL": "https://sourcify.dev/server"
++    "SERVER_URL": "http://localhost:5555"
 +  }
 \ No newline at end of file
