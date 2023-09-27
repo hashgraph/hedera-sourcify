@@ -11,4 +11,4 @@ metadata:
   {{- end }}    
 data: 
   config.json: |-
-   {{- .Values.ui.config | toJson  | squote | nindent 4 }}
+   {{- .Values.ui.config | toJson  | nindent 4 }}

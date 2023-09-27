@@ -37,6 +37,9 @@ spec:
       {{- end }}  
       containers:
         - name: {{ .Chart.Name }}-ui
+          env:
+          - name: UI_DOMAIN_NAME
+            value: {{ .Values.ui.env.UI_DOMAIN_NAME }}
           securityContext:
             {{- toYaml .Values.ui.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.ui.image.tag | default "ui-latest" }}"

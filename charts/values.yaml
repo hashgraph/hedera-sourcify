@@ -79,6 +79,8 @@ serverRepository:
     REPOSITORY_SERVER_URL: "http://sourcify-repository"
     TESTING: true
     NODE_ENV: "development"
+    ca_cert: ""
+    ca_key: ""
 
 repository:
   ## Deploy sourcify repository
@@ -249,11 +251,11 @@ ui:
     "SERVER_URL": "http://sourcify-server:5555",
     "REPOSITORY_SERVER_URL": "http://sourcify-repository:10000",
     "HASHSCAN_URL": "http://127.0.0.1:8080",
-    "UI_DOMAIN_NAME": "hedera-sourcify.expample.com",
-    "TESTING": true,
-    "NODE_ENV": "development"
     }
 
+## Pod environment variables for UI
+  env:
+    UI_DOMAIN_NAME: "sourcify.example.com"
 
 monitor:
   ## Deploy sourcify monitor

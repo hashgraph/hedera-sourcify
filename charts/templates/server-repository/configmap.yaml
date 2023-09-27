@@ -19,3 +19,32 @@ data:
   REPOSITORY_SERVER_EXTERNAL_PORT: {{ .Values.serverRepository.service.repository.port | quote }}
   TESTING: {{ .Values.serverRepository.config.TESTING | quote }}
   NODE_ENV: {{ .Values.serverRepository.config.NODE_ENV | default "development" }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-%s" .Chart.Name "adapter" }}
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+    {{- include "sourcify.serverRepository.selectorLabels" . | nindent 4 }}
+  {{- if .Values.serverRepository.annotations }}
+  annotations:
+  {{ toYaml .Values.serverRepository.annotations | indent 4 }}
+  {{- end }}
+data:
+  default.conf: |-
+    server {
+      listen 443 ssl;
+      http2 on;
+      server_name sourcify-server;
+      ssl_certificate /usr/local/share/ca-certificates/ca.crt;
+      ssl_certificate_key /usr/local/share/ca-certificates/ca.key;
+      location / {
+        proxy_pass http://localhost:5555;
+        proxy_set_header HOST $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_ssl_certificate /usr/local/share/ca-certificates/tls.crt;
+        proxy_ssl_certificate_key /usr/local/share/ca-certificates/tls.key;
+      }
+    }
