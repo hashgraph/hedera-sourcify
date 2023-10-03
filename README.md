@@ -93,6 +93,62 @@ or build the images locally.
 3. Run `npm run server:start`
 4. Run `npm run test:hedera`
 
+## Configuration
+
+The following tables describe the configuration items used by the different services
+
+### _ui_ module
+
+The _ui_ service is a single page application based on React. As such, it cannot be configured by environment variables at runtime.
+It reads it configuration from a file located at the following path: `/usr/share/nginx/html/config.json`
+In deployment, the actual configuration can be provided to the container via a mount point.
+
+Example contents for `config.json`:
+
+```config.json
+{
+    "SERVER_URL": "https://server.sourcify-integration.hedera-devops.com",
+    "REPOSITORY_SERVER_URL": "https://repository.sourcify-integration.hedera-devops.com",
+    "HASHSCAN_URL": "https://hashscan.io"
+}
+```
+### _server_ module
+
+The following environment variables are needed by the _server_ at runtime:
+
+| Name                    | Example value                                             | Description                                                                                         |
+|-------------------------|-----------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| `REPOSITORY_PATH`       | ../../data/repository                                     | DO NOT CHANGE - Path of the contract repository, both inside container and mount point on the host. |
+| `SOLC_REPO`             | /home/data/solc-bin/linux-amd64                           | Path where Solidity compiler binaries will be saved (inside container)                              |
+| `SOLJSON_REPO`          | /home/data/solc-bin/soljson                               | Path where Solidity JS compilers will be saved (inside container)                                   |
+| `SOLC_REPO_HOST`        | ../../data/solc-bin/linux-amd64                           | Mount point for the Solidity compiler binaries downloaded (on host machine)                         |
+| `SOLJSON_REPO_HOST`     | ../../data/solc-bin/soljson                               | Mount point for the Solidity JS compilers downloaded (on host machine)                              |
+| `SERVER_PORT`           | 80                                                        | HTTP port used inside container                                                                     |
+| `SERVER_EXTERNAL_PORT`  | 5002                                                      | HTTP port exposed by container                                                                      |
+| `UI_DOMAIN_NAME`        | sourcify-integration.hedera-devops.com                    | Fully qualified domain name of the host running the ui                                              |
+| `REPOSITORY_SERVER_URL` | https://repository.sourcify-integration.hedera-devops.com | URL of repository server (from outside the cluster)                                                 |
+| `TESTING`               | false                                                     | DO NOT CHANGE                                                                                       |
+| `TAG`                   | latest                                                    | DO NOT CHANGE                                                                                       |
+
+### _repository_ module
+
+The _repository_ service encompasses a single page application based on React and a web server.
+
+- Similar to the _ui_, the React part reads it configuration from a file located at the following path: `/redirects/config.json`
+In deployment, the actual configuration can be provided to the container via the same mount point as the one provided to the _ui_, 
+even though the only useful item for the _repository_ is the following:
+`"SERVER_URL": "https://server.sourcify-integration.hedera-devops.com"` value
+
+- The web server part needs the following environment variables at runtime:
+
+| Name                              | Example value                          | Description                                              |
+|-----------------------------------|----------------------------------------|----------------------------------------------------------|
+| `REPOSITORY_PATH`                 | ../../data/repository                  | Path of the contract repository mount point on the host. |
+| `REPOSITORY_SERVER_EXTERNAL_PORT` | 10000                                  | HTTP port exposed by container                           |
+| `UI_DOMAIN_NAME`                  | sourcify-integration.hedera-devops.com | Fully qualified domain name of the host running the ui   |
+| `TESTING`                         | false                                  | DO NOT CHANGE                                            |
+| `TAG`                             | latest                                 | DO NOT CHANGE                                            |
+
 ## Support
 
 If you have a question on how to use the product, please see our
