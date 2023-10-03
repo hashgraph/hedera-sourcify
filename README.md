@@ -29,8 +29,6 @@ From the root of the project workspace:
 
 1. Run `npm ci`. This will create populate and link `node_modules`.
 2. `cp environments/.env.dev.hedera  environments/.env`
-   * Adjust SERVER_PORT variable in `environments/.env` to use 5555 instead of 5000 if running on a Mac
-   * Adjust the value of the port in the SERVER_URL field in ui/public/config.json accordingly
 3. Make sure the following variables defined in `.env` point to directories which exist on the file system: `REPOSITORY_PATH, SOLC_REPO, SOLJSON_REPO` (paths relative to the environments/ directory)
 4. Run `npx lerna bootstrap && npx lerna run build`. This will build the server and ui as well as needed libraries.
 5. Run `docker-compose -f environments/build-repository.yaml build`. This will build the docker image for the repository service.
@@ -60,7 +58,6 @@ or build the images locally.
 1. `cp environments/.env.docker.hedera  environments/.env`
 2. Adjust the configuration in `environments/.env` as follows:
     * Replace all occurrences of `localhost` by the fully qualified hostname if not running locally
-    * Adjust SERVER_EXTERNAL_PORT variable in `environments/.env` to use 5555 instead of 5000 if running on a Mac
 3. `cp environments/example-docker-config.json  environments/docker-config.json`
     * Adjust the URLs in `docker-config.json` as needed
 4. You may need to authenticate to the GitHub container registry at `ghcr.io` using a personal access token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
