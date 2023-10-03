@@ -39,7 +39,7 @@ jobs:
       - name: Wait for hedera-sourcify server
         uses: iFaxity/wait-on-action@v1
         with:
-          resource: http://127.0.0.1:5000/chains
+          resource: http://127.0.0.1:5002/chains
 
       - name: Start tests
         run: npm run test:hedera
