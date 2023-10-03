@@ -934,7 +934,7 @@ const sourcifyChainsExtensions: SourcifyChainsExtensionsObject = {
 const sourcifyChainsMap: SourcifyChainMap = {};
 
 // Add test chains too if developing or testing
-if (process.env.NODE_ENV !== "production") {
+if (process.env.USE_LOCAL_NODE === "true") {
   for (const chain of LOCAL_CHAINS) {
     sourcifyChainsMap[chain.chainId.toString()] = chain;
   }
@@ -949,7 +949,7 @@ for (const i in allChains) {
   if (chainId in sourcifyChainsMap) {
     // Don't throw on local chains in development, override the chain.json item
     if (
-      process.env.NODE_ENV !== "production" &&
+      process.env.USE_LOCAL_NODE === "true" &&
       LOCAL_CHAINS.map((c) => c.chainId).includes(chainId)
     ) {
       continue;
