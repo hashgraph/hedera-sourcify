@@ -54,7 +54,7 @@ spec:
           {{- end }}
           volumeMounts:
             - name: {{ .Chart.Name }}
-              mountPath: /usr/etc/hedera
+              mountPath: /data
         - name: {{ printf "%s-%s" .Chart.Name "repository" }}
           securityContext:
             {{- toYaml .Values.repository.securityContext | nindent 12 }}
@@ -75,22 +75,9 @@ spec:
             - name: {{ .Chart.Name }}
               mountPath: /data
               readOnly: true
-        - name: {{ printf "%s-%s" .Chart.Name "adapter" }}
-          securityContext:
-            {{- toYaml .Values.repository.securityContext | nindent 12 }}
-          image: nginx
-          imagePullPolicy: {{ .Values.repository.image.pullPolicy }}        
-          ports:
-            - name: https
-              containerPort: 443
-              protocol: TCP
-          volumeMounts:
-            - name: {{ printf "%s-%s" .Chart.Name "adapter-config" }}
-              mountPath: /etc/nginx/conf.d
-              readOnly: true
-            - name: {{ printf "%s-%s" .Chart.Name "adapter-tls" }}
-              mountPath: /usr/local/share/ca-certificates/
-              readOnly: true                                             
+            - name: {{ printf "%s-%s" .Chart.Name "repository" }}
+              mountPath: /redirects/config.json
+              subPath: config.json                         
       {{- if .Values.serverRepository.nodeSelector }}
       nodeSelector:
         {{- toYaml .Values.serverRepository.nodeSelector | nindent 8 }}
@@ -109,16 +96,11 @@ spec:
           persistentVolumeClaim:
             claimName: {{ template "sourcify.name" . }}-pvc
         {{- else }}
+      volumes:        
         - name: {{ .Chart.Name }}
           emptyDir: {}
       {{- end }}
-        - name: {{ printf "%s-%s" .Chart.Name "adapter-config" }}
-          configMap:
-            name: {{ printf "%s-%s" .Chart.Name "adapter" }}
-            items:
-              - key: default.conf
-                path: default.conf
-        - name: {{ printf "%s-%s" .Chart.Name "adapter-tls" }}
-          secret:
-            secretName: {{ printf "%s-%s" .Chart.Name "adapter" }}               
+        - configMap:
+            name: {{ printf "%s-%s" .Chart.Name "repository" }}
+          name: {{ printf "%s-%s" .Chart.Name "repository" }}        
 {{- end -}}

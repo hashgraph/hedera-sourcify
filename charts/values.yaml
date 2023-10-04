@@ -36,7 +36,7 @@ serverRepository:
       port: 5555
     repository:
       type: "ClusterIP"
-      port: 10000
+      port: 80
 
   ## server-repository image configuration, image repository is defined in the global image section above
   image:
@@ -79,8 +79,13 @@ serverRepository:
     REPOSITORY_SERVER_URL: "http://sourcify-repository"
     TESTING: true
     NODE_ENV: "development"
-    ca_cert: ""
-    ca_key: ""
+    UI_DOMAIN_NAME: sourcify.example.com
+    repository:
+      {
+      "SERVER_URL": "http://sourcify-server:5555",
+      "REPOSITORY_SERVER_URL": "http://sourcify-repository:10000",
+      "HASHSCAN_URL": "http://127.0.0.1:8080",
+      }
 
 repository:
   ## Deploy sourcify repository
