@@ -302,8 +302,4 @@ monitor:
     create: true
     annotations: {}
     name: "monitor"
-
-
-
-
-
+    
