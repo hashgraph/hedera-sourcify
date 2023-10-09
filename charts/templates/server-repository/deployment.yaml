@@ -31,7 +31,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ template "sourcify.serverRepository.serviceAccountName" . }}
-      {{- if .Values.serverRepository.podSecurityContext}}
+      {{- if .Values.serverRepository.podSecurityContext }}
       securityContext:
         {{- toYaml .Values.serverRepository.podSecurityContext | nindent 8 }}
       {{- end }}  
@@ -48,6 +48,17 @@ spec:
             - name: serverport
               containerPort: {{ .Values.serverRepository.service.server.port }}
               protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: serverport
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: serverport
+            periodSeconds: 10
+            failureThreshold: 6            
           {{- if .Values.serverRepository.server.resources }}
           resources:
             {{- toYaml .Values.serverRepository.server.resources | nindent 12 }}
@@ -67,6 +78,16 @@ spec:
             - name: repositoryport
               containerPort: {{ .Values.serverRepository.service.repository.port }}
               protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /select-contract/health
+              port: repositoryport
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /select-contract/health
+              port: repositoryport
+            periodSeconds: 10             
           {{- if .Values.serverRepository.repository.resources }}
           resources:
             {{- toYaml .Values.serverRepository.repository.resources | nindent 12 }}
