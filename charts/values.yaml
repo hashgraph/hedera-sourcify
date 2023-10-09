@@ -4,9 +4,92 @@ imagePullSecrets: []
 image:
   repository: "ghcr.io/hashgraph/hedera-sourcify"
 
+serverRepository:
+  ## Deploy sourcify server-repository
+  enabled: true
+
+  ## Confiure server-repository for autoscailing
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+
+  ## Set server-repository replica count
+  replicaCount: 1
+
+  ## server-repository annotations and deployment configurations
+  annotations: {}
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+
+  ## Annotations and securityContext for server-repository pods
+  podAnnotations: {}
+  podSecurityContext: {}
+
+  ## server-repository service configuration
+  service:
+    server:
+      type: "ClusterIP"
+      port: 5555
+    repository:
+      type: "ClusterIP"
+      port: 80
+
+  ## server-repository image configuration, image repository is defined in the global image section above
+  image:
+    server:
+      tag: "server-latest"
+    repository:
+      tag: "repository-latest"  
+    pullPolicy: "IfNotPresent"
+
+  ## server-repository serviceAccount creation and configuration
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "server-repository"
+
+  ## server-repository ingress creation and configuration
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: ""
+        paths: []
+    tls: []
+
+  ## server-repository persistent volume claim configuration
+  persistence:
+    enabled: false
+    ## server-repository persistent volume size
+    size: 100Gi
+    ## server-repository persistent volume storage class - setting nil based on best practices [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#writing-portable-configuration)
+    storageClass: "nil"
+    ## server-repository persistent volume access mode
+    accessMode: "ReadWriteOnce"
+
+  ## Configurations for the server-repository containers
+  config:
+    REPOSITORY_PATH: "/data"
+    SERVER_URL: "http://sourcify-server:5555"
+    REPOSITORY_SERVER_URL: "http://sourcify-repository"
+    TESTING: true
+    NODE_ENV: "development"
+    UI_DOMAIN_NAME: sourcify.example.com
+    repository:
+      {
+      "SERVER_URL": "http://sourcify-server:5555",
+      "REPOSITORY_SERVER_URL": "http://sourcify-repository:10000",
+      "HASHSCAN_URL": "http://127.0.0.1:8080",
+      }
+
 repository:
   ## Deploy sourcify repository
-  enabled: true
+  enabled: false
 
   ## Confiure repository for autoscailing
   autoscaling:
@@ -57,7 +140,7 @@ repository:
 
 server:
   ## Deploy sourcify server
-  enabled: true
+  enabled: false
 
   ## Confiure server for autoscailing
   autoscaling:
@@ -167,6 +250,17 @@ ui:
         paths: []
     tls: []
 
+## Configurations for the UI container
+  config:
+    {
+    "SERVER_URL": "http://sourcify-server:5555",
+    "REPOSITORY_SERVER_URL": "http://sourcify-repository:10000",
+    "HASHSCAN_URL": "http://127.0.0.1:8080",
+    }
+
+## Pod environment variables for UI
+  env:
+    UI_DOMAIN_NAME: "sourcify.example.com"
 
 monitor:
   ## Deploy sourcify monitor
@@ -208,6 +302,4 @@ monitor:
     create: true
     annotations: {}
     name: "monitor"
-
-
-
+    

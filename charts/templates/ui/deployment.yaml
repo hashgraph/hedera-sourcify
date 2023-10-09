@@ -26,7 +26,7 @@ spec:
       labels:
         {{- include "sourcify.ui.selectorLabels" . | nindent 8 }}
     spec:
-      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -37,26 +37,29 @@ spec:
       {{- end }}  
       containers:
         - name: {{ .Chart.Name }}-ui
+          env:
+          - name: UI_DOMAIN_NAME
+            value: {{ .Values.ui.env.UI_DOMAIN_NAME }}
           securityContext:
             {{- toYaml .Values.ui.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.ui.image.tag | default "ui-latest" }}"
           imagePullPolicy: {{ .Values.ui.image.pullPolicy }}
           ports:
-            - name: https
-              containerPort: 443
+            - name: http
+              containerPort: 80
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: https
-          readinessProbe:
-            httpGet:
-              path: /
-              port: https
           {{- if .Values.ui.resources }}
           resources:
             {{- toYaml .Values.ui.resources | nindent 12 }}
           {{- end }}
+          volumeMounts:
+            - name: {{ printf "%s-%s" .Chart.Name "ui" }}
+              mountPath: /usr/share/nginx/html/config.json
+              subPath: config.json
+      volumes:
+      - configMap:
+          name: {{ printf "%s-%s" .Chart.Name "ui" }}
+        name: {{ printf "%s-%s" .Chart.Name "ui" }}                          
       {{- if .Values.ui.nodeSelector }}
       nodeSelector:
         {{- toYaml .Values.ui.nodeSelector | nindent 8 }}

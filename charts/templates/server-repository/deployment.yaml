@@ -1,0 +1,127 @@
+{{- if .Values.serverRepository.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "sourcify.name" . }}
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+    {{- include "sourcify.serverRepository.selectorLabels" . | nindent 4 }}
+  {{- if .Values.serverRepository.annotations }}
+  annotations:
+  {{ toYaml .Values.serverRepository.annotations | indent 4 }}
+  {{- end }}    
+spec:
+  {{- if not .Values.serverRepository.autoscaling.enabled }}
+  replicas: {{ .Values.serverRepository.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+    {{- include "sourcify.serverRepository.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- if .Values.serverRepository.podAnnotations }}
+      annotations:
+        {{- toYaml .Values.serverRepository.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "sourcify.serverRepository.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "sourcify.serverRepository.serviceAccountName" . }}
+      {{- if .Values.serverRepository.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.serverRepository.podSecurityContext | nindent 8 }}
+      {{- end }}  
+      containers:        
+        - name: {{ printf "%s-%s" .Chart.Name "server" }}
+          securityContext:
+            {{- toYaml .Values.serverRepository.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.server.tag | default "server-latest" }}"
+          imagePullPolicy: {{ .Values.serverRepository.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "sourcify.name" . }}
+          ports:
+            - name: serverport
+              containerPort: {{ .Values.serverRepository.service.server.port }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: serverport
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: serverport
+            periodSeconds: 10
+            failureThreshold: 6            
+          {{- if .Values.serverRepository.server.resources }}
+          resources:
+            {{- toYaml .Values.serverRepository.server.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: {{ .Chart.Name }}
+              mountPath: /data
+        - name: {{ printf "%s-%s" .Chart.Name "repository" }}
+          securityContext:
+            {{- toYaml .Values.repository.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.repository.tag | default "repository-latest" }}"
+          imagePullPolicy: {{ .Values.repository.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "sourcify.name" . }}          
+          ports:
+            - name: repositoryport
+              containerPort: {{ .Values.serverRepository.service.repository.port }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /select-contract/health
+              port: repositoryport
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /select-contract/health
+              port: repositoryport
+            periodSeconds: 10             
+          {{- if .Values.serverRepository.repository.resources }}
+          resources:
+            {{- toYaml .Values.serverRepository.repository.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: {{ .Chart.Name }}
+              mountPath: /data
+              readOnly: true
+            - name: {{ printf "%s-%s" .Chart.Name "repository" }}
+              mountPath: /redirects/config.json
+              subPath: config.json                         
+      {{- if .Values.serverRepository.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.serverRepository.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serverRepository.affinity }}
+      affinity:
+        {{- toYaml .Values.serverRepository.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serverRepository.tolerations }}
+      tolerations:
+        {{- toYaml .Values.serverRepository.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serverRepository.persistence.enabled }}
+      volumes:
+        - name: {{ .Chart.Name }}
+          persistentVolumeClaim:
+            claimName: {{ template "sourcify.name" . }}-pvc
+        {{- else }}
+      volumes:        
+        - name: {{ .Chart.Name }}
+          emptyDir: {}
+      {{- end }}
+        - configMap:
+            name: {{ printf "%s-%s" .Chart.Name "repository" }}
+          name: {{ printf "%s-%s" .Chart.Name "repository" }}        
+{{- end -}}

@@ -57,6 +57,13 @@ app.kubernetes.io/name: {{ printf "%s-%s" .Chart.Name "server" }}
 {{- end }}
 
 {{/*
+Selector labels for the serverRepository deployment.
+*/}}
+{{- define "sourcify.serverRepository.selectorLabels" -}}
+app.kubernetes.io/name: {{ printf "%s-%s" .Chart.Name "server-repository" }}
+{{- end }}
+
+{{/*
 Selector labels for the monitor deployment.
 */}}
 {{- define "sourcify.monitor.selectorLabels" -}}
@@ -89,6 +96,17 @@ Create the souricfy-server name of the service account to use
 {{- default (include "sourcify.fullname" .) .Values.server.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.server.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the souricfy-serverRepository name of the service account to use
+*/}}
+{{- define "sourcify.serverRepository.serviceAccountName" -}}
+{{- if .Values.serverRepository.serviceAccount.create }}
+{{- default (include "sourcify.fullname" .) .Values.serverRepository.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serverRepository.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
