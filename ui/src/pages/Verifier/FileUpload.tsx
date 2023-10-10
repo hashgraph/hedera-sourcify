@@ -75,64 +75,64 @@ const FileUpload: React.FC<FileUploadProps> = ({
             to verify.
           </p>
         </div>
-        <div className="flex flex-row flex-wrap gap-3 mt-4 justify-center md:justify-start">
-          <Button
-            type={
-              importMethodSelected === ImportMethods.REMOTE
-                ? "primary"
-                : "secondary"
-            }
-            onClick={() => selectImportMethod(ImportMethods.REMOTE)}
-            className="text-sm"
-          >
-            <>
-              <AiOutlinePlus className="inline align-middle mr-1" />
-              Import from remote
-            </>
-          </Button>
-          <Button
-            type={
-              importMethodSelected === ImportMethods.GITHUB
-                ? "primary"
-                : "secondary"
-            }
-            onClick={() => selectImportMethod(ImportMethods.GITHUB)}
-            className="text-sm"
-          >
-            <>
-              <AiOutlineGithub className="inline align-middle mr-1" />
-              Import from GitHub
-            </>
-          </Button>
-          <Button
-            type={
-              importMethodSelected === ImportMethods.CONTRACT
-                ? "primary"
-                : "secondary"
-            }
-            onClick={() => selectImportMethod(ImportMethods.CONTRACT)}
-            className="text-sm"
-          >
-            <>
-              <AiOutlineFileSearch className="inline align-middle mr-1" />
-              Import from Contract
-            </>
-          </Button>
-          <Button
-            type={
-              importMethodSelected === ImportMethods.SOLIDITY_JSON
-                ? "primary"
-                : "secondary"
-            }
-            onClick={() => selectImportMethod(ImportMethods.SOLIDITY_JSON)}
-            className="text-sm"
-          >
-            <>
-              <SiSolidity className="inline align-middle mr-1" />
-              Import from Solidity JSON
-            </>
-          </Button>
-        </div>
+        {/*<div className="flex flex-row flex-wrap gap-3 mt-4 justify-center md:justify-start">*/}
+        {/*  <Button*/}
+        {/*    type={*/}
+        {/*      importMethodSelected === ImportMethods.REMOTE*/}
+        {/*        ? "primary"*/}
+        {/*        : "secondary"*/}
+        {/*    }*/}
+        {/*    onClick={() => selectImportMethod(ImportMethods.REMOTE)}*/}
+        {/*    className="text-sm"*/}
+        {/*  >*/}
+        {/*    <>*/}
+        {/*      <AiOutlinePlus className="inline align-middle mr-1" />*/}
+        {/*      Import from remote*/}
+        {/*    </>*/}
+        {/*  </Button>*/}
+        {/*  <Button*/}
+        {/*    type={*/}
+        {/*      importMethodSelected === ImportMethods.GITHUB*/}
+        {/*        ? "primary"*/}
+        {/*        : "secondary"*/}
+        {/*    }*/}
+        {/*    onClick={() => selectImportMethod(ImportMethods.GITHUB)}*/}
+        {/*    className="text-sm"*/}
+        {/*  >*/}
+        {/*    <>*/}
+        {/*      <AiOutlineGithub className="inline align-middle mr-1" />*/}
+        {/*      Import from GitHub*/}
+        {/*    </>*/}
+        {/*  </Button>*/}
+        {/*  <Button*/}
+        {/*    type={*/}
+        {/*      importMethodSelected === ImportMethods.CONTRACT*/}
+        {/*        ? "primary"*/}
+        {/*        : "secondary"*/}
+        {/*    }*/}
+        {/*    onClick={() => selectImportMethod(ImportMethods.CONTRACT)}*/}
+        {/*    className="text-sm"*/}
+        {/*  >*/}
+        {/*    <>*/}
+        {/*      <AiOutlineFileSearch className="inline align-middle mr-1" />*/}
+        {/*      Import from Contract*/}
+        {/*    </>*/}
+        {/*  </Button>*/}
+        {/*  <Button*/}
+        {/*    type={*/}
+        {/*      importMethodSelected === ImportMethods.SOLIDITY_JSON*/}
+        {/*        ? "primary"*/}
+        {/*        : "secondary"*/}
+        {/*    }*/}
+        {/*    onClick={() => selectImportMethod(ImportMethods.SOLIDITY_JSON)}*/}
+        {/*    className="text-sm"*/}
+        {/*  >*/}
+        {/*    <>*/}
+        {/*      <SiSolidity className="inline align-middle mr-1" />*/}
+        {/*      Import from Solidity JSON*/}
+        {/*    </>*/}
+        {/*  </Button>*/}
+        {/*</div>*/}
         <div className="flex flex-grow flex-col pb-8">
           {importMethodSelected === ImportMethods.REMOTE && (
             <div className="mt-4">
