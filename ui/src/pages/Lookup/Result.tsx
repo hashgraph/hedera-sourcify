@@ -156,14 +156,14 @@ const NetworkRow = ({ address, chainId, status }: NetworkRowProp) => {
               View in Sourcify Repository
             </a>
           </td>
-          <td className="py-4 pr-4 text-right">
-            <a
-              className="underline"
-              href={generateUrl(URL_TYPE.REMIX, chainId, address, status)}
-            >
-              View in Remix
-            </a>
-          </td>
+          {/*<td className="py-4 pr-4 text-right">*/}
+          {/*  <a*/}
+          {/*    className="underline"*/}
+          {/*    href={generateUrl(URL_TYPE.REMIX, chainId, address, status)}*/}
+          {/*  >*/}
+          {/*    View in Remix*/}
+          {/*  </a>*/}
+          {/*</td>*/}
         </tr>
       ) : (
         <div className="border-b hover:bg-gray-100 flex flex-col">
@@ -181,14 +181,14 @@ const NetworkRow = ({ address, chainId, status }: NetworkRowProp) => {
               View in Sourcify Repository
             </a>
           </div>
-          <div className="pb-4">
-            <a
-              className="underline"
-              href={generateUrl(URL_TYPE.REMIX, chainId, address, status)}
-            >
-              View in Remix
-            </a>
-          </div>
+          {/*<div className="pb-4">*/}
+          {/*  <a*/}
+          {/*    className="underline"*/}
+          {/*    href={generateUrl(URL_TYPE.REMIX, chainId, address, status)}*/}
+          {/*  >*/}
+          {/*    View in Remix*/}
+          {/*  </a>*/}
+          {/*</div>*/}
         </div>
       )}
     </>
