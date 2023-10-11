@@ -8,6 +8,11 @@ export class Configuration {
     private _repositoryServerUrl: string | undefined;
     private _repositoryServerUrlFullMatch: string | undefined;
     private _hashScanUrl: string | undefined;
+    private _remoteImport: boolean | undefined;
+    private _githubImport: boolean | undefined;
+    private _contractImport: boolean | undefined;
+    private _jsonImport: boolean | undefined;
+    private _openInRemix: boolean | undefined;
     private _repositoryServerUrlPartialMatch: string | undefined;
     private _ipfsIpnsGatewayUrl: string | undefined;
     private _sessionDataUrl: string | undefined;
@@ -66,6 +71,21 @@ export class Configuration {
     get serverUrl(): string {
         return this._serverUrl ?? ""
     }
+    get remoteImport(): boolean {
+        return this._remoteImport ?? false
+    }
+    get githubImport(): boolean {
+        return this._githubImport ?? false
+    }
+    get contractImport(): boolean {
+        return this._contractImport ?? false
+    }
+    get jsonImport(): boolean {
+        return this._jsonImport ?? false
+    }
+    get openInRemix(): boolean {
+        return this._openInRemix ?? false
+    }
 
     public readConfig = async (): Promise<void> =>  {
 
@@ -82,6 +102,11 @@ export class Configuration {
         this._serverUrl = configData.SERVER_URL
         this._repositoryServerUrl = configData.REPOSITORY_SERVER_URL
         this._hashScanUrl = configData.HASHSCAN_URL
+        this._remoteImport = configData.REMOTE_IMPORT
+        this._githubImport = configData.GITHUB_IMPORT
+        this._contractImport = configData.CONTRACT_IMPORT
+        this._jsonImport = configData.JSON_IMPORT
+        this._openInRemix = configData.OPEN_IN_REMIX
 
         this._repositoryServerUrlFullMatch = `${this._repositoryServerUrl}/contracts/full_match`
         this._repositoryServerUrlPartialMatch = `${this._repositoryServerUrl}/contracts/partial_match`
