@@ -3,6 +3,12 @@ name: Release Production Environment Docker Image to GitHub
 on:
   push:
     tags: [ v* ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag:"
+        type: string
+        required: false
 
 env:
   OWNER: hashgraph
@@ -23,7 +29,12 @@ jobs:
           submodules: 'true'
 
       - name: Get tag
-        run: echo "TAG=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+        run: |
+          if [[ -v "{{ GIT_REF }}" ]]; then
+            echo "TAG=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+          else
+            echo "TAG=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          fi
 
       - name: Patch h5ai-nginx submodule
         run: ./scripts/hedera-apply-h5ai-nginx-patch.sh
