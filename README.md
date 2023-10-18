@@ -109,7 +109,7 @@ Example contents for `config.json`:
 {
     "SERVER_URL": "https://server.sourcify-integration.hedera-devops.com",
     "REPOSITORY_SERVER_URL": "https://repository.sourcify-integration.hedera-devops.com",
-    "HASHSCAN_URL": "https://hashscan.io",
+    "EXPLORER_URL": "http://localhost:8080",
     "REMOTE_IMPORT": false,
     "GITHUB_IMPORT": false,
     "CONTRACT_IMPORT": false,
@@ -123,7 +123,7 @@ The following properties can be provided in config.json
 |-------------------------|------------------------------------------------------------------------------|
 | `SERVER_URL`            | URL of the server (from outside the cluster).                                |
 | `REPOSITORY_SERVER_URL` | HTTP port exposed by container                                               |
-| `HASHSCAN_URL`          | URL of HashScan                                                              |
+| `EXPLORER_URL`          | URL of the mirror-node explorer                                              |
 | `REMOTE_IMPORT`         | Flag to activate mode "Import from remote"                                   |
 | `GITHUB_IMPORT`         | Flag to activate mode "Import from GitHub"                                   |                                 
 | `CONTRACT_IMPORT`       | Flag to activate mode "Import from contract's metadata"                      |                                           

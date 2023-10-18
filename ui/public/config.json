@@ -1,7 +1,7 @@
   {
     "SERVER_URL": "http://localhost:5002",
     "REPOSITORY_SERVER_URL": "http://localhost:10000",
-    "HASHSCAN_URL": "https://hashscan.io",
+    "EXPLORER_URL": "http://localhost:8080",
     "BRAND_PRODUCT_LOGO_URL": "",
     "TERMS_OF_SERVICE_URL": "",
     "REMOTE_IMPORT": false,

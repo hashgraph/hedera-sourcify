@@ -68,9 +68,9 @@ const Header = () => {
           </a>
           <a
             className="link-underline mx-2 my-2 md:mx-6 hover:text-ceruleanBlue-500"
-            href={configuration.hashScanUrl}
+            href={configuration.explorerUrl}
           >
-            HashScan
+            Explorer
           </a>
         </nav>
       </div>

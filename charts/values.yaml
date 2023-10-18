@@ -75,16 +75,16 @@ serverRepository:
   ## Configurations for the server-repository containers
   config:
     REPOSITORY_PATH: "/data"
-    SERVER_URL: "http://sourcify-server:5555"
-    REPOSITORY_SERVER_URL: "http://sourcify-repository"
+    SERVER_URL: "http://127.0.0.1:5555"
+    REPOSITORY_SERVER_URL: "http://127.0.0.1:10000"
     TESTING: true
     NODE_ENV: "development"
-    UI_DOMAIN_NAME: sourcify.example.com
+    UI_DOMAIN_NAME: verify.example.com
     repository:
       {
-      "SERVER_URL": "http://sourcify-server:5555",
-      "REPOSITORY_SERVER_URL": "http://sourcify-repository:10000",
-      "HASHSCAN_URL": "http://127.0.0.1:8080",
+      "SERVER_URL": "http://127.0.0.1:5555",
+      "REPOSITORY_SERVER_URL": "http://127.0.0.1:10000",
+      "EXPLORER_URL": "http://127.0.0.1:8080",
       }
 
 ui:
@@ -141,11 +141,11 @@ ui:
 ## Configurations for the UI container
   config:
     {
-    "SERVER_URL": "http://sourcify-server:5555",
-    "REPOSITORY_SERVER_URL": "http://sourcify-repository:10000",
-    "HASHSCAN_URL": "http://127.0.0.1:8080",
+    "SERVER_URL": "http://127.0.0.1:5555",
+    "REPOSITORY_SERVER_URL": "http://127.0.0.1:10000",
+    "EXPLORER_URL": "http://127.0.0.1:8080",
     }
 
 ## Pod environment variables for UI
   env:
-    UI_DOMAIN_NAME: "sourcify.example.com"
+    UI_DOMAIN_NAME: "verify.example.com"
