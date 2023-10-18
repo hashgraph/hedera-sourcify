@@ -8,9 +8,6 @@ import {configuration} from "./utils/Configuration";
 function App() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    // if (process.env.REACT_APP_TAG === "latest") {
-    //   document.title = "(staging) sourcify.eth";
-    // }
     document.title = " Smart Contract Verifier";
 
     configuration.readConfig()

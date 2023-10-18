@@ -8,7 +8,7 @@ import Field from "./Field";
 import Result from "./Result";
 import { useParams, useNavigate } from "react-router-dom";
 import { isAddress, getAddress } from "@ethersproject/address";
-import {TERMS_OF_SERVICE_URL} from "../../constants";
+import {configuration} from "../../utils/Configuration";
 
 const Lookup = () => {
   const navigate = useNavigate();
@@ -85,9 +85,11 @@ const Lookup = () => {
             <Field loading={loading} handleRequest={handleRequest} />
           )}
         </div>
-        <div className="text-center text-xs italic mx-2 mt-1 text-gray-400">
-          <a href={TERMS_OF_SERVICE_URL}>See Terms of Service</a>
-        </div>
+        {configuration.termsOfServiceUrl && (
+          <div className="text-center text-xs italic mx-2 mt-1 text-gray-400">
+            <a href={configuration.termsOfServiceUrl}>See Terms of Service</a>
+          </div>
+        )}
       </div>
     </div>
   );

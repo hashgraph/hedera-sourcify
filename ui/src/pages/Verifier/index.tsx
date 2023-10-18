@@ -2,7 +2,7 @@ import bytes from "bytes";
 import { useCallback, useContext, useEffect, useState } from "react";
 import Header from "../../components/Header";
 import Toast from "../../components/Toast";
-import { DOCS_URL, TERMS_OF_SERVICE_URL } from "../../constants";
+import { DOCS_URL } from "../../constants";
 import { Context } from "../../Context";
 import {
   Create2VerificationInput,
@@ -59,9 +59,7 @@ const Verifier: React.FC = () => {
                 <>
                   <div>Possibly a CORS error, check the browser console.</div>
                   <div>
-                    Are you on a different domain than sourcify.dev or
-                    sourcify.eth? API v2 is not available except the official
-                    UI. See{" "}
+                    See{" "}
                     <a
                       className="font-bold"
                       href={DOCS_URL}
@@ -245,7 +243,9 @@ const Verifier: React.FC = () => {
       </div>
       <div className="text-center text-xs italic mx-2 mt-1 text-gray-400">
         <p>Note: Once a contract is verified it can't be removed from the repository.</p>
-        <a href={TERMS_OF_SERVICE_URL}>See Terms of Service</a>
+        {configuration.termsOfServiceUrl && (
+          <a href={configuration.termsOfServiceUrl}>See Terms of Service</a>
+        )}
       </div>
     </div>
   );
