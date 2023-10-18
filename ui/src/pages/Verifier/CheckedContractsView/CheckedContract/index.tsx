@@ -14,6 +14,7 @@ import Create2Form from "./Create2Form";
 import Invalid from "./Invalid";
 import Label from "./Label";
 import Missing from "./Missing";
+import {configuration} from "../../../../utils/Configuration";
 
 type CheckedContractProps = {
   checkedContract: SendableContract;
@@ -112,7 +113,7 @@ const CheckedContract: React.FC<CheckedContractProps> = ({
 
       {/* Collapsed section */}
       <div className={`${collapsed ? "hidden" : ""} break-words px-4 p-4`}>
-        <div className="flex flex-row flex-wrap gap-3 mt-4 justify-center md:justify-start mb-6">
+        {configuration.create2Verification && <div className="flex flex-row flex-wrap gap-3 mt-4 justify-center md:justify-start mb-6">
           <div className="">
             <Button
               type={
@@ -139,7 +140,7 @@ const CheckedContract: React.FC<CheckedContractProps> = ({
               Verify create2 contract
             </Button>
           </div>
-        </div>
+        </div>}
         {verifyMethodSelected === VerifyMethods.DEPLOYED &&
           ["perfect", "partial", "error"].includes(customStatus) && (
             <ChainAddressForm

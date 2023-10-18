@@ -15,6 +15,7 @@ export class Configuration {
     private _contractImport: boolean | undefined;
     private _jsonImport: boolean | undefined;
     private _openInRemix: boolean | undefined;
+    private _create2Verification: boolean | undefined;
     private _repositoryServerUrlPartialMatch: string | undefined;
     private _ipfsIpnsGatewayUrl: string | undefined;
     private _sessionDataUrl: string | undefined;
@@ -94,6 +95,9 @@ export class Configuration {
     get openInRemix(): boolean {
         return this._openInRemix ?? false
     }
+    get create2Verification(): boolean {
+        return this._create2Verification ?? false
+    }
 
     public readConfig = async (): Promise<void> =>  {
 
@@ -117,6 +121,7 @@ export class Configuration {
         this._contractImport = configData.CONTRACT_IMPORT
         this._jsonImport = configData.JSON_IMPORT
         this._openInRemix = configData.OPEN_IN_REMIX
+        this._create2Verification = configData.CREATE2_VERIFICATION
 
         this._repositoryServerUrlFullMatch = `${this._repositoryServerUrl}/contracts/full_match`
         this._repositoryServerUrlPartialMatch = `${this._repositoryServerUrl}/contracts/partial_match`
