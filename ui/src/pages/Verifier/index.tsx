@@ -59,9 +59,7 @@ const Verifier: React.FC = () => {
                 <>
                   <div>Possibly a CORS error, check the browser console.</div>
                   <div>
-                    Are you on a different domain than sourcify.dev or
-                    sourcify.eth? API v2 is not available except the official
-                    UI. See{" "}
+                    See{" "}
                     <a
                       className="font-bold"
                       href={DOCS_URL}
