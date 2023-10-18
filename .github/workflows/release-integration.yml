@@ -1,4 +1,4 @@
-name: Release Integration Environment Docker Image to GitHub
+name: Release Integration Environment
 
 on:
     push:

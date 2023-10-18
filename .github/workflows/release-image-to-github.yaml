@@ -1,4 +1,4 @@
-name: Release Production Environment Docker Image to GitHub
+name: Release Production Environment
 
 on:
   push:
