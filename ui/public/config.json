@@ -1,9 +1,11 @@
   {
     "SERVER_URL": "http://localhost:5002",
     "REPOSITORY_SERVER_URL": "http://localhost:10000",
-    "HASHSCAN_URL": "https://hashscan-latest.hedera-devops.com",
-    "REMOTE_IMPORT": true,
-    "GITHUB_IMPORT": true,
+    "HASHSCAN_URL": "https://hashscan.io",
+    "BRAND_PRODUCT_LOGO_URL": "",
+    "TERMS_OF_SERVICE_URL": "",
+    "REMOTE_IMPORT": false,
+    "GITHUB_IMPORT": false,
     "CONTRACT_IMPORT": false,
     "JSON_IMPORT": false,
     "OPEN_IN_REMIX": false

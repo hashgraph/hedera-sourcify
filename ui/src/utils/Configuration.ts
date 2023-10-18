@@ -8,6 +8,8 @@ export class Configuration {
     private _repositoryServerUrl: string | undefined;
     private _repositoryServerUrlFullMatch: string | undefined;
     private _hashScanUrl: string | undefined;
+    private _brandProductLogoUrl: string | undefined;
+    private _termsOfServiceUrl: string | undefined;
     private _remoteImport: boolean | undefined;
     private _githubImport: boolean | undefined;
     private _contractImport: boolean | undefined;
@@ -62,6 +64,12 @@ export class Configuration {
     get hashScanUrl(): string {
         return this._hashScanUrl ?? ""
     }
+    get brandProductLogoUrl(): string {
+        return this._brandProductLogoUrl ?? ""
+    }
+    get termsOfServiceUrl(): string {
+        return this._termsOfServiceUrl ?? ""
+    }
     get repositoryServerUrlFullMatch(): string {
         return this._repositoryServerUrlFullMatch ?? ""
     }
@@ -102,6 +110,8 @@ export class Configuration {
         this._serverUrl = configData.SERVER_URL
         this._repositoryServerUrl = configData.REPOSITORY_SERVER_URL
         this._hashScanUrl = configData.HASHSCAN_URL
+        this._brandProductLogoUrl = configData.BRAND_PRODUCT_LOGO_URL
+        this._termsOfServiceUrl = configData.TERMS_OF_SERVICE_URL
         this._remoteImport = configData.REMOTE_IMPORT
         this._githubImport = configData.GITHUB_IMPORT
         this._contractImport = configData.CONTRACT_IMPORT
