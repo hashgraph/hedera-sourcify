@@ -2,7 +2,7 @@ import { useState } from "react";
 import { HiMenu } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import ReactTooltip from "react-tooltip";
-import logoText from "../../assets/brand-product-logo-black.png";
+import logoText from "../../assets/logo-rounded.svg";
 import { DOCS_URL } from "../../constants";
 import {configuration} from "../../utils/Configuration";
 
@@ -19,9 +19,20 @@ const Header = () => {
   return (
     <header className="flex justify-between py-4 md:py-6 w-auto flex-wrap md:flex-nowrap">
       <ReactTooltip effect="solid" />
-      <Link to="/" className="flex items-center">
-        <img src={logoText} alt="HashScan logo" style={{minWidth:220,maxWidth:220}}/>
-      </Link>
+      <div className="flex items-center">
+        {configuration.brandProductLogoUrl ? (
+          <Link to="/" className="flex items-center">
+            <img src={configuration.brandProductLogoUrl} alt="Brand product logo" style={{minWidth: 220, maxWidth: 220}}/>
+          </Link>
+        ) : (
+          <Link to="/" className="flex items-center">
+            <img src={logoText} alt="Hedera logo" className="max-h-10"/>
+            <span className="ml-3 text-gray-700 font-vt323 text-2xl">
+              Hedera
+            </span>
+          </Link>
+        )}
+      </div>
       <button className="block md:hidden" onClick={toggleNav}>
         <HiMenu className="text-gray-700 text-3xl hover:text-ceruleanBlue-500" />
       </button>
