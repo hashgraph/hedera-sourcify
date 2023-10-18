@@ -167,6 +167,16 @@ even though the only useful item for the _repository_ is the following:
 | `TESTING`                         | false                                  | DO NOT CHANGE                                          |
 | `TAG`                             | latest                                 | DO NOT CHANGE                                          |
 
+
+## Release
+
+The repo has Github Actions automation to generate docker images based on the latest changes in a branch.
+To initiate the release for version `x.y.z` simply checkout branch `release/x.y` and run the following commands
+```
+git tag vx.y.z
+git push origin vx.y.z
+```
+
 ## Support
 
 If you have a question on how to use the product, please see our

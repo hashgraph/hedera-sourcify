@@ -1,8 +1,14 @@
-name: Release Production Environment
+name: Release Integration Environment
 
 on:
-  push:
-    tags: [ v* ]
+    push:
+      branches: [ main ]
+    workflow_dispatch:
+      inputs:
+        version:
+          description: "Release tag:"
+          type: string
+          required: true
 
 env:
   OWNER: hashgraph
@@ -21,9 +27,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: 'true'
-
+      
       - name: Get tag
-        run: echo "TAG=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+        run: |
+          if [[ -v "${{ github.event.inputs.version }}" ]]; then
+            echo "TAG=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "TAG=main" >> $GITHUB_ENV
+          fi
 
       - name: Patch h5ai-nginx submodule
         run: ./scripts/hedera-apply-h5ai-nginx-patch.sh
