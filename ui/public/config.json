@@ -8,5 +8,6 @@
     "GITHUB_IMPORT": false,
     "CONTRACT_IMPORT": false,
     "JSON_IMPORT": false,
-    "OPEN_IN_REMIX": false
+    "OPEN_IN_REMIX": false,
+    "CREATE2_VERIFICATION": false
   }

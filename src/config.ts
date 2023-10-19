@@ -42,6 +42,9 @@ export default {
   corsAllowedOrigins: [
     new RegExp(`^https?:\/\/(?:.+\\.)?${process.env.UI_DOMAIN_NAME}(?::\d+)?`),                     // domain defined by UI_DOMAIN_NAME and subdomains
   ],
+  features: {
+    create2: process.env.SERVER_CREATE2_VERIFICATION || "false"
+  }
 };
 
 type EtherscanAPIs = {
