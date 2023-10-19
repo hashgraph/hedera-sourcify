@@ -1,11 +1,11 @@
 openapi: "3.0.0"
 info:
-  version: 1.0.0
+  version: 0.1.0-rc1
   title: Sourcify API
   description: API to interact with Sourcify
   license:
     name: MIT
-    url: https://github.com/ethereum/sourcify/blob/master/LICENSE
+    url: https://github.com/hashgraph/hedera-sourcify/blob/master/LICENSE
 servers:
   - url: https://sourcify.dev/server
     description: Production server 
