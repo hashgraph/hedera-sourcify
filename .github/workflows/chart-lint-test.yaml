@@ -4,7 +4,7 @@
 name: Charts Linting and Testing
 
 on:
-  push:
+  pull_request:
     branches:
     - main
     - /^release\/.*$/
