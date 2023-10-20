@@ -1,0 +1,6 @@
+remote: origin
+target: main
+chart-dirs:
+- charts
+helm-extra-args: --timeout 600
+

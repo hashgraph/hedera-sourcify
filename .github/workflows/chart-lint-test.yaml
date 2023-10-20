@@ -1,0 +1,54 @@
+# Lint and Test was added using helm/chart-repo-actions-demo as a reference
+# https://github.com/helm/charts-repo-actions-demo/blob/main/.github/workflows/lint-test.yaml
+
+name: Charts Linting and Testing
+
+on:
+  push:
+    branches:
+    - main
+    - /^release\/.*$/
+    paths:
+    - 'charts/**'
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Helm
+      uses: azure/setup-helm@v3.5
+      with:
+        version: 'v3.13.0'
+
+    # ct (chart testing) requires python
+    - name: Setup Python
+      uses: actions/setup-python@v4.7.1
+      with:
+        python-version: '3.x'
+
+    - name: Install chart-testing
+      uses: helm/chart-testing-action@v2.4.0
+      
+    - name: Run chart-testing (list-changed)
+      id: list-changed
+      run: |
+        changed=$(ct list-changed --chart-dirs charts --config .github/ct.yaml)
+        if [[ -n "$changed" ]]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run chart-testing (lint)
+      run: ct lint --config .github/ct.yaml
+
+    - name: Create kind cluster
+      uses: helm/kind-action@v1.8.0
+      if: steps.list-changed.outputs.changed == 'true'
+
+    - name: Run chart-testing (install)
+      run: ct install --config .github/ct.yaml  
+
