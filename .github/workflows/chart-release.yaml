@@ -3,7 +3,9 @@ name: Chart Release
 on:
   push:
     branches:
-      - gh-pages
+      - main
+    paths:
+      - 'charts/**'  
 
 jobs:
   release:
@@ -35,5 +37,3 @@ jobs:
           config: .github/cr.yaml
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-        
