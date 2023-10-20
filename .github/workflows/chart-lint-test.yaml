@@ -6,10 +6,10 @@ name: Charts Linting and Testing
 on:
   pull_request:
     branches:
-    - main
-    - /^release\/.*$/
+      - main
+      - /^release\/.*$/
     paths:
-    - 'charts/**'
+      - 'charts/**'
 
 jobs:
   lint-test:
