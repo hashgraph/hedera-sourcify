@@ -87,9 +87,9 @@ const Message = ({
           <HiCheck className={`${textColor} inline mr-1 align-middle`} />
           Verification successful!{" "}
           <span className={`${darkTextColor} font-bold`}>
-            {customStatus}ly
+            {customStatus === "perfect" ? "Full Match" : "Partial Match"}
           </span>{" "}
-          verified at <b>{chain.title || chain.name}</b>:
+          at <b>{chain.title || chain.name}</b>:
           {checkedContract.address}
           {checkedContract?.address && (
             <RepoLinks
