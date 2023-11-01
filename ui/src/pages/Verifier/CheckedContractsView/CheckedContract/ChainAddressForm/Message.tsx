@@ -89,7 +89,7 @@ const Message = ({
           <span className={`${darkTextColor} font-bold`}>
             {customStatus === "perfect" ? "Full Match" : "Partial Match"}
           </span>{" "}
-          at <b>{chain.title || chain.name}</b>:
+          verified at <b>{chain.title || chain.name}</b>:
           {checkedContract.address}
           {checkedContract?.address && (
             <RepoLinks
