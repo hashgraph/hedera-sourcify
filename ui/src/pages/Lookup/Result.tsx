@@ -61,7 +61,7 @@ type MatchStatusProps = {
 };
 const PerfectMatchInfoText = (
   <span>
-    A perfect match indicates the Solidity source code does not deviate a single
+    A full match indicates the Solidity source code does not deviate a single
     byte from the source code when deployed. <br /> See{" "}
     <a
       href={DOCS_URL}
@@ -103,7 +103,7 @@ const MatchStatusBadge = ({ status }: MatchStatusProps) => {
           data-html={true}
           data-for="perfect-info"
         >
-          {status} match
+          Full match
         </span>
       </>
     );

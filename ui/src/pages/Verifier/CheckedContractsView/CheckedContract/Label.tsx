@@ -8,7 +8,7 @@ interface ILABELS {
   [key: string]: string;
 }
 const LABELS: ILABELS = {
-  perfect: "Perfect Match",
+  perfect: "Full Match",
   partial: "Partial Match",
   missing: "Files Missing",
   invalid: "Invalid Files",
