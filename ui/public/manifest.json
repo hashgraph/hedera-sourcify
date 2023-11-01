@@ -1,7 +1,7 @@
 {
-  "short_name": "sourcify.eth",
-  "name": "sourcify.eth",
-  "description": "Sourcify: Solidity contract source code and metadata verification tool",
+  "short_name": "Hedera Verifier",
+  "name": "Hedera Verifier",
+  "description": "Hedera Verifier: Solidity contract source code and metadata verification tool",
   "icons": [
     {
       "src": "favicon.ico",
