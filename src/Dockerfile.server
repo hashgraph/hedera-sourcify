@@ -8,6 +8,7 @@ COPY packages ./packages
 COPY src ./src
 COPY *.json ./
 COPY openapi.yaml ./openapi.yaml
+COPY scripts/hedera-reset-docker.sh ./
 
 RUN npm config set fetch-retry-mintimeout 20000
 RUN npm config set fetch-retry-maxtimeout 120000
