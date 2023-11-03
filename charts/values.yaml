@@ -149,3 +149,9 @@ ui:
 ## Pod environment variables for UI
   env:
     UI_DOMAIN_NAME: "verify.example.com"
+
+reset:
+  image:
+    repository: "apline/curl"
+    tag: "8.4.0"
+    pullPolicy: "IfNotPresent"    

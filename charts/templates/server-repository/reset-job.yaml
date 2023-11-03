@@ -1,2 +1,39 @@
 {{- if .Values.previewnet-reset.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-%s" .Chart.Name "prvw-reset-job" | trimSuffix "-"| trunc 52 }}
+spec:
+  # activeDeadlineSeconds: 600 ## this is used to termanate the job after 10 minutes.  How long does it take to reset and shoud this be set?
+  # backoffLimit: 0 # Number of failed retries before considering a Job as failed. Defaults to 6 if not set.  Should this be set to 0?  How many failures are acceptable?
+  template:
+    spec:
+      containers:
+      - name: reset
+        image: "{{ .Values.reset.image.repository }}:{{ .Values.reset.image.tag }}"
+        imagePullPolicy: {{ .Values.reset.image.pullPolicy }}
+        command:
+        - /bin/sh
+        - -c
+        - https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset.sh ; chmod +x hedera-reset.sh ; ./hedera-reset.sh previewnet
+{{- end }}
+---
+{{- if .Values.testnet-reset.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-%s" .Chart.Name "tsnt-reset-job" | trimSuffix "-"| trunc 52 }}
+spec:
+  # activeDeadlineSeconds: 600 ## this is used to termanate the job after 10 minutes.  How long does it take to reset and shoud this be set?
+  # backoffLimit: 0 # Number of failed retries before considering a Job as failed. Defaults to 6 if not set.  Should this be set to 0?  How many failures are acceptable?
+  template:
+    spec:
+      containers:
+      - name: reset
+        image: "{{ .Values.reset.image.repository }}:{{ .Values.reset.image.tag }}"
+        imagePullPolicy: {{ .Values.reset.image.pullPolicy }}
+        command:
+        - /bin/sh
+        - -c
+        - https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset.sh ; chmod +x hedera-reset.sh ; ./hedera-reset.sh testnet
 {{- end }}
