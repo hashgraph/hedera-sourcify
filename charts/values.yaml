@@ -151,7 +151,15 @@ ui:
     UI_DOMAIN_NAME: "verify.example.com"
 
 reset:
+  ## Previewnet reset job, default is to disable
+  previewnet-reset: 
+    enabled: false
+  ## Testnet reset job, default is to disable
+  testnet-reset:
+    enabled: false  
+  ## Set default immage repository, tag, and pull policy
   image:
     repository: "apline/curl"
     tag: "8.4.0"
-    pullPolicy: "IfNotPresent"    
+    pullPolicy: "IfNotPresent"
+
