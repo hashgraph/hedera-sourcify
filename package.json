@@ -1,7 +1,7 @@
 {
   "name": "@hashgraph/hedera-sourcify",
-  "version": "0.1.0-rc1",
-  "description": "A Hedera fork of ethereum sorucify that provides a Solidity metadata-based re-compilation and source verification tool",
+  "version": "0.1.0-rc2",
+  "description": "A Hedera fork of ethereum sourcify that provides a Solidity metadata-based re-compilation and source verification tool",
   "private": true,
   "repository": {
     "type": "git",
