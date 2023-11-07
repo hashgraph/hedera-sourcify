@@ -19,7 +19,7 @@ Make sure the repository submodule h5ai-nginx is present:
 - `git submodule update --init --recursive`
 
 Apply the Hedera patch to the `h5ai-nginx` submodule (execute this only once).
-- `./scripts/hedera-apply-patch.sh`
+- `./scripts/hedera-apply-h5ai-nginx-patch.sh`
 
 ## Local build for development
 
