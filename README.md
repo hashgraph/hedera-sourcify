@@ -30,8 +30,10 @@ From the root of the project workspace:
 1. Run `npm ci`. This will create populate and link `node_modules`.
 2. `cp environments/.env.dev.hedera  environments/.env`
 3. Make sure the following variables defined in `.env` point to directories which exist on the file system: `REPOSITORY_PATH, SOLC_REPO, SOLJSON_REPO` (paths relative to the environments/ directory)
-4. Run `npx lerna bootstrap && npx lerna run build`. This will build the server and ui as well as needed libraries.
-5. Run `docker-compose -f environments/build-repository.yaml build`. This will build the docker image for the repository service.
+4. `cp environments/example-docker-config.json environments/docker-config.json`
+   * Adjust as needed. With local build, this is used by the repository container, which only needs the SERVER_URL
+5. Run `npx lerna bootstrap && npx lerna run build`. This will build the server and ui as well as needed libraries.
+6. Run `docker-compose -f environments/build-repository.yaml build`. This will build the docker image for the repository service.
 
 ### Run
 
@@ -44,7 +46,7 @@ From the root of the project workspace:
 This assumes the default ports (per .env.dev.hedera) are used:
 
 * `Open http://localhost:10000`. This should open the Repository select-contract-form. The options available for the Chain should be the 3 Hedera networks (mainnet, testnet, previewnet).
-* `Open http://localhost:5555/chains`. This should return a JSON value containing the 3 Hedera networks
+* `Open http://localhost:5002/chains`. This should return a JSON value containing the 3 Hedera networks
 * `Open http://localhost:5555/files/contracts/296`. This should return a JSON value containing the addresses of all contracts verified on testnet (or report error "_Contracts have not been found!_" if nothing has been verified yet)
 * `Open http://localhost:3000`. This should bring up the Verifier page.
 
@@ -64,9 +66,9 @@ or build the images locally.
 
 ### Pulling pre-built images
 
-* Run `docker pull ghcr.io/hashgraph/hedera-sourcify:ui-latest`
-* Run `docker pull ghcr.io/hashgraph/hedera-sourcify:server-latest`
-* Run `docker pull ghcr.io/hashgraph/hedera-sourcify:repository-latest`
+* Run `docker pull ghcr.io/hashgraph/hedera-sourcify:ui-main`
+* Run `docker pull ghcr.io/hashgraph/hedera-sourcify:server-main`
+* Run `docker pull ghcr.io/hashgraph/hedera-sourcify:repository-main`
 * Then follow _Run_ step below.
 
 ### Build images
