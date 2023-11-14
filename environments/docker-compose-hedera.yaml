@@ -17,8 +17,8 @@ services:
 
   repository:
     <<: *project-base
-    image: ghcr.io/hashgraph/hedera-sourcify:repository-latest
-    container_name: repository-latest
+    image: ghcr.io/hashgraph/hedera-sourcify:repository-${TAG}
+    container_name: repository-${TAG}
     volumes:
       - <<: *project-repository-mount
         target: /data
@@ -31,8 +31,8 @@ services:
 
   server:
     <<: *project-base
-    image: ghcr.io/hashgraph/hedera-sourcify:server-latest
-    container_name: server-latest
+    image: ghcr.io/hashgraph/hedera-sourcify:server-${TAG}
+    container_name: server-${TAG}
     ports:
       - "${SERVER_EXTERNAL_PORT}:${SERVER_PORT}"
     volumes:
@@ -52,8 +52,8 @@ services:
 
   ui:
     <<: *project-base
-    image: ghcr.io/hashgraph/hedera-sourcify:ui-latest
-    container_name: ui-latest
+    image: ghcr.io/hashgraph/hedera-sourcify:ui-${TAG}
+    container_name: ui-${TAG}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
