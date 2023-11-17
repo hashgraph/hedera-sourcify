@@ -214,4 +214,4 @@ to [oss@hedera.com](mailto:oss@hedera.com).
 
 ## License
 
-[TBD](LICENSE)
+[Apache License 2.0](LICENSE)
