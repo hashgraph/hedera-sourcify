@@ -68,9 +68,9 @@ spec:
               mountPath: /data
         - name: {{ printf "%s-%s" .Chart.Name "repository" }}
           securityContext:
-            {{- toYaml .Values.repository.securityContext | nindent 12 }}
+            {{- toYaml .Values.serverRepository.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.repository.tag | default "repository-latest" }}"
-          imagePullPolicy: {{ .Values.repository.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.serverRepository.image.pullPolicy }}
           envFrom:
             - configMapRef:
                 name: {{ template "sourcify.name" . }}          

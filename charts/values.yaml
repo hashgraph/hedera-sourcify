@@ -152,10 +152,10 @@ ui:
 
 reset:
   ## Previewnet reset job, default is to disable
-  previewnet-reset: 
+  previewnet_reset: 
     enabled: false
   ## Testnet reset job, default is to disable
-  testnet-reset:
+  testnet_reset:
     enabled: false  
   ## Set default immage repository, tag, and pull policy
   image:

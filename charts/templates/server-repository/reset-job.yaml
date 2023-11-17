@@ -1,4 +1,4 @@
-{{- if .Values.reset.previewnet-reset.enabled }}
+{{- if .Values.reset.previewnet_reset.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -18,7 +18,7 @@ spec:
         - https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset.sh ; chmod +x hedera-reset.sh ; ./hedera-reset.sh previewnet
 {{- end }}
 ---
-{{- if .Values.reset.testnet-reset.enabled }}
+{{- if .Values.reset.testnet_reset.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
