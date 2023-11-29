@@ -48,6 +48,19 @@ const LOCAL_CHAINS: SourcifyChain[] = [
     supported: true,
     monitored: false,
   }),
+  new SourcifyChain({
+    name: "Ganache Local",
+    shortName: "ganache-local",
+    chainId: 1337,
+    faucets: [],
+    // infoURL: "https://hedera.com",
+    nativeCurrency: { "name": "none", "symbol": "NONE", "decimals": 18 },
+    network: "Ganache",
+    networkId: 1337,
+    rpc: ["http://localhost:8545"],
+    supported: true,
+    monitored: false,
+  }),
 ];
 
 interface SourcifyChainsExtensionsObject {
@@ -1007,8 +1020,8 @@ export function getSortedChainsArray(
       getPrimarySortKey(a) > getPrimarySortKey(b)
         ? 1
         : getPrimarySortKey(b) > getPrimarySortKey(a)
-        ? -1
-        : 0
+          ? -1
+          : 0
     );
   const sortedChains = ethereumChains.concat(otherChains);
   return sortedChains;

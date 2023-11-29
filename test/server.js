@@ -8,6 +8,8 @@ process.env.SOLJSON_REPO = "./dist/data/soljson-repo";
 process.env.IPFS_GATEWAY = "http://ipfs.io/ipfs/";
 process.env.FETCH_TIMEOUT = 15000; // instantiated http-gateway takes a little longer
 
+process.env.USE_LOCAL_NODE = 'true';
+
 const {
   assertValidationError,
   assertVerification,
