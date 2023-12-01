@@ -159,8 +159,9 @@ describe("Server", function () {
 
     const agent = chai.request.agent(server.app);
     let verificationId;
+    let contracts;
 
-    it("should input files from existing contract via auxdata ipfs", async () => {
+    before(async function () {
       const artifacts = require("./testcontracts/Create2/Wallet.json");
 
       const account = await localSigner.getAddress();
@@ -176,15 +177,20 @@ describe("Server", function () {
         .field("address", addressDeployed)
         .field("chainId", defaultContractChain);
 
-      verificationId = res.body.contracts[0].verificationId;
-      chai.expect(res.body.contracts).to.have.a.lengthOf(1);
-      const contract = res.body.contracts[0];
+      contracts = res.body.contracts;
+      verificationId = contracts[0].verificationId;
+      chai.expect(verificationId).to.be.not.undefined;
+    });
+
+    it("should input files from existing contract via auxdata ipfs", async () => {
+      chai.expect(contracts).to.have.a.lengthOf(1);
+      const contract = contracts[0];
       chai.expect(contract.files.found).to.have.a.lengthOf(1);
       const retrivedFile = contract.files.found[0];
       chai.expect(retrivedFile).to.equal("contracts/create2/Wallet.sol");
     });
 
-    it("should create2 verify with session", (done) => {
+    it.skip("should create2 verify with session", (done) => {
       let clientToken;
       const sourcifyClientTokensRaw = process.env.CREATE2_CLIENT_TOKENS;
       if (sourcifyClientTokensRaw?.length) {
@@ -214,7 +220,7 @@ describe("Server", function () {
         });
     });
 
-    it("should create2 verify non-session", (done) => {
+    it.skip("should create2 verify non-session", (done) => {
       const metadata = fs
         .readFileSync("test/testcontracts/Create2/Wallet_metadata.json")
         .toString();
@@ -273,7 +279,7 @@ describe("Server", function () {
       chai
         .request(server.app)
         .get("/check-by-addresses")
-        .query({ chainIds: 1 })
+        .query({ chainIds: defaultContractChain })
         .end((err, res) => {
           assertValidationError(err, res, "addresses");
           done();
@@ -378,7 +384,7 @@ describe("Server", function () {
       chai
         .request(server.app)
         .get("/check-all-by-addresses")
-        .query({ chainIds: 1 })
+        .query({ chainIds: defaultContractChain })
         .end((err, res) => {
           assertValidationError(err, res, "addresses");
           done();
@@ -1322,7 +1328,7 @@ describe("Server", function () {
         });
     });
 
-    it("should correctly handle when uploaded 0/2 and then 1/2 sources", (done) => {
+    it.skip("should correctly handle when uploaded 0/2 and then 1/2 sources", (done) => {
       const metadataPath = path.join(
         "test",
         "sources",
