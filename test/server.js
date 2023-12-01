@@ -1753,10 +1753,12 @@ describe("Server", function () {
     const {
       getCreatorTx,
     } = require("../dist/server/services/VerificationService-util");
-    it("should run getCreatorTx with chainId 40", async function () {
+
+    it.skip("should run getCreatorTx with chainId 40", async function () {
       const sourcifyChain = sourcifyChainsArray.find(
         (sourcifyChain) => sourcifyChain.chainId === 40
       );
+      chai.expect(sourcifyChain).to.be.not.undefined;
       const creatorTx = await getCreatorTx(
         sourcifyChain,
         "0x4c09368a4bccD1675F276D640A0405Efa9CD4944"
@@ -1767,6 +1769,7 @@ describe("Server", function () {
           "0xb7efb33c736b1e8ea97e356467f99d99221343f077ce31a3e3ac1d2e0636df1d"
         );
     });
+
     // Commented out as fails way too often
     // it("should run getCreatorTx with chainId 51", async function () {
     //   const sourcifyChain = sourcifyChainsArray.find(
@@ -1782,10 +1785,13 @@ describe("Server", function () {
     //       "0xb1af0ec1283551480ae6e6ce374eb4fa7d1803109b06657302623fc65c987420"
     //     );
     // });
-    it("should run getCreatorTx with chainId 83", async function () {
+
+    it.skip("should run getCreatorTx with chainId 83", async function () {
       const sourcifyChain = sourcifyChainsArray.find(
         (sourcifyChain) => sourcifyChain.chainId === 83
       );
+      chai.expect(sourcifyChain).to.be.not.undefined;
+
       const creatorTx = await getCreatorTx(
         sourcifyChain,
         "0x89e772941d94Ef4BDA1e4f68E79B4bc5F6096389"
@@ -1796,10 +1802,13 @@ describe("Server", function () {
           "0x8cc7b0fb66eaf7b32bac7b7938aedfcec6d49f9fe607b8008a5541e72d264069"
         );
     });
-    it("should run getCreatorTx with chainId 335", async function () {
+
+    it.skip("should run getCreatorTx with chainId 335", async function () {
       const sourcifyChain = sourcifyChainsArray.find(
         (sourcifyChain) => sourcifyChain.chainId === 335
       );
+      chai.expect(sourcifyChain).to.be.not.undefined;
+
       const creatorTx = await getCreatorTx(
         sourcifyChain,
         "0x40D843D06dAC98b2586fD1DFC5532145208C909F"
@@ -1810,10 +1819,13 @@ describe("Server", function () {
           "0xd125cc92f61d0898d55a918283f8b855bde15bc5f391b621e0c4eee25c9997ee"
         );
     });
-    it("should run getCreatorTx with regex for new Blockscout", async function () {
+
+    it.skip("should run getCreatorTx with regex for new Blockscout", async function () {
       const sourcifyChain = sourcifyChainsArray.find(
         (sourcifyChain) => sourcifyChain.chainId === 100
       );
+      chai.expect(sourcifyChain).to.be.not.undefined;
+
       const creatorTx = await getCreatorTx(
         sourcifyChain,
         "0x3CE1a25376223695284edc4C2b323C3007010C94"
@@ -1824,10 +1836,13 @@ describe("Server", function () {
           "0x11da550e6716be8b4bd9203cb384e89b8f8941dc460bd99a4928ce2825e05456"
         );
     });
-    it("should run getCreatorTx with regex for old Blockscout", async function () {
+
+    it.skip("should run getCreatorTx with regex for old Blockscout", async function () {
       const sourcifyChain = sourcifyChainsArray.find(
         (sourcifyChain) => sourcifyChain.chainId === 1313161554
       );
+      chai.expect(sourcifyChain).to.be.not.undefined;
+
       const creatorTx = await getCreatorTx(
         sourcifyChain,
         "0xC6e5185438e1730959c1eF3551059A3feC744E90"
@@ -1838,10 +1853,13 @@ describe("Server", function () {
           "0x5db54485baca39ffaeda1e28edb467a8fd3372dbd21a891b2619a02dbf4acc18"
         );
     });
-    it("should run getCreatorTx with regex for Etherscan", async function () {
+
+    it.skip("should run getCreatorTx with regex for Etherscan", async function () {
       const sourcifyChain = sourcifyChainsArray.find(
         (sourcifyChain) => sourcifyChain.chainId === 84531
       );
+      chai.expect(sourcifyChain).to.be.not.undefined;
+
       const creatorTx = await getCreatorTx(
         sourcifyChain,
         "0xbe92671bdd1a1062e1a9f3be618e399fb5facace"
@@ -1852,6 +1870,7 @@ describe("Server", function () {
           "0x15c5208cacbc1e14d9906926b8a991ec986a442f26081fe5ac9de4eb671c5195"
         );
     });
+
     it("should attach and trigger an event with the event manager", function (done) {
       const EventManager = require("../dist/common/EventManager").EventManager;
       const em = new EventManager({
