@@ -30,6 +30,9 @@ jobs:
       - name: Build hedera-sourcify server
         run: npx lerna bootstrap && npx lerna run build
 
+      - name: Run Verification Service API tests
+        run: npm run test:server
+
       - name: Start Hedera Local Node
         run: npm run local-node:start
 
