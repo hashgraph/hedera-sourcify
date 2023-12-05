@@ -294,7 +294,8 @@ export const verifyContractsInSession = async (
   contractWrappers: ContractWrapperMap,
   session: Session,
   verificationService: IVerificationService,
-  repositoryService: IRepositoryService
+  repositoryService: IRepositoryService,
+  dryRun: boolean = false
 ): Promise<void> => {
   for (const id in contractWrappers) {
     const contractWrapper = contractWrappers[id];
@@ -379,7 +380,7 @@ export const verifyContractsInSession = async (
     contractWrapper.status = match.status || "error";
     contractWrapper.statusMessage = match.message;
     contractWrapper.storageTimestamp = match.storageTimestamp;
-    if (match.status) {
+    if (match.status && !dryRun) {
       await repositoryService.storeMatch(checkedContract, match);
     }
   }

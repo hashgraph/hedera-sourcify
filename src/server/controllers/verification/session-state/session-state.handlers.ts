@@ -40,6 +40,7 @@ export async function addInputFilesEndpoint(req: Request, res: Response) {
     return { path: pb.path, content: pb.buffer.toString(FILE_ENCODING) };
   });
 
+  const dryRun = Boolean(req.body.dryRun)
   const session = req.session;
   const newFilesCount = saveFiles(pathContents, session);
   if (newFilesCount) {
@@ -48,7 +49,8 @@ export async function addInputFilesEndpoint(req: Request, res: Response) {
       session.contractWrappers,
       session,
       services.verification,
-      services.repository
+      services.repository,
+      dryRun
     );
   }
   res.send(getSessionJSON(session));
@@ -102,6 +104,7 @@ export async function addInputContractEndpoint(req: Request, res: Response) {
     content: retrievedMetadataBase64,
   });
 
+  const dryRun = Boolean(req.query.dryrun)
   const session = req.session;
 
   const newFilesCount = saveFiles(pathContents, session);
@@ -112,7 +115,8 @@ export async function addInputContractEndpoint(req: Request, res: Response) {
       session.contractWrappers,
       session,
       services.verification,
-      services.repository
+      services.repository,
+      dryRun
     );
   }
   res.send(getSessionJSON(session));

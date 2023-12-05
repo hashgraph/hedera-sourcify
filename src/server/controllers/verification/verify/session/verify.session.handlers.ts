@@ -19,6 +19,7 @@ export async function verifyContractsInSessionEndpoint(
     throw new BadRequestError("There are currently no pending contracts.");
   }
 
+  const dryRun = Boolean(req.query.dryRun)
   const receivedContracts: SendableContract[] = req.body.contracts;
 
   const verifiable: ContractWrapperMap = {};
@@ -40,7 +41,8 @@ export async function verifyContractsInSessionEndpoint(
     verifiable,
     session,
     services.verification,
-    services.repository
+    services.repository,
+    dryRun
   );
   res.send(getSessionJSON(session));
 }
