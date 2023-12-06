@@ -30,6 +30,10 @@ jobs:
       - name: Build hedera-sourcify server
         run: npx lerna bootstrap && npx lerna run build
 
+      - run: cd packages/bytecode-utils && npm run test
+      - run: cd packages/contract-call-decoder && npm run test
+      - run: cd packages/lib-sourcify && npm run test
+
       - name: Run Verification Service API tests
         run: npm run test:server
 
