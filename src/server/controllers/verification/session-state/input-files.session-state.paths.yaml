@@ -42,7 +42,8 @@ paths:
           in: query
           schema:
             type: boolean
-          description: Dry-run flag. When set to true, a successful verification result will not be stored in the repository.
+            default: false
+          description: Dry-run flag. When present and set to true, a successful verification result will not be stored in the repository.
           required: false
       responses:
         "200":
