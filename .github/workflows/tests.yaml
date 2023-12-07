@@ -6,6 +6,20 @@ on:
 
 jobs:
 
+  unit-tests:
+    name: Basic server non-regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npx lerna bootstrap && npx lerna run build
+      - run: cd packages/bytecode-utils && npm run test
+      - run: cd packages/contract-call-decoder && npm run test
+      - run: cd packages/lib-sourcify && npm run test
+
   test-server:
 
     name: Basic server non-regression
@@ -29,10 +43,6 @@ jobs:
 
       - name: Build hedera-sourcify server
         run: npx lerna bootstrap && npx lerna run build
-
-      - run: cd packages/bytecode-utils && npm run test
-      - run: cd packages/contract-call-decoder && npm run test
-      - run: cd packages/lib-sourcify && npm run test
 
       - name: Run Verification Service API tests
         run: npm run test:server
