@@ -106,6 +106,21 @@ or build the images locally.
 3. Run `npm run server:start`
 4. Run `npm run test:hedera`
 
+Moreover, to run the server tests against a local Ganache instance run
+
+```sh
+npm run test:server
+```
+
+> Note that there is no need to spin up a Ganache instance separately.
+> It is automatically started and stopped by the server test.
+
+### Unit Tests
+
+Under `packages/` there are dependencies that are used by the verification services and need to be unit-tested separately.
+To test them run `cd packages/<package> && npm run test`.
+The corresponding job that runs these tests in CI is `unit-tests`.
+
 ## Configuration
 
 The following tables describe the configuration items used by the different services
