@@ -40,7 +40,7 @@ export async function addInputFilesEndpoint(req: Request, res: Response) {
     return { path: pb.path, content: pb.buffer.toString(FILE_ENCODING) };
   });
 
-  const dryRun = Boolean(req.body.dryRun)
+  const dryRun = Boolean(req.query.dryrun)
   const session = req.session;
   const newFilesCount = saveFiles(pathContents, session);
   if (newFilesCount) {
