@@ -114,6 +114,8 @@ npm run test:server
 
 > Note that there is no need to spin up a Ganache instance separately.
 > It is automatically started and stopped by the server test.
+>
+> We use the `USE_LOCAL_NODE` environment variable to enable Ganache as a local chain.
 
 ### Unit Tests
 
