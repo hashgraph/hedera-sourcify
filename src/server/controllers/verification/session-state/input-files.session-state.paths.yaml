@@ -1,5 +1,4 @@
 openapi: "3.0.0"
-
 paths:
   /session/input-files:
     post:
@@ -38,6 +37,13 @@ paths:
             type: string
             format: uri
           description: Remote file URL
+          required: false
+        - name: dryrun
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Dry-run flag. When present and set to true, a successful verification result will not be stored in the repository.
           required: false
       responses:
         "200":
