@@ -6,8 +6,8 @@ on:
 
 jobs:
 
-  unit-tests:
-    name: Basic server non-regression
+  unit-test-bytecode-utils:
+    name: Unit Test bytecode-utils
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,7 +17,17 @@ jobs:
       - run: npm ci
       - run: npx lerna bootstrap && npx lerna run build
       - run: cd packages/bytecode-utils && npm run test
-      - run: cd packages/contract-call-decoder && npm run test
+
+  unit-test-lib-sourcify:
+    name: Unit Test lib-sourcify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npx lerna bootstrap && npx lerna run build
       - run: cd packages/lib-sourcify && npm run test
 
   test-server:
