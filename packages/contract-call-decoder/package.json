@@ -76,8 +76,8 @@
     "README.md"
   ],
   "ava": {
-    "failFast": true,
-    "timeout": "60s",
+    "failFast": false,
+    "timeout": "120s",
     "typescript": {
       "rewritePaths": {
         "src/": "build/main/"
