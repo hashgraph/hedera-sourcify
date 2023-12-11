@@ -6,8 +6,8 @@ on:
 
 jobs:
 
-  unit-test-bytecode-utils:
-    name: Unit Test bytecode-utils
+  bytecode-utils-uts:
+    name: bytecode-utils unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -18,8 +18,8 @@ jobs:
       - run: npx lerna bootstrap && npx lerna run build
       - run: cd packages/bytecode-utils && npm run test
 
-  unit-test-lib-sourcify:
-    name: Unit Test lib-sourcify
+  lib-sourcify-uts:
+    name: lib-sourcify unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,32 +30,33 @@ jobs:
       - run: npx lerna bootstrap && npx lerna run build
       - run: cd packages/lib-sourcify && npm run test
 
-  test-server:
-
-    name: Basic server non-regression
-
+  server-ganache-its:
+    name: server over Ganache integration tests
     runs-on: ubuntu-latest
-
     steps:
-      - name: Use Node.js TLS 18
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - run: npm ci
+      - run: npx lerna bootstrap && npx lerna run build
+      - run: npm run test:server
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: npm ci
+  server-local-node-its:
+    name: server over Hedera's local node integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
 
       - name: Provide environment variables
         run: cp environments/.env.dev.hedera environments/.env
 
       - name: Build hedera-sourcify server
         run: npx lerna bootstrap && npx lerna run build
-
-      - name: Run Verification Service API tests
-        run: npm run test:server
 
       - name: Start Hedera Local Node
         run: npm run local-node:start
