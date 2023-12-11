@@ -69,6 +69,7 @@ diff --git a/Dockerfile b/Dockerfile
  FROM node:14-alpine
  RUN apk add --no-cache git
  RUN git clone https://github.com/sourcifyeth/h5ai.git
++RUN cd h5ai && git checkout 15173ca22fcd4e9b2c0d11bdacc509428dba1bcd
 +COPY h5ai.patch /h5ai.patch
 +RUN cd h5ai && git apply /h5ai.patch
  RUN cd h5ai && npm install && npm run build 
