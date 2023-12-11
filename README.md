@@ -55,16 +55,23 @@ This assumes the default ports (per .env.dev.hedera) are used:
 
 ## Use Docker images
 
-You can either use pre-built Docker images from the GitHub container repository
-or build the images locally.
+This set-up uses an nginx reverse proxy in front of the 3 services (ui, server, repository) in order to support HTTPS when running locally.
+The SSL set-up is based on a self-signed certificate obtained per the instructions at: https://letsencrypt.org/docs/certificates-for-localhost/
+
+Note:
+* The design of the repository (itself based on an nginx reverse proxy) is such that it requires to be on a distinct host,
+so it cannot be accessed by localhost like ui and server. To this effect you need to define a hostname locally (see below)
+* For each of the 3 services, you may either use a pre-built Docker image from the GitHub container repository 
+or build the images locally.  
 
 ### Set-up
 
 1. `cp environments/.env.docker.hedera  environments/.env`
-2. Adjust the configuration in `environments/.env` as follows:
-    - Replace all occurrences of `localhost` by the fully qualified hostname if not running locally
-3. `cp environments/example-docker-config.json  environments/docker-config.json`
-    - Adjust the URLs in `docker-config.json` as needed
+   - Adjust the configuration in `environments/.env` if needed
+2. `cp environments/example-https-docker-config.json  environments/docker-config.json`
+   - Adjust the URLs in `docker-config.json` if needed
+3. `sudo bash -c 'echo "127.0.0.1       repository.local" >> /etc/hosts'`
+   - This will define the domain `repository.local` used by the repository
 4. You may need to authenticate to the GitHub container registry at `ghcr.io` using a personal access token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
 
 ### Pulling pre-built images
@@ -82,8 +89,8 @@ or build the images locally.
 
 ### Run
 
-1. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
-2. `Open http://localhost:1234` to bring up the Verifier page.
+1. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d`
+2. `Open https://localhost` to bring up the Verifier page.
 
 ### Stop
 
