@@ -51,8 +51,8 @@ diff --git a/Dockerfile b/Dockerfile
 --- a/Dockerfile	(revision 453a6681ef93a7a43ee339b5301743e27d7a3b62)
 +++ b/Dockerfile	(date 1702401995981)
 @@ -1,6 +1,9 @@
- FROM node:14-alpine
- RUN apk add --no-cache git
+ FROM node:14.14-alpine
+ RUN apk add --no-cache git python2 make g++
  RUN git clone https://github.com/sourcifyeth/h5ai.git
 +RUN cd h5ai && git checkout 15173ca22fcd4e9b2c0d11bdacc509428dba1bcd
 +COPY h5ai.patch /h5ai.patch
