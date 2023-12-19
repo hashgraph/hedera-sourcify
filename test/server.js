@@ -1271,91 +1271,93 @@ describe("Server", function () {
         });
     });
 
-    it("should not store the successful verification result when the query parameter dryrun=true is provided", (done) => {
-      const agent = chai.request.agent(server.app);
-      agent
-        .post("/session/input-files?dryrun=true")
-        .attach("files", sourceBuffer)
-        .attach("files", metadataBuffer)
-        .then((res) => {
-          const contracts = assertSingleContractStatus(res, "error");
-          contracts[0].address = defaultContractAddress;
+    describe("dryrun query parameter", function () {
+      it("should not store the successful verification result when the query parameter dryrun=true is provided", (done) => {
+        const agent = chai.request.agent(server.app);
+        agent
+          .post("/session/input-files?dryrun=true")
+          .attach("files", sourceBuffer)
+          .attach("files", metadataBuffer)
+          .then((res) => {
+            const contracts = assertSingleContractStatus(res, "error");
+            contracts[0].address = defaultContractAddress;
 
-          agent
-            .post("/session/verify-checked?dryrun=true")
-            .send({ contracts })
-            .then((res) => {
-              assertSingleContractStatus(res, "error");
-              contracts[0].chainId = defaultContractChain;
+            agent
+              .post("/session/verify-checked?dryrun=true")
+              .send({contracts})
+              .then((res) => {
+                assertSingleContractStatus(res, "error");
+                contracts[0].chainId = defaultContractChain;
 
-              agent
-                .post("/session/verify-checked?dryrun=true")
-                .send({ contracts })
-                .then((res) => {
-                  assertSingleContractStatus(res, "perfect");
-                  assertContractNotSaved(defaultContractAddress, defaultContractChain);
-                  done();
-                });
-            });
-        });
-    });
+                agent
+                  .post("/session/verify-checked?dryrun=true")
+                  .send({contracts})
+                  .then((res) => {
+                    assertSingleContractStatus(res, "perfect");
+                    assertContractNotSaved(defaultContractAddress, defaultContractChain);
+                    done();
+                  });
+              });
+          });
+      });
 
-    it("should store the successful verification result when the query parameter dryrun=false is provided", (done) => {
-      const agent = chai.request.agent(server.app);
-      agent
-        .post("/session/input-files?dryrun=false")
-        .attach("files", sourceBuffer)
-        .attach("files", metadataBuffer)
-        .then((res) => {
-          const contracts = assertSingleContractStatus(res, "error");
-          contracts[0].address = defaultContractAddress;
+      it("should store the successful verification result when the query parameter dryrun=false is provided", (done) => {
+        const agent = chai.request.agent(server.app);
+        agent
+          .post("/session/input-files?dryrun=false")
+          .attach("files", sourceBuffer)
+          .attach("files", metadataBuffer)
+          .then((res) => {
+            const contracts = assertSingleContractStatus(res, "error");
+            contracts[0].address = defaultContractAddress;
 
-          agent
-            .post("/session/verify-checked?dryrun=false")
-            .send({ contracts })
-            .then((res) => {
-              assertSingleContractStatus(res, "error");
-              contracts[0].chainId = defaultContractChain;
+            agent
+              .post("/session/verify-checked?dryrun=false")
+              .send({contracts})
+              .then((res) => {
+                assertSingleContractStatus(res, "error");
+                contracts[0].chainId = defaultContractChain;
 
-              agent
-                .post("/session/verify-checked?dryrun=false")
-                .send({ contracts })
-                .then((res) => {
-                  assertSingleContractStatus(res, "perfect");
-                  assertContractSaved(defaultContractAddress, defaultContractChain, "perfect");
-                  done();
-                });
-            });
-        });
-    });
+                agent
+                  .post("/session/verify-checked?dryrun=false")
+                  .send({contracts})
+                  .then((res) => {
+                    assertSingleContractStatus(res, "perfect");
+                    assertContractSaved(defaultContractAddress, defaultContractChain, "perfect");
+                    done();
+                  });
+              });
+          });
+      });
 
-    it("should store the successful verification result when the query parameter dryrun is not provided", (done) => {
-      const agent = chai.request.agent(server.app);
-      agent
-        .post("/session/input-files")
-        .attach("files", sourceBuffer)
-        .attach("files", metadataBuffer)
-        .then((res) => {
-          const contracts = assertSingleContractStatus(res, "error");
-          contracts[0].address = defaultContractAddress;
+      it("should store the successful verification result when the query parameter dryrun is not provided", (done) => {
+        const agent = chai.request.agent(server.app);
+        agent
+          .post("/session/input-files")
+          .attach("files", sourceBuffer)
+          .attach("files", metadataBuffer)
+          .then((res) => {
+            const contracts = assertSingleContractStatus(res, "error");
+            contracts[0].address = defaultContractAddress;
 
-          agent
-            .post("/session/verify-checked")
-            .send({ contracts })
-            .then((res) => {
-              assertSingleContractStatus(res, "error");
-              contracts[0].chainId = defaultContractChain;
+            agent
+              .post("/session/verify-checked")
+              .send({contracts})
+              .then((res) => {
+                assertSingleContractStatus(res, "error");
+                contracts[0].chainId = defaultContractChain;
 
-              agent
-                .post("/session/verify-checked")
-                .send({ contracts })
-                .then((res) => {
-                  assertSingleContractStatus(res, "perfect");
-                  assertContractSaved(defaultContractAddress, defaultContractChain, "perfect");
-                  done();
-                });
-            });
-        });
+                agent
+                  .post("/session/verify-checked")
+                  .send({contracts})
+                  .then((res) => {
+                    assertSingleContractStatus(res, "perfect");
+                    assertContractSaved(defaultContractAddress, defaultContractChain, "perfect");
+                    done();
+                  });
+              });
+          });
+      });
     });
 
     it("should fail for a source that is missing and unfetchable", (done) => {
