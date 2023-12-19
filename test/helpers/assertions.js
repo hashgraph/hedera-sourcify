@@ -166,7 +166,7 @@ const assertContractNotSaved = (expectedAddress, expectedChain) => {
     "metadata.json"
   )
   const isExist = fs.existsSync(fullMatchPath) || fs.existsSync(partialMatchPath);
-  chai.expect(isExist, "Contract should not have been saved").to.be.false;
+  chai.expect(isExist, `Contract should not have been saved, either ${fullMatchPath} | ${partialMatchPath} exists`).to.be.false;
 }
 
 module.exports = {
