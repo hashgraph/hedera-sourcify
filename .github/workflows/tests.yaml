@@ -18,6 +18,18 @@ jobs:
       - run: npx lerna bootstrap && npx lerna run build
       - run: cd packages/bytecode-utils && npm run test
 
+  contract-call-decoder-uts:
+    name: contract-call-decoder unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npx lerna bootstrap && npx lerna run build
+      - run: cd packages/contract-call-decoder && npm run test
+
   lib-sourcify-uts:
     name: lib-sourcify unit tests
     runs-on: ubuntu-latest

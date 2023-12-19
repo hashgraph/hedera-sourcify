@@ -124,7 +124,7 @@ test('evaluate calldata can correctly parse addresses, bigints and bytes', async
   t.is(`${decodedContractCall.method.decodedParams[3]}`, '0x010101ff');
 });
 
-test('evaluate calldata from tx getting metadata from bytecode', async (t) => {
+test.skip('evaluate calldata from tx getting metadata from bytecode', async (t) => {
   const ethereumProvider = provider('https://rpc.ankr.com/eth_goerli');
   const tx = {
     to: '0xD4B081C226Bc8aBdaf111DEf54c09E779ad29428',
