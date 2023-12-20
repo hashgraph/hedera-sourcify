@@ -5,7 +5,7 @@ const path = require("path");
 const fs = require("fs");
 const { getAddress } = require("ethers");
 
-exports.assertValidationError = (err, res, field, message) => {
+const assertValidationError = (err, res, field, message) => {
   try {
     chai.expect(err).to.be.null;
     chai.expect(res.body.message.toLowerCase()).to.include(field.toLowerCase());
@@ -18,7 +18,7 @@ exports.assertValidationError = (err, res, field, message) => {
   }
 };
 
-exports.assertVerification = (
+const assertVerification = (
   err,
   res,
   done,
@@ -52,7 +52,7 @@ exports.assertVerification = (
   }
 };
 
-exports.assertVerificationSession = (
+const assertVerificationSession = (
   err,
   res,
   done,
@@ -92,7 +92,7 @@ exports.assertVerificationSession = (
 /**
  * Lookup (check-by-address etc.) doesn't return chainId, otherwise same as assertVerification
  */
-exports.assertLookup = (err, res, expectedAddress, expectedStatus, done) => {
+const assertLookup = (err, res, expectedAddress, expectedStatus, done) => {
   chai.expect(err).to.be.null;
   chai.expect(res.status).to.equal(StatusCodes.OK);
   const resultArray = res.body;
@@ -106,7 +106,7 @@ exports.assertLookup = (err, res, expectedAddress, expectedStatus, done) => {
 /**
  * check-all-by-address returns chain and status objects in an array.
  */
-exports.assertLookupAll = (
+const assertLookupAll = (
   err,
   res,
   expectedAddress,
@@ -123,7 +123,10 @@ exports.assertLookupAll = (
   if (done) done();
 };
 
-function assertContractSaved(expectedAddress, expectedChain, expectedStatus) {
+/**
+ * assertContractSaved checks that the verification result was adequately stored on the file system.
+ */
+const assertContractSaved = (expectedAddress, expectedChain, expectedStatus) => {
   // Check if saved to the disk
   if (expectedStatus === "perfect" || expectedStatus === "partial") {
     const match = expectedStatus === "perfect" ? "full_match" : "partial_match";
@@ -139,4 +142,39 @@ function assertContractSaved(expectedAddress, expectedChain, expectedStatus) {
     );
     chai.expect(isExist, "Contract is not saved").to.be.true;
   }
+}
+
+/**
+ * assertContractNotSaved checks that the verification result was not stored on the file system.
+ */
+const assertContractNotSaved = (expectedAddress, expectedChain) => {
+  // Check contract verification result was NOT saved to the disk
+  const fullMatchPath = path.join(
+    config.repository.path,
+    "contracts",
+    "full_match",
+    expectedChain,
+    getAddress(expectedAddress),
+    "metadata.json"
+  )
+  const partialMatchPath = path.join(
+    config.repository.path,
+    "contracts",
+    "partial_match",
+    expectedChain,
+    getAddress(expectedAddress),
+    "metadata.json"
+  )
+  const isExist = fs.existsSync(fullMatchPath) || fs.existsSync(partialMatchPath);
+  chai.expect(isExist, `Contract should not have been saved, either ${fullMatchPath} | ${partialMatchPath} exists`).to.be.false;
+}
+
+module.exports = {
+  assertValidationError,
+  assertVerification,
+  assertVerificationSession,
+  assertLookup,
+  assertLookupAll,
+  assertContractSaved,
+  assertContractNotSaved
 }
