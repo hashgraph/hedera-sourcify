@@ -11,29 +11,30 @@ servers:
     url: ""
   - description: The production REST API server
     url: "https://server-verify.hashscan.io"
-  - description: The integration REST API server
-    url: "https://server-sourcify.hedera-devops.com"
   - description: Local development server address on default port 5002
     url: "http://localhost:5002"
+tags:
+  - name: Session Verification
+    description: Not supported endpoints. Use with caution.
 paths:
-  # /session/data:
-  #   $ref: "src/server/controllers/verification/session-state/data.session-state.paths.yaml#/paths/~1session~1data"
-  # /session/clear:
-  #   $ref: "src/server/controllers/verification/session-state/clear.session-state.paths.yaml#/paths/~1session~1clear"
-  # /session/input-files:
-  #   $ref: "src/server/controllers/verification/session-state/input-files.session-state.paths.yaml#/paths/~1session~1input-files"
-  # /session/input-contract:
-  #   $ref: "src/server/controllers/verification/session-state/input-contract.session-state.paths.yaml#/paths/~1session~1input-contract"
-  # /session/verify-checked:
-  #   $ref: "src/server/controllers/verification/verify/session/verify.session.paths.yaml#/paths/~1session~1verify-checked"
-  # /session/input-solc-json:
-  #   $ref: "src/server/controllers/verification/solc-json/session/solc-json.session.paths.yaml#/paths/~1session~1input-solc-json"
-  # /session/verify/create2:
-  #   $ref: "src/server/controllers/verification/create2/session/create2.session.paths.yaml#/paths/~1session~1verify~1create2"
-  # /session/verify/create2/compile:
-  #   $ref: "src/server/controllers/verification/create2/session/compile.create2.session.paths.yaml#/paths/~1session~1verify~1create2~1compile"
-  # /session/verify/etherscan:
-  #   $ref: "src/server/controllers/verification/etherscan/session/etherscan.session.paths.yaml#/paths/~1session~1verify~1etherscan"
+  /session/data:
+    $ref: "src/server/controllers/verification/session-state/data.session-state.paths.yaml#/paths/~1session~1data"
+  /session/clear:
+    $ref: "src/server/controllers/verification/session-state/clear.session-state.paths.yaml#/paths/~1session~1clear"
+  /session/input-files:
+    $ref: "src/server/controllers/verification/session-state/input-files.session-state.paths.yaml#/paths/~1session~1input-files"
+  /session/input-contract:
+    $ref: "src/server/controllers/verification/session-state/input-contract.session-state.paths.yaml#/paths/~1session~1input-contract"
+  /session/verify-checked:
+    $ref: "src/server/controllers/verification/verify/session/verify.session.paths.yaml#/paths/~1session~1verify-checked"
+  /session/input-solc-json:
+    $ref: "src/server/controllers/verification/solc-json/session/solc-json.session.paths.yaml#/paths/~1session~1input-solc-json"
+  /session/verify/create2:
+    $ref: "src/server/controllers/verification/create2/session/create2.session.paths.yaml#/paths/~1session~1verify~1create2"
+  /session/verify/create2/compile:
+    $ref: "src/server/controllers/verification/create2/session/compile.create2.session.paths.yaml#/paths/~1session~1verify~1create2~1compile"
+  /session/verify/etherscan:
+    $ref: "src/server/controllers/verification/etherscan/session/etherscan.session.paths.yaml#/paths/~1session~1verify~1etherscan"
   /verify:
     $ref: "src/server/controllers/verification/verify/stateless/verify.stateless.paths.yaml#/paths/~1verify"
   /verify/solc-json:
