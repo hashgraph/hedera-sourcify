@@ -15,7 +15,7 @@ servers:
     url: "http://localhost:5002"
 tags:
   - name: Session Verification
-    description: Not supported endpoints. Use with caution.
+    description: Endpoints behind CORS validation. Unable to use them from outside the domain `hashscan.io`.
 paths:
   /session/data:
     $ref: "src/server/controllers/verification/session-state/data.session-state.paths.yaml#/paths/~1session~1data"
