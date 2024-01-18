@@ -27,16 +27,17 @@ Make sure you are running a local node instance and grab one of the alias ECDSA 
 hedera start -d --network local
 ```
 
+Then start the local verification service
+
+```console
+npm run server:start
+```
+
 Create a new Foundry project
 
 ```console
 forge init hello_foundry
-```
-
-Start the local verification service
-
-```console
-npm run server:start
+cd hello_foundry
 ```
 
 Deploy and verify the contract locally
