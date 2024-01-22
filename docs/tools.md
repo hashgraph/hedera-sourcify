@@ -49,3 +49,41 @@ forge create --rpc-url http://localhost:7546 \
   --verifier sourcify \
   --verifier-url http://localhost:5002
 ```
+
+## Hardhat
+
+You can also verify contracts using Hardhat with the [`hardhat-verify`](https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#verifying-on-sourcify) plugin using our verification service.
+
+> There is currently a minor issue that might confuse users but that does not affect Sourcify verification <https://github.com/NomicFoundation/hardhat/issues/4776>.
+
+Create a new Hardhat project, install its dependencies and use the following `hardhat.config.js`
+
+```js
+require("@nomicfoundation/hardhat-toolbox");
+
+/** @type import('hardhat/config').HardhatUserConfig */
+module.exports = {
+  solidity: "0.8.19",
+  networks: {
+    testnet: {
+      url: 'https://testnet.hashio.io/api',
+      accounts: ["<your account id, go to https://portal.hedera.com/ to setup one>"],
+      chainId: 296,
+    },
+  },
+  sourcify: {
+    enabled: true,
+    apiUrl: "https://server-verify.hashscan.io",
+    browserUrl: "https://repository-verify.hashscan.io",
+  }
+};
+```
+
+Then run
+
+```console
+npx hardhat run --network testnet scripts/deploy.js
+npx hardhat verify --network testnet <CONTRACT_ADDR>
+```
+
+Your contract should be now verified.
