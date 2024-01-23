@@ -67,7 +67,7 @@ module.exports = {
   networks: {
     testnet: {
       url: 'https://testnet.hashio.io/api',
-      accounts: ["<your account id, go to https://portal.hedera.com/ to setup one>"],
+      accounts: ["<your private key, go to https://portal.hedera.com/ to setup one>"],
       chainId: 296,
     },
   },
