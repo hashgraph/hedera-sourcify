@@ -187,8 +187,10 @@ export class Server {
       includePath: true,
       includeStatusCode: true,
       includeUp: true,
+      httpDurationMetricName: "sourcify_http_request_duration_seconds",
       promClient: {
         collectDefaultMetrics: {
+          prefix: "sourcify_",
         }
       }
     });
@@ -196,9 +198,9 @@ export class Server {
     this.app.use(metricsMiddleware);
 
     const counter = new client.Counter({
-      name: 'event_count',
-      help: 'events that happened during verification labeled with: event and chainId',
-      labelNames: ['event', 'chainId'],
+      name: "sourcify_event_count",
+      help: "events that happened during verification labeled with: event and chainId",
+      labelNames: ["event", "chainId"],
     });
 
     SourcifyEventManager.on("*", [
