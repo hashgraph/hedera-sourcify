@@ -16,7 +16,7 @@ case ${1} in
   *) echo "Usage: hedera-reset-docker.sh testnet | previewnet"; exit 22;;
 esac
 
-CONTRACT_PATH="/home/data/repository/contracts"
+CONTRACT_PATH="/data/contracts"
 
 if [ ! -d "${CONTRACT_PATH}" ]; then
   echo "Expected contract repository was not found at this path: ${CONTRACT_PATH}"
