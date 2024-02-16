@@ -28,6 +28,12 @@ import { initDeprecatedRoutes } from "./deprecated.routes";
 import { getAddress } from "ethers";
 import { logger } from "../common/loggerLoki";
 import { setLibSourcifyLogger } from "@ethereum-sourcify/lib-sourcify";
+
+import promBundle from "express-prom-bundle";
+import { SourcifyEventManager } from "../common/SourcifyEventManager/SourcifyEventManager";
+
+import client from "prom-client";
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fileUpload = require("express-fileupload");
 
@@ -174,6 +180,35 @@ export class Server {
       }
       next();
     });
+
+    // Add the options to the prometheus middleware most option are for http_request_duration_seconds histogram metric
+    const metricsMiddleware = promBundle({
+      includeMethod: true,
+      includePath: true,
+      includeStatusCode: true,
+      includeUp: true,
+      httpDurationMetricName: "sourcify_http_request_duration_seconds",
+      promClient: {
+        collectDefaultMetrics: {
+          prefix: "sourcify_",
+        }
+      }
+    });
+    // add the prometheus middleware to all routes
+    this.app.use(metricsMiddleware);
+
+    const counter = new client.Counter({
+      name: "sourcify_event_count",
+      help: "events that happened during verification labeled with: event and chainId",
+      labelNames: ["event", "chainId"],
+    });
+
+    SourcifyEventManager.on("*", [
+      (event: string, argument: any) => {
+        const chainId = argument.chainId;
+        counter.labels({ event, chainId }).inc(1);
+      },
+    ]);
 
     // Session API endpoints require non "*" origins because of the session cookies
     const sessionPaths = [
