@@ -13,7 +13,7 @@ spec:
       template:
         spec:
           serviceAccountName: {{ template "sourcify.serverRepository.serviceAccountName" . }}
-          restartPolicy: Never
+          restartPolicy: Never        
           containers:
           - name: reset
             image: "{{ .Values.reset.image.repository }}:{{ .Values.reset.image.tag }}"
@@ -21,7 +21,14 @@ spec:
             command:
             - /bin/sh
             - -c
-            - wget https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset.sh ; chmod +x hedera-reset.sh ; ./hedera-reset.sh previewnet
+            - wget https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset-docker.sh ; chmod +x hedera-reset-docker.sh ; ./hedera-reset-docker.sh previewnet
+            volumeMounts:
+              - name: {{ .Chart.Name }}
+                mountPath: /data              
+          volumes:
+            - name: {{ .Chart.Name }}
+              persistentVolumeClaim:
+                claimName: {{ template "sourcify.name" . }}-pvc
 {{- end }}
 
 ---
@@ -48,5 +55,5 @@ spec:
             command:
             - /bin/sh
             - -c
-            - wget https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset.sh ; chmod +x hedera-reset.sh ; ./hedera-reset.sh testnet
+            - wget https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset-docker.sh ; chmod +x hedera-reset-docker.sh ; ./hedera-reset-dcoker.sh testnet
 {{- end }}
