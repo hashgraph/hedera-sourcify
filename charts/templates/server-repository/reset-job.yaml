@@ -13,7 +13,11 @@ spec:
       template:
         spec:
           serviceAccountName: {{ template "sourcify.serverRepository.serviceAccountName" . }}
-          restartPolicy: Never        
+          restartPolicy: Never
+          # The node where this runs must be the same place the persistent volume is mounted.  The kubernetes pvc will show an annotation `volume.kubernetes.io/selected-node` with this value.
+          {{ if .Values.reset.previewnet_reset.nodeName }}
+          nodeName: {{ .Values.reset.previewnet_reset.nodeName }}
+          {{ end }}
           containers:
           - name: reset
             image: "{{ .Values.reset.image.repository }}:{{ .Values.reset.image.tag }}"
@@ -21,7 +25,8 @@ spec:
             command:
             - /bin/sh
             - -c
-            - wget https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset-docker.sh ; chmod +x hedera-reset-docker.sh ; ./hedera-reset-docker.sh previewnet
+            # - wget https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset-docker.sh ; chmod +x hedera-reset-docker.sh ; ./hedera-reset-docker.sh previewnet
+            - sleep 1000000
             volumeMounts:
               - name: {{ .Chart.Name }}
                 mountPath: /data              
