@@ -14,29 +14,63 @@ spec:
         spec:
           serviceAccountName: {{ template "sourcify.serverRepository.serviceAccountName" . }}
           restartPolicy: Never
-          # The node where this runs must be the same place the persistent volume is mounted.  The kubernetes pvc will show an annotation `volume.kubernetes.io/selected-node` with this value.
-          {{ if .Values.reset.previewnet_reset.nodeName }}
-          nodeName: {{ .Values.reset.previewnet_reset.nodeName }}
-          {{ end }}
           containers:
           - name: reset
             image: "{{ .Values.reset.image.repository }}:{{ .Values.reset.image.tag }}"
             imagePullPolicy: {{ .Values.reset.image.pullPolicy }}
             command:
-            - /bin/sh
+            - /bin/bash
             - -c
-            # - wget https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset-docker.sh ; chmod +x hedera-reset-docker.sh ; ./hedera-reset-docker.sh previewnet
-            - sleep 1000000
-            volumeMounts:
-              - name: {{ .Chart.Name }}
-                mountPath: /data              
-          volumes:
-            - name: {{ .Chart.Name }}
-              persistentVolumeClaim:
-                claimName: {{ template "sourcify.name" . }}-pvc
+            - POD=$(kubectl get pods -l app.kubernetes.io/name=sourcify-server-repository -n sourcify | tail -1 | awk '{print $1}'); k exec -it -n sourcify $POD -- ./hedera-reset-docker.sh previewnet
+# This job requires a special service account with specific permissions to accomplish this task
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ printf "%s-%s" .Chart.Name "prvw-reset-sa" | trimSuffix "-"| trunc 52 }}
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+  {{- with .Values.serverRepository.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ printf "%s-%s" .Chart.Name "prvw-reset-role" | trimSuffix "-"| trunc 52 }}
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+  {{- with .Values.serverRepository.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ printf "%s-%s" .Chart.Name "prvw-reset-role-binding" | trimSuffix "-"| trunc 52 }}
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+  {{- with .Values.serverRepository.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ printf "%s-%s" .Chart.Name "prvw-reset-role" | trimSuffix "-"| trunc 52 }}
+
 {{- end }}
 
----
+# Testnet reset job
 {{- if .Values.reset.testnet_reset.enabled }}
 apiVersion: batch/v1
 kind: CronJob
@@ -60,5 +94,51 @@ spec:
             command:
             - /bin/sh
             - -c
-            - wget https://raw.githubusercontent.com/hashgraph/hedera-sourcify/main/scripts/hedera-reset-docker.sh ; chmod +x hedera-reset-docker.sh ; ./hedera-reset-dcoker.sh testnet
+            - POD=$(kubectl get pods -l app.kubernetes.io/name=sourcify-server-repository -n sourcify | tail -1 | awk '{print $1}'); k exec -it -n sourcify $POD -- ./hedera-reset-docker.sh testnet
+
+# This job requires a special service account with specific permissions to accomplish this task
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ printf "%s-%s" .Chart.Name "tsnt-reset-sa" | trimSuffix "-"| trunc 52 }}
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+  {{- with .Values.serverRepository.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ printf "%s-%s" .Chart.Name "tsnt-reset-role" | trimSuffix "-"| trunc 52 }}
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+  {{- with .Values.serverRepository.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ printf "%s-%s" .Chart.Name "tsnt-reset-role-binding" | trimSuffix "-"| trunc 52 }}
+  labels:
+    {{- include "sourcify.labels" . | nindent 4 }}
+  {{- with .Values.serverRepository.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ printf "%s-%s" .Chart.Name "tsnt-reset-role" | trimSuffix "-"| trunc 52 }}
 {{- end }}
