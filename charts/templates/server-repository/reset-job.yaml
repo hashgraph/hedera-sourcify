@@ -12,7 +12,7 @@ spec:
       backoffLimit: 0
       template:
         spec:
-          serviceAccountName: {{ template "sourcify.serverRepository.serviceAccountName" . }}
+          serviceAccountName: {{ printf "%s-%s" .Chart.Name "prvw-reset-sa" | trimSuffix "-"| trunc 52 }}
           restartPolicy: Never
           containers:
           - name: reset
@@ -21,9 +21,11 @@ spec:
             command:
             - /bin/bash
             - -c
-            - POD=$(kubectl get pods -l app.kubernetes.io/name=sourcify-server-repository -n sourcify | tail -1 | awk '{print $1}'); k exec -it -n sourcify $POD -- ./hedera-reset-docker.sh previewnet
-# This job requires a special service account with specific permissions to accomplish this task
+            - POD=$(kubectl get pods -l app.kubernetes.io/name=sourcify-server-repository -n sourcify | tail -1 | awk '{print $1}'); kubectl exec -it -n sourcify $POD -- ./hedera-reset-docker.sh previewnet
+{{- end }}
+
 ---
+{{- if .Values.reset.previewnet_reset.enabled }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -34,7 +36,10 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+{{- end }}
+
 ---
+{{- if .Values.reset.previewnet_reset.enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -52,11 +57,14 @@ rules:
   - apiGroups: [""]
     resources: ["pods/exec"]
     verbs: ["create"]
+{{- end }}
+
 ---
+{{- if .Values.reset.previewnet_reset.enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ printf "%s-%s" .Chart.Name "prvw-reset-role-binding" | trimSuffix "-"| trunc 52 }}
+  name: {{ printf "%s-%s" .Chart.Name "prvw-reset-rolebinding" | trimSuffix "-"| trunc 52 }}
   labels:
     {{- include "sourcify.labels" . | nindent 4 }}
   {{- with .Values.serverRepository.serviceAccount.annotations }}
@@ -67,9 +75,13 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: {{ printf "%s-%s" .Chart.Name "prvw-reset-role" | trimSuffix "-"| trunc 52 }}
-
+subjects:
+  - kind: ServiceAccount
+    name: {{ printf "%s-%s" .Chart.Name "prvw-reset-sa" | trimSuffix "-"| trunc 52 }}
+    namespace: {{ .Release.Namespace }}  
 {{- end }}
 
+---
 # Testnet reset job
 {{- if .Values.reset.testnet_reset.enabled }}
 apiVersion: batch/v1
@@ -85,7 +97,7 @@ spec:
       backoffLimit: 0
       template:
         spec:
-          serviceAccountName: {{ template "sourcify.serverRepository.serviceAccountName" . }}
+          serviceAccountName: {{ printf "%s-%s" .Chart.Name "tsnt-reset-sa" | trimSuffix "-"| trunc 52 }}
           restartPolicy: Never
           containers:
           - name: reset
@@ -94,10 +106,9 @@ spec:
             command:
             - /bin/sh
             - -c
-            - POD=$(kubectl get pods -l app.kubernetes.io/name=sourcify-server-repository -n sourcify | tail -1 | awk '{print $1}'); k exec -it -n sourcify $POD -- ./hedera-reset-docker.sh testnet
-
-# This job requires a special service account with specific permissions to accomplish this task
+            - POD=$(kubectl get pods -l app.kubernetes.io/name=sourcify-server-repository -n sourcify | tail -1 | awk '{print $1}'); kubectl exec -it -n sourcify $POD -- ./hedera-reset-docker.sh testnet
 ---
+# This job requires a special service account with specific permissions to accomplish this task
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -141,4 +152,8 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: {{ printf "%s-%s" .Chart.Name "tsnt-reset-role" | trimSuffix "-"| trunc 52 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ printf "%s-%s" .Chart.Name "tsnt-reset-sa" | trimSuffix "-"| trunc 52 }}
+    namespace: {{ .Release.Namespace }}    
 {{- end }}
