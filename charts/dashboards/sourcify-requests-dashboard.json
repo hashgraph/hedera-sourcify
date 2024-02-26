@@ -1,0 +1,997 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "datasource",
+                    "uid": "grafana"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 9,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+            },
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 0,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unitScale": true
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "id": 30,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "disableTextWrap": false,
+                    "editorMode": "builder",
+                    "expr": "sourcify_http_request_duration_seconds_count",
+                    "fullMetaSearch": false,
+                    "includeNullMetadata": true,
+                    "instant": false,
+                    "legendFormat": "__auto",
+                    "range": true,
+                    "refId": "A",
+                    "useBackend": false
+                }
+            ],
+            "title": "Sourcify Requests",
+            "type": "timeseries"
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unitScale": true
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 6,
+                "w": 8,
+                "x": 0,
+                "y": 6
+            },
+            "hiddenSeries": false,
+            "id": 12,
+            "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "10.3.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum by (app) (rate(sourcify_http_request_duration_seconds_count[2m]))",
+                    "interval": "",
+                    "legendFormat": "{{app}}",
+                    "refId": "A"
+                }
+            ],
+            "thresholds": [],
+            "timeRegions": [],
+            "title": "Sourcify - Requests Per Second",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "reqps",
+                    "label": "",
+                    "logBase": 1,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false
+            }
+        },
+        {
+            "cards": {},
+            "color": {
+                "cardColor": "#FADE2A",
+                "colorScale": "sqrt",
+                "colorScheme": "interpolateOranges",
+                "exponent": 0.3,
+                "mode": "opacity"
+            },
+            "dataFormat": "tsbuckets",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "scaleDistribution": {
+                            "type": "linear"
+                        }
+                    },
+                    "unitScale": true
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 8,
+                "x": 8,
+                "y": 6
+            },
+            "heatmap": {},
+            "hideZeroBuckets": true,
+            "highlightCards": true,
+            "id": 22,
+            "legend": {
+                "show": true
+            },
+            "options": {
+                "calculate": false,
+                "calculation": {},
+                "cellGap": 2,
+                "cellValues": {},
+                "color": {
+                    "exponent": 0.5,
+                    "fill": "#FADE2A",
+                    "mode": "opacity",
+                    "reverse": false,
+                    "scale": "exponential",
+                    "scheme": "Oranges",
+                    "steps": 128
+                },
+                "exemplars": {
+                    "color": "rgba(255,0,255,0.7)"
+                },
+                "filterValues": {
+                    "le": 1e-9
+                },
+                "legend": {
+                    "show": true
+                },
+                "rowsFrame": {
+                    "layout": "unknown"
+                },
+                "showValue": "never",
+                "tooltip": {
+                    "mode": "single",
+                    "showColorScale": false,
+                    "yHistogram": false
+                },
+                "yAxis": {
+                    "axisPlacement": "left",
+                    "decimals": 2,
+                    "reverse": false,
+                    "unit": "s"
+                }
+            },
+            "pluginVersion": "10.3.1",
+            "reverseYBuckets": false,
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "label_replace(sum by (le) (increase(sourcify_http_request_duration_seconds_bucket[$__rate_interval])), \"le\", \"Inf\", \"le\", \"\\\\+Inf\")",
+                    "format": "heatmap",
+                    "instant": false,
+                    "interval": "",
+                    "intervalFactor": 10,
+                    "legendFormat": "{{le}} ",
+                    "refId": "A"
+                }
+            ],
+            "title": "Sourcify Request Duration Heatmap",
+            "tooltip": {
+                "show": true,
+                "showHistogram": false
+            },
+            "transformations": [],
+            "type": "heatmap",
+            "xAxis": {
+                "show": true
+            },
+            "yAxis": {
+                "decimals": 2,
+                "format": "s",
+                "logBase": 1,
+                "show": true
+            },
+            "yBucketBound": "middle"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unitScale": true
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 8,
+                "x": 16,
+                "y": 6
+            },
+            "id": 23,
+            "options": {
+                "displayMode": "gradient",
+                "maxVizHeight": 300,
+                "minVizHeight": 16,
+                "minVizWidth": 8,
+                "namePlacement": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "mean"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showUnfilled": true,
+                "sizing": "auto",
+                "valueMode": "color"
+            },
+            "pluginVersion": "10.3.1",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum by (le) (rate(sourcify_http_request_duration_seconds_bucket[$__rate_interval]))",
+                    "format": "heatmap",
+                    "instant": false,
+                    "interval": "",
+                    "intervalFactor": 10,
+                    "legendFormat": "{{le}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Sourcify Request Duration Summary",
+            "type": "bargauge"
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unitScale": true
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 6,
+                "w": 8,
+                "x": 0,
+                "y": 12
+            },
+            "hiddenSeries": false,
+            "id": 8,
+            "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "10.3.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum by (le) (rate(sourcify_http_request_duration_seconds_bucket[3m]))\n",
+                    "interval": "",
+                    "legendFormat": "Requests > {{le}}s per second",
+                    "refId": "A"
+                }
+            ],
+            "thresholds": [],
+            "timeRegions": [],
+            "title": "Sourcify Request Duration (Stacked All Buckets)",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unitScale": true
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 6,
+                "w": 8,
+                "x": 8,
+                "y": 12
+            },
+            "hiddenSeries": false,
+            "id": 20,
+            "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "10.3.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"0.003\"}[3m]))",
+                    "hide": true,
+                    "interval": "",
+                    "legendFormat": "t  <  0.003",
+                    "refId": "A"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"0.03\"}[3m])) - sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"0.003\"}[3m]))",
+                    "interval": "",
+                    "legendFormat": "0.003  <  t  <  0.03",
+                    "refId": "B"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"0.1\"}[3m])) - sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"0.03\"}[3m]))",
+                    "interval": "",
+                    "legendFormat": "0.03  <  t  <  0.1",
+                    "refId": "C"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"0.3\"}[3m])) - sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"0.1\"}[3m]))",
+                    "interval": "",
+                    "legendFormat": "0.1  <  t  < 0.3",
+                    "refId": "D"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"1.5\"}[3m])) - sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"0.3\"}[3m]))",
+                    "interval": "",
+                    "legendFormat": "0.3  <  t  <  1.5",
+                    "refId": "E"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"10\"}[3m])) - sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"1.5\"}[3m]))",
+                    "interval": "",
+                    "legendFormat": "1.5  <  t  <  10",
+                    "refId": "F"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"+Inf\"}[3m])) - sum (rate(sourcify_http_request_duration_seconds_bucket{le=\"10\"}[3m]))",
+                    "interval": "",
+                    "legendFormat": "10  <  t",
+                    "refId": "G"
+                }
+            ],
+            "thresholds": [],
+            "timeRegions": [],
+            "title": "Sourcify Request Duration (Unstacked Buckets)",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false
+            }
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "decimals": 2,
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "red",
+                                "value": null
+                            },
+                            {
+                                "color": "#EAB839",
+                                "value": 99
+                            },
+                            {
+                                "color": "green",
+                                "value": 99.9
+                            }
+                        ]
+                    },
+                    "unit": "%",
+                    "unitScale": true
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 5,
+                "w": 8,
+                "x": 16,
+                "y": 12
+            },
+            "id": 26,
+            "interval": "1m",
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "mean"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+            },
+            "pluginVersion": "10.3.1",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "(sum by (app) (increase(sourcify_http_request_duration_seconds_bucket{le=\"0.3\"}[1d])) / sum by (app) (increase(sourcify_http_request_duration_seconds_count[1d]))) * 100",
+                    "interval": "",
+                    "legendFormat": "",
+                    "refId": "A"
+                }
+            ],
+            "title": "Percentage of requests shorter than 0.3 seconds",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "decimals": 0,
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "yellow",
+                                "value": null
+                            },
+                            {
+                                "color": "orange",
+                                "value": 1
+                            },
+                            {
+                                "color": "red",
+                                "value": 3
+                            }
+                        ]
+                    },
+                    "unitScale": true
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 7,
+                "w": 8,
+                "x": 16,
+                "y": 17
+            },
+            "id": 28,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "last"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "value_and_name",
+                "wideLayout": true
+            },
+            "pluginVersion": "10.3.1",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "increase(kube_pod_container_status_restarts_total[3h]) > 0",
+                    "interval": "",
+                    "legendFormat": "{{pod}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Container Restarts (last 3h)",
+            "type": "stat"
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unitScale": true
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 6,
+                "w": 8,
+                "x": 0,
+                "y": 18
+            },
+            "hiddenSeries": false,
+            "id": 29,
+            "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "10.3.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "sum by (app, le) (rate(sourcify_http_request_duration_seconds_count[3m]) - ignoring (le) group_right rate(sourcify_http_request_duration_seconds_bucket{le!=\"+Inf\"}[3m]))",
+                    "interval": "",
+                    "legendFormat": "Requests > {{le}}s per second",
+                    "refId": "A"
+                }
+            ],
+            "thresholds": [],
+            "timeRegions": [],
+            "title": "Request Request Duration (Stacked Buckets)",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false
+            }
+        },
+        {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "%",
+                    "unitScale": true
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 6,
+                "w": 8,
+                "x": 8,
+                "y": 18
+            },
+            "hiddenSeries": false,
+            "id": 27,
+            "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "10.3.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "e11bdd27-0fb3-4bda-896c-4ffeb11d0f63"
+                    },
+                    "expr": "(sum by (app) (rate(sourcify_http_request_duration_seconds_bucket{le=\"0.3\"}[2m])) / sum by (app) (rate(sourcify_http_request_duration_seconds_count[2m]))) * 100",
+                    "interval": "",
+                    "legendFormat": "",
+                    "refId": "A"
+                }
+            ],
+            "thresholds": [
+                {
+                    "colorMode": "critical",
+                    "fill": true,
+                    "line": true,
+                    "op": "lt",
+                    "value": 99,
+                    "yaxis": "left"
+                }
+            ],
+            "timeRegions": [],
+            "title": "Percentage of requests shorter than 0.3 seconds",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                    "format": "%",
+                    "logBase": 1,
+                    "max": "100",
+                    "show": true
+                },
+                {
+                    "format": "short",
+                    "logBase": 1,
+                    "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false
+            }
+        }
+    ],
+    "refresh": "",
+    "schemaVersion": 39,
+    "tags": [],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Sourcify Requests Dashboard",
+    "uid": "b134dead-ff9f-488b-b8b9-5f2da75cf0c8",
+    "version": 1,
+    "weekStart": ""
+}
