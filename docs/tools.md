@@ -75,9 +75,14 @@ module.exports = {
     enabled: true,
     apiUrl: "https://server-verify.hashscan.io",
     browserUrl: "https://repository-verify.hashscan.io",
+  },
+  etherscan: {
+    enabled: false,
   }
 };
 ```
+
+Note that the `hardhat-verify` plugin has Etherscan enabled by default, and Sourcify disabled by default, hence you need to set both flags as above in the configuration.
 
 Then run
 
@@ -85,5 +90,15 @@ Then run
 npx hardhat run --network testnet scripts/deploy.js
 npx hardhat verify --network testnet <CONTRACT_ADDR>
 ```
+
+Alternatively, to do so programmatically, invoke `hre.run` to run the required task. 
+
+```js
+await hre.run('verify:sourcify', {
+  address: deployedAddress,
+});
+```
+
+This is useful when you intend to run verification within a [Hardhat script](https://hardhat.org/hardhat-runner/docs/advanced/scripts).
 
 Your contract should be now verified.
