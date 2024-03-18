@@ -159,7 +159,7 @@ reset:
     enabled: false  
   ## Set default immage repository, tag, and pull policy
   image:
-    repository: "apline/curl"
-    tag: "8.4.0"
+    repository: "bitnami/kubectl"
+    tag: "1.28.7"
     pullPolicy: "IfNotPresent"
 
