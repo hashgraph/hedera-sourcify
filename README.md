@@ -167,6 +167,28 @@ The following properties can be provided in config.json
 | `OPEN_IN_REMIX`             | Flag to activate link "Open in Remix" (default is false)                                        |
 | `CREATE2_VERIFICATION`      | Flag to activate create2 verification (default is false)                                        |
 
+#### Customizing the favicon
+
+The favicon may be modified by providing alternative versions of the 3 following files: `manifest.json`, `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` and passing them to the `ui` service via mount points.
+
+This can be done for instance by adding the following to the definition of the `ui` service in the `docker-compose` yaml file used:
+
+```
+volumes:
+  - type: bind
+    source: ./manifest.json
+    target: /usr/share/nginx/html/manifest.json
+  - type: bind
+    source: ./favicon.ico
+    target: /usr/share/nginx/html/favicon.ico
+  - type: bind
+    source: ./favicon-16x16.png
+    target: /usr/share/nginx/html/favicon-16x16.png
+  - type: bind
+    source: ./favicon-32x32.png
+    target: /usr/share/nginx/html/favicon-32x32.png`
+```
+
 ### _server_ module
 
 The following environment variables are needed by the _server_ at runtime:
