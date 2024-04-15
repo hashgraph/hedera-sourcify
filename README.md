@@ -68,6 +68,7 @@ Hedera verification service uses 3 images
 Its main task is to compile input Solidity sources and check compiler results.
 It checks compilers results against the bytecode retrieved from an Ethereum-compatible network, _e.g._, JSON-RPC Relay.
 Other services interact with it through its REST API.
+You can inspect the endpoints provided by visiting `/api-docs` (OpenAPI generated docs) on the `server`, _e.g._, <https://server-verify.hashscan.io/api-docs/>.
 A successful verification stores the contracts sources under _Repository Volume_.
 - [`repository`](#repository-service) **[Repository]**. Provides a verified Smart Contract front end lookup and explorer. It reads verified smart contracts from the _Repository Volume_.
 - [`ui`](#ui-service) **[Verifier UI]**. A user frontend to verify and lookup Smart Contracts.
