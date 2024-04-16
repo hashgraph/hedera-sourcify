@@ -10,10 +10,9 @@ Tools for verifying Hedera smart contracts using standard open source libraries.
 
 ## Prerequisites
 
-Install:
+Install
 
-- [node](https://nodejs.org/en/about/)
-- [npm](https://www.npmjs.com/)
+- [`node`](https://nodejs.org/en/about/) and [`npm`](https://www.npmjs.com/)
 - [Docker](https://docs.docker.com/engine/reference/commandline/docker/)
 
 Make sure the repository submodule `h5ai-nginx` is present
@@ -50,12 +49,16 @@ From the root of the project workspace:
 
 ### Sanity check the configuration
 
-This assumes the default ports (per .env.dev.hedera) are used:
+This assumes the default ports (per `environments/.env.dev.hedera`) are used:
 
-- `Open http://localhost:10000`. This should open the Repository select-contract-form. The options available for the Chain should be the 3 Hedera networks (mainnet, testnet, previewnet).
-- `Open http://localhost:5002/chains`. This should return a JSON value containing the 3 Hedera networks
-- `Open http://localhost:5555/files/contracts/296`. This should return a JSON value containing the addresses of all contracts verified on testnet (or report error "_Contracts have not been found!_" if nothing has been verified yet)
-- `Open http://localhost:3000`. This should bring up the Verifier page.
+- Open <http://localhost:10000>.
+This should open the Repository `select-contract-form`. The options available for the Chain should be the 3 Hedera networks (mainnet, testnet, previewnet).
+- Open <http://localhost:5002/chains>.
+This should return a JSON value containing the 3 Hedera networks
+- Open <http://localhost:5555/files/contracts/296>.
+This should return a JSON value containing the addresses of all contracts verified on testnet (or report error `"Contracts have not been found!"` if nothing has been verified yet)
+- Open <http://localhost:3000>.
+This should bring up the Verifier page.
 
 ## Use Docker images
 
@@ -123,7 +126,7 @@ A successful verification stores the contracts sources under _Repository Volume_
 ### Run
 
 1. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
-2. `Open http://localhost:1234` to bring up the Verifier page.
+2. Open <http://localhost:1234> to bring up the Verifier page.
 
 ### Stop
 
@@ -143,32 +146,6 @@ To reset **previewnet**
 docker exec server-latest /home/app/hedera-reset-docker.sh previewnet
 ```
 
-## Test
-
-### Basic non-regression server test
-
-1. Make sure the variables HEDERA_NETWORK, OPERATOR_ACCOUNT_ID and OPERATOR_KEY are defined in `environments/.env`
-2. Run `hedera start --network local -d`
-3. Run `npm run server:start`
-4. Run `npm run test:hedera`
-
-Moreover, to run the server tests against a local Ganache instance run
-
-```sh
-npm run test:server
-```
-
-> Note that there is no need to spin up a Ganache instance separately.
-> It is automatically started and stopped by the server test.
->
-> We use the `USE_LOCAL_NODE` environment variable to enable Ganache as a local chain.
-
-### Unit Tests
-
-Under `packages/` there are dependencies that are used by the verification services and need to be unit-tested separately.
-To test them run `cd packages/<package> && npm run test`.
-The corresponding job that runs these tests in CI is `unit-tests`.
-
 ## Configuration
 
 The following tables describe the configuration items used by the different services
@@ -187,7 +164,7 @@ Example contents for `config.json`
     "REPOSITORY_SERVER_URL": "https://repository.sourcify-integration.hedera-devops.com",
     "EXPLORER_URL": "http://localhost:8080",
     "BRAND_PRODUCT_LOGO_URL": "http://example.com/path/to/my-logo.jpg",
-    "TERMS_OF_SERVICE_URL": http://example.com/path/to/my-terms.html"",
+    "TERMS_OF_SERVICE_URL": "http://example.com/path/to/my-terms.html",
     "REMOTE_IMPORT": false,
     "GITHUB_IMPORT": false,
     "CONTRACT_IMPORT": false,
@@ -268,11 +245,38 @@ even though the only useful item for the _repository_ is the following:
 
 | Name                              | Example value         | Description                                                                            |
 |-----------------------------------|-----------------------|----------------------------------------------------------------------------------------|
-| `REPOSITORY_PATH`                 | ../../data/repository | Path of the contract repository on the host.                                           |
-| `REPOSITORY_SERVER_EXTERNAL_PORT` | 10000                 | HTTP port exposed by container                                                         |
-| `UI_DOMAIN_NAME`                  | example.com           | Fully qualified domain name of the host running the ui                                 |
-| `TESTING`                         | false                 | DO NOT CHANGE                                                                          |
-| `TAG`                             | latest                | Added to the docker image tags (e.g. ui-latest, server-latest, repository-latest)      |
+| `REPOSITORY_PATH`                 | `../../data/repository` | Path of the contract repository on the host.                                           |
+| `REPOSITORY_SERVER_EXTERNAL_PORT` | `10000`                 | HTTP port exposed by container                                                         |
+| `UI_DOMAIN_NAME`                  | `example.com`           | Fully qualified domain name of the host running the ui                                 |
+| `TESTING`                         | `false`                 | DO NOT CHANGE                                                                          |
+| `TAG`                             | `latest`                | Added to the docker image tags (e.g. ui-latest, server-latest, repository-latest)      |
+
+## Test
+
+### Basic non-regression server test
+
+1. Make sure the variables `HEDERA_NETWORK`, `OPERATOR_ACCOUNT_ID` and `OPERATOR_KEY` are defined in `environments/.env`
+2. Run `hedera start --network local -d`
+3. Run `npm run server:start`
+4. Run `npm run test:hedera`
+
+Moreover, to run the server tests against a local Ganache instance run
+
+```sh
+npm run test:server
+```
+
+> [!NOTE]
+> Note that there is no need to spin up a Ganache instance separately.
+> It is automatically started and stopped by the server test.
+>
+> We use the `USE_LOCAL_NODE` environment variable to enable Ganache as a local chain.
+
+### Unit Tests
+
+Under `packages/` there are dependencies that are used by the verification services and need to be unit-tested separately.
+To test them run `cd packages/<package> && npm run test`.
+The corresponding job that runs these tests in CI is `unit-tests`.
 
 ## Releases
 
@@ -306,6 +310,6 @@ to [oss@hedera.com](mailto:oss@hedera.com).
 
 [Apache License 2.0](LICENSE)
 
-# 🔐 Security
+## 🔐 Security
 
 Please do not file a public ticket mentioning the vulnerability. Refer to the security policy defined in the [SECURITY.md](https://github.com/hashgraph/hedera-sourcify/blob/main/SECURITY.md).
