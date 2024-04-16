@@ -10,19 +10,22 @@ Tools for verifying Hedera smart contracts using standard open source libraries.
 
 ## Prerequisites
 
-Install:
+Install
 
-- [node](https://nodejs.org/en/about/)
-- [npm](https://www.npmjs.com/)
+- [`node`](https://nodejs.org/en/about/) and [`npm`](https://www.npmjs.com/)
 - [Docker](https://docs.docker.com/engine/reference/commandline/docker/)
 
-Make sure the repository submodule h5ai-nginx is present:
+Make sure the repository submodule `h5ai-nginx` is present
 
-- `git submodule update --init --recursive`
+```sh
+git submodule update --init --recursive
+```
 
-Apply the Hedera patch to the `h5ai-nginx` submodule (execute this only once).
+Apply the Hedera patch to the `h5ai-nginx` submodule **(execute this only once)**
 
-- `./scripts/hedera-apply-h5ai-nginx-patch.sh`
+```sh
+./scripts/hedera-apply-h5ai-nginx-patch.sh
+```
 
 ## Local build for development
 
@@ -46,17 +49,57 @@ From the root of the project workspace:
 
 ### Sanity check the configuration
 
-This assumes the default ports (per .env.dev.hedera) are used:
+This assumes the default ports (per `environments/.env.dev.hedera`) are used:
 
-- `Open http://localhost:10000`. This should open the Repository select-contract-form. The options available for the Chain should be the 3 Hedera networks (mainnet, testnet, previewnet).
-- `Open http://localhost:5002/chains`. This should return a JSON value containing the 3 Hedera networks
-- `Open http://localhost:5555/files/contracts/296`. This should return a JSON value containing the addresses of all contracts verified on testnet (or report error "_Contracts have not been found!_" if nothing has been verified yet)
-- `Open http://localhost:3000`. This should bring up the Verifier page.
+- Open <http://localhost:10000>.
+This should open the Repository `select-contract-form`. The options available for the Chain should be the 3 Hedera networks (mainnet, testnet, previewnet).
+- Open <http://localhost:5002/chains>.
+This should return a JSON value containing the 3 Hedera networks
+- Open <http://localhost:5555/files/contracts/296>.
+This should return a JSON value containing the addresses of all contracts verified on testnet (or report error `"Contracts have not been found!"` if nothing has been verified yet)
+- Open <http://localhost:3000>.
+This should bring up the Verifier page.
 
 ## Use Docker images
 
 You can either use pre-built Docker images from the GitHub container repository
 or build the images locally.
+
+Hedera verification service uses 3 images
+
+- [`server`](#server-service) **[Verifier Server]**. This service provides the actual verification of Smart Contracts.
+Its main task is to compile input Solidity sources and check compiler results.
+It checks compilers results against the bytecode retrieved from an Ethereum-compatible network, _e.g._, JSON-RPC Relay.
+Other services interact with it through its REST API.
+You can inspect the endpoints provided by visiting `/api-docs` (OpenAPI generated docs) on the `server`, _e.g._, <https://server-verify.hashscan.io/api-docs/>.
+A successful verification stores the contracts sources under _Repository Volume_.
+- [`repository`](#repository-service) **[Repository]**. Provides a verified Smart Contract front end lookup and explorer. It reads verified smart contracts from the _Repository Volume_.
+- [`ui`](#ui-service) **[Verifier UI]**. A user frontend to verify and lookup Smart Contracts.
+
+> [!NOTE]
+> Note that unlike Sourcify, we do not use the [`monitor`](https://docs.sourcify.dev/docs/running-monitor/) service given that we do not use IPFS verification.
+
+```mermaid
+    C4Container
+    title Container Diagram for Smart Contract Verification System
+
+    Container_Boundary(scvs, "Smart Contract Verification System") {
+        Container(ui, "Verifier UI", "JavaScript, React", "Customized Sourcify Verifier front-end")
+        Container(server, "Verifier Server", "JavaScript, Node", "Provides the REST API that enables verification of Smart Contracts, includes a Solidity compiler")
+        Container(repo, "Repository", "nginx", "Provides a front-end to lookup and view verified Smart Contracts")
+        ContainerDb_Ext(repo_vol, "Repository Volume", "File System Volume", "Stores verified smart contracts")
+    }
+
+    System_Ext(eth, "Ethereum-compatible Network (json-rpc-relay)", "Provides the source of truth to fetch Smart Contract bytecode")
+
+    Rel(server, eth, "Uses", "JSON-RPC `eth_getCode`")
+    UpdateRelStyle(server, eth, $offsetY="-50", $offsetX="-140")
+
+    Rel(ui, server, "Uses", "REST")
+
+    Rel(server, repo_vol, "Mounts, read&write", "/tmp/sourcify/repository")
+    Rel_Back(repo, repo_vol, "Mounts, read", "/data")
+```
 
 ### Set-up
 
@@ -83,65 +126,45 @@ or build the images locally.
 ### Run
 
 1. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
-2. `Open http://localhost:1234` to bring up the Verifier page.
+2. Open <http://localhost:1234> to bring up the Verifier page.
 
 ### Stop
 
 - Run `docker-compose -f environments/docker-compose-hedera.yaml down`
 
-### Reset network
+### Reset networks
 
-- To reset **testnet**:
-  `docker exec server-latest /home/app/hedera-reset-docker.sh testnet`
-
-- To reset **previewnet**:
-  `docker exec server-latest /home/app/hedera-reset-docker.sh previewnet`
-
-## Test
-
-### Basic non-regression server test
-
-1. Make sure the variables HEDERA_NETWORK, OPERATOR_ACCOUNT_ID and OPERATOR_KEY are defined in `environments/.env`
-2. Run `hedera start --network local -d`
-3. Run `npm run server:start`
-4. Run `npm run test:hedera`
-
-Moreover, to run the server tests against a local Ganache instance run
+To reset **testnet**
 
 ```sh
-npm run test:server
+docker exec server-latest /home/app/hedera-reset-docker.sh testnet
 ```
 
-> Note that there is no need to spin up a Ganache instance separately.
-> It is automatically started and stopped by the server test.
->
-> We use the `USE_LOCAL_NODE` environment variable to enable Ganache as a local chain.
+To reset **previewnet**
 
-### Unit Tests
-
-Under `packages/` there are dependencies that are used by the verification services and need to be unit-tested separately.
-To test them run `cd packages/<package> && npm run test`.
-The corresponding job that runs these tests in CI is `unit-tests`.
+```sh
+docker exec server-latest /home/app/hedera-reset-docker.sh previewnet
+```
 
 ## Configuration
 
 The following tables describe the configuration items used by the different services
 
-### _ui_ module
+### _ui_ service
 
 The _ui_ service is a single page application based on React. As such, it cannot be configured by environment variables at runtime.
 It reads it configuration from a file located at the following path: `/usr/share/nginx/html/config.json`
 In deployment, the actual configuration can be provided to the container via a mount point.
 
-Example contents for `config.json`:
+Example contents for `config.json`
 
-```config.json
+```json
 {
     "SERVER_URL": "https://server.sourcify-integration.hedera-devops.com",
     "REPOSITORY_SERVER_URL": "https://repository.sourcify-integration.hedera-devops.com",
     "EXPLORER_URL": "http://localhost:8080",
     "BRAND_PRODUCT_LOGO_URL": "http://example.com/path/to/my-logo.jpg",
-    "TERMS_OF_SERVICE_URL": http://example.com/path/to/my-terms.html"",
+    "TERMS_OF_SERVICE_URL": "http://example.com/path/to/my-terms.html",
     "REMOTE_IMPORT": false,
     "GITHUB_IMPORT": false,
     "CONTRACT_IMPORT": false,
@@ -151,7 +174,7 @@ Example contents for `config.json`:
 }
 ```
 
-The following properties can be provided in config.json
+The following properties can be provided in `config.json`
 
 | Name                        | Description                                                                                     |
 |-----------------------------|-------------------------------------------------------------------------------------------------|
@@ -173,7 +196,7 @@ The favicon may be modified by providing alternative versions of the 3 following
 
 This can be done for instance by adding the following to the definition of the `ui` service in the `docker-compose` yaml file used:
 
-```
+```yaml
 volumes:
   - type: bind
     source: ./manifest.json
@@ -189,7 +212,7 @@ volumes:
     target: /usr/share/nginx/html/favicon-32x32.png`
 ```
 
-### _server_ module
+### _server_ service
 
 The following environment variables are needed by the _server_ at runtime:
 
@@ -209,7 +232,7 @@ The following environment variables are needed by the _server_ at runtime:
 | `TESTING`                     | false                           | DO NOT CHANGE                                                                     |
 | `TAG`                         | latest                          | Added to the docker image tags (e.g. ui-latest, server-latest, repository-latest) |
 
-### _repository_ module
+### _repository_ service
 
 The _repository_ service encompasses a single page application based on React and a web server.
 
@@ -222,13 +245,40 @@ even though the only useful item for the _repository_ is the following:
 
 | Name                              | Example value         | Description                                                                            |
 |-----------------------------------|-----------------------|----------------------------------------------------------------------------------------|
-| `REPOSITORY_PATH`                 | ../../data/repository | Path of the contract repository on the host.                                           |
-| `REPOSITORY_SERVER_EXTERNAL_PORT` | 10000                 | HTTP port exposed by container                                                         |
-| `UI_DOMAIN_NAME`                  | example.com           | Fully qualified domain name of the host running the ui                                 |
-| `TESTING`                         | false                 | DO NOT CHANGE                                                                          |
-| `TAG`                             | latest                | Added to the docker image tags (e.g. ui-latest, server-latest, repository-latest)      |
+| `REPOSITORY_PATH`                 | `../../data/repository` | Path of the contract repository on the host.                                           |
+| `REPOSITORY_SERVER_EXTERNAL_PORT` | `10000`                 | HTTP port exposed by container                                                         |
+| `UI_DOMAIN_NAME`                  | `example.com`           | Fully qualified domain name of the host running the ui                                 |
+| `TESTING`                         | `false`                 | DO NOT CHANGE                                                                          |
+| `TAG`                             | `latest`                | Added to the docker image tags (e.g. ui-latest, server-latest, repository-latest)      |
 
-## Release
+## Test
+
+### Basic non-regression server test
+
+1. Make sure the variables `HEDERA_NETWORK`, `OPERATOR_ACCOUNT_ID` and `OPERATOR_KEY` are defined in `environments/.env`
+2. Run `hedera start --network local -d`
+3. Run `npm run server:start`
+4. Run `npm run test:hedera`
+
+Moreover, to run the server tests against a local Ganache instance run
+
+```sh
+npm run test:server
+```
+
+> [!NOTE]
+> Note that there is no need to spin up a Ganache instance separately.
+> It is automatically started and stopped by the server test.
+>
+> We use the `USE_LOCAL_NODE` environment variable to enable Ganache as a local chain.
+
+### Unit Tests
+
+Under `packages/` there are dependencies that are used by the verification services and need to be unit-tested separately.
+To test them run `cd packages/<package> && npm run test`.
+The corresponding job that runs these tests in CI is `unit-tests`.
+
+## Releases
 
 The repo has Github Actions automation to generate docker images based on the latest changes in a branch.
 To initiate the release for version `x.y.z` simply checkout branch `release/x.y` and run the following commands
@@ -260,6 +310,6 @@ to [oss@hedera.com](mailto:oss@hedera.com).
 
 [Apache License 2.0](LICENSE)
 
-# 🔐 Security
+## 🔐 Security
 
 Please do not file a public ticket mentioning the vulnerability. Refer to the security policy defined in the [SECURITY.md](https://github.com/hashgraph/hedera-sourcify/blob/main/SECURITY.md).
