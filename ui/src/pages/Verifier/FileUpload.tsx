@@ -11,7 +11,7 @@ import RemoteInput from "./RemoteInput";
 import GitHubInput from "./GitHubInput";
 import ContractInput from "./ContractInput";
 import SolcJsonInput from "./SolcJsonInput";
-import {configuration} from "../../utils/Configuration";
+import { configuration } from "../../utils/Configuration";
 
 enum ImportMethods {
   UPLOAD,
@@ -73,7 +73,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
           <h2 className="font-bold text-xl block">File Add Zone</h2>
           <p>
             Add the Solidity source files and metadata of all contracts you want
-            to verify.
+            to verify (<span className="font-medium">*.sol</span> or <span className="font-medium">*.json</span>).
           </p>
         </div>
         <div className="flex flex-row flex-wrap gap-3 mt-4 justify-center md:justify-start">
@@ -93,7 +93,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
               </>
             </Button>
           ) : (
-            <div/>
+            <div />
           )}
           {configuration.githubImport ? (
             <Button
@@ -106,12 +106,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
               className="text-sm"
             >
               <>
-                <AiOutlineGithub className="inline align-middle mr-1"/>
+                <AiOutlineGithub className="inline align-middle mr-1" />
                 Import from GitHub
               </>
             </Button>
           ) : (
-            <div/>
+            <div />
           )}
           {configuration.contractImport ? (
             <Button
@@ -124,12 +124,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
               className="text-sm"
             >
               <>
-                <AiOutlineFileSearch className="inline align-middle mr-1"/>
+                <AiOutlineFileSearch className="inline align-middle mr-1" />
                 Import from Contract
               </>
             </Button>
           ) : (
-            <div/>
+            <div />
           )}
           {configuration.jsonImport ? (
             <Button
@@ -142,12 +142,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
               className="text-sm"
             >
               <>
-                <SiSolidity className="inline align-middle mr-1"/>
+                <SiSolidity className="inline align-middle mr-1" />
                 Import from Solidity JSON
               </>
             </Button>
           ) : (
-            <div/>
+            <div />
           )}
         </div>
         <div className="flex flex-grow flex-col pb-8">
