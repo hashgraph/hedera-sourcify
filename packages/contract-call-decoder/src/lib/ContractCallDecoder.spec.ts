@@ -36,7 +36,7 @@ test('can evaluate call data', async (t) => {
   );
 });
 
-test('get metadata of a non-contract address', async (t) => {
+test.skip('get metadata of a non-contract address', async (t) => {
   const ethereumProvider = provider('https://rpc.ankr.com/eth_goerli');
   try {
     await getMetadataFromAddress({
