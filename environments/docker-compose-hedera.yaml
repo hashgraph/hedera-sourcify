@@ -51,6 +51,9 @@ services:
   ui:
     <<: *project-base
     image: ghcr.io/hashgraph/hedera-sourcify:ui-${TAG}
+    build:
+      context: ../ui
+      dockerfile: Dockerfile
     container_name: ui-${TAG}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]

@@ -1,7 +1,0 @@
-version: "3.7"
-services:
-  server:
-    image: ghcr.io/hashgraph/hedera-sourcify:server-${TAG}
-    build:
-      context: ../
-      dockerfile: src/Dockerfile.server

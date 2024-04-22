@@ -119,9 +119,15 @@ A successful verification stores the contracts sources under _Repository Volume_
 
 ### Build images
 
-1. Run `docker-compose -f environments/build-ui.yaml build`
-2. Run `docker-compose -f environments/build-server.yaml build`
-3. Run `docker-compose -f environments/build-repository.yaml build`
+Run the following to build the `ui`
+
+```sh
+docker compose --file environments/docker-compose-hedera.yaml build ui
+```
+
+Run `docker-compose -f environments/build-server.yaml build`.
+
+Run `docker-compose -f environments/build-repository.yaml build`.
 
 ### Run
 
@@ -152,8 +158,9 @@ The following tables describe the configuration items used by the different serv
 
 ### _ui_ service
 
-The _ui_ service is a single page application based on React. As such, it cannot be configured by environment variables at runtime.
-It reads it configuration from a file located at the following path: `/usr/share/nginx/html/config.json`
+The _ui_ service is a single page application based on React.
+As such, it cannot be configured by environment variables at runtime.
+It reads its configuration from a file located at the following path `/usr/share/nginx/html/config.json`.
 In deployment, the actual configuration can be provided to the container via a mount point.
 
 Example contents for `config.json`
