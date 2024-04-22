@@ -47,10 +47,6 @@ jobs:
           context: ./ui
           file: ./ui/Dockerfile
           platforms: linux/amd64, linux/arm64
-          build-args: |
-            SERVER_URL=http://localhost:5002
-            REPOSITORY_SERVER_URL=http://localhost:10000
-            TAG=${{env.TAG}}
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:ui-${{env.TAG}}
 
