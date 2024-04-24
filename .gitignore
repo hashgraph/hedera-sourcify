@@ -17,7 +17,6 @@ tmp
 metacoin-source-verify/
 **/synced
 **/sort.log
-**/.env.secrets
 logs
 **/too_big.txt
 chain-tests-report/
