@@ -43,9 +43,20 @@ From the root of the project workspace:
 
 ### Run
 
-- Run `docker-compose -f environments/repository.yaml up -d`. This will start repository service.
-- Run `npm run server:start`. This will start the server.
-- In a different terminal, run `cd ui; npm run start`. This will start and bring up the UI.
+To start the repository service, run
+
+```sh
+docker compose --file environments/docker-compose-hedera.yaml up --detach repository
+```
+
+Run `npm run server:start`. This will start the server.
+
+To start and bring up the UI, run in a different terminal
+
+```sh
+cd ui
+npm run start
+```
 
 ### Sanity check the configuration
 
@@ -131,7 +142,7 @@ Run `docker-compose -f environments/build-repository.yaml build`.
 
 ### Run
 
-1. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
+1. Run `docker compose --file environments/docker-compose-hedera.yaml up --detach repository server ui`
 2. Open <http://localhost:1234> to bring up the Verifier page.
 
 ### Stop
