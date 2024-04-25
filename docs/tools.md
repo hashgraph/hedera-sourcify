@@ -91,7 +91,7 @@ npx hardhat run --network testnet scripts/deploy.js
 npx hardhat verify --network testnet <CONTRACT_ADDR>
 ```
 
-Alternatively, to do so programmatically, invoke `hre.run` to run the required task. 
+Alternatively, to do so programmatically, invoke `hre.run` to run the required task.
 
 ```js
 await hre.run('verify:sourcify', {
