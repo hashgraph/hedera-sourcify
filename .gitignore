@@ -1,3 +1,6 @@
+# Placeholder for volume mount point for the repository.
+/data/
+
 .idea
 .DS_Store
 db/
