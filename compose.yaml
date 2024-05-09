@@ -1,7 +1,8 @@
 version: "3.7"
+
 x-project-base: &project-base
   env_file:
-    - .env
+    - .env.defaults
   restart: always
   networks:
     - source-verify
@@ -13,11 +14,13 @@ services:
 
   repository:
     <<: *project-base
-    image: ghcr.io/ethereum/sourcify/repository:${TAG}
+    image: ghcr.io/hashgraph/hedera-sourcify/repository:${TAG}
+    build:
+      context: ./h5ai-nginx
     container_name: repository-${TAG}
     volumes:
       - type: bind
-        source: ../data
+        source: ./data
         target: /data
         read_only: true
     ports:
@@ -25,7 +28,10 @@ services:
 
   server:
     <<: *project-base
-    image: ghcr.io/ethereum/sourcify/server:${TAG}
+    image: ghcr.io/hashgraph/hedera-sourcify/server:${TAG}
+    build:
+      context: ./sourcify
+      dockerfile: ./services/server/Dockerfile
     container_name: server-${TAG}
     environment:
       - NODE_ENV=development
@@ -39,7 +45,7 @@ services:
         source: ./sourcify-chains.json
         target: /home/app/services/server/dist/sourcify-chains.json
       - type: bind
-        source: ../data
+        source: ./data
         target: /tmp/sourcify/repository
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${SERVER_PORT}/health"]
@@ -49,10 +55,9 @@ services:
 
   ui:
     <<: *project-base
-    image: ghcr.io/hashgraph/hedera-sourcify:ui-${TAG}
+    image: ghcr.io/hashgraph/hedera-sourcify/ui:${TAG}
     build:
-      context: ../ui
-      dockerfile: Dockerfile
+      context: ./ui
     container_name: ui-${TAG}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
