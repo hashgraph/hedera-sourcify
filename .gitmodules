@@ -2,3 +2,6 @@
 	path = h5ai-nginx
 	url = https://github.com/sourcifyeth/h5ai-nginx
 	ignore = dirty
+[submodule "sourcify"]
+	path = sourcify
+	url = https://github.com/ethereum/sourcify.git
