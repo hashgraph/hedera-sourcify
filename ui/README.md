@@ -1,10 +1,22 @@
-# Sourcify new UI
+# Hedera Sourcify UI
 
 Bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Install
+
+Install with
+
+```sh
+npm install
+```
+
 ## Run
 
-Install with `npm install` and run the development server with `npm start`.
+Run the development server with
+
+```sh
+npm start
+```
 
 ## Build
 
