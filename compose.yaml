@@ -1,8 +1,6 @@
 version: "3.7"
 
 x-project-base: &project-base
-  env_file:
-    - .env.defaults
   restart: always
   networks:
     - source-verify
@@ -18,13 +16,18 @@ services:
     build:
       context: ./h5ai-nginx
     container_name: repository-${TAG}
+    environment:
+      # https://github.com/ethereum/sourcify/issues/1330
+      # https://github.com/sourcifyeth/h5ai-nginx/pull/3
+      - SOURCIFY_SERVER=http://host.docker.internal:5555
     volumes:
       - type: bind
         source: ./data
         target: /data
         read_only: true
     ports:
-      - "${REPOSITORY_SERVER_EXTERNAL_PORT}:80"
+      # The `repository` app is exposed under port `:80` through `h5ai-nginx.conf.template`
+      - "${REPOSITORY_PORT}:80"
 
   server:
     <<: *project-base
@@ -36,7 +39,8 @@ services:
     environment:
       - NODE_ENV=development
     ports:
-      - "${SERVER_EXTERNAL_PORT}:${SERVER_PORT}"
+      # Value is set in `services/server/src/config/default.js`
+      - "${SERVER_PORT}:5555"
     volumes:
       - type: bind
         source: ./servers.yaml
@@ -48,7 +52,7 @@ services:
         source: ./data
         target: /tmp/sourcify/repository
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${SERVER_PORT}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5555/health"]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -69,4 +73,5 @@ services:
         source: ./ui-config.json
         target: /usr/share/nginx/html/config.json
     ports:
-      - "${UI_EXTERNAL_PORT}:80"
+      # The `ui` app is exposed under port `:80` through `nginx.conf`
+      - "${UI_PORT}:80"
