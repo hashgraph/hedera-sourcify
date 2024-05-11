@@ -15,11 +15,22 @@ services:
     image: ghcr.io/hashgraph/hedera-sourcify/repository:${TAG}
     build:
       context: ./h5ai-nginx
+      args:
+        HIDE_OPEN_IN_REMIX: 1
+ 
     container_name: repository-${TAG}
     environment:
       # https://github.com/ethereum/sourcify/issues/1330
       # https://github.com/sourcifyeth/h5ai-nginx/pull/3
       - SOURCIFY_SERVER=http://host.docker.internal:5555
+
+      # URL of the server that provides the `chains` endpoint, i.e., $SERVER_URL/chains.
+      # It is used to populate the `Chain` select list in the `select-contract-form`.
+      # Given this select list is populated on the client side,
+      # this URL should be accessible from the browser.
+      #
+      # See https://github.com/sourcifyeth/h5ai-nginx/pull/2 for more details.
+      - SERVER_URL=http://localhost:5555
     volumes:
       - type: bind
         source: ./data
