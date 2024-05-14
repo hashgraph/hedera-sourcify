@@ -30,7 +30,7 @@ jobs:
       
       - name: Get tag
         run: |
-          if [[ -v "${{ github.event.inputs.version }}" ]]; then
+          if [[ "${{ github.event.inputs.version }}" ]]; then
             echo "TAG=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           else
             echo "TAG=main" >> $GITHUB_ENV
