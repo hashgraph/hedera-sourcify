@@ -26,7 +26,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          submodules: 'true'
+          submodules: true
       
       - name: Get tag
         run: |
@@ -36,8 +36,8 @@ jobs:
             echo "TAG=main" >> $GITHUB_ENV
           fi
 
-      - name: Patch h5ai-nginx submodule
-        run: ./scripts/hedera-apply-h5ai-nginx-patch.sh
+      # - name: Patch h5ai-nginx submodule
+      #   run: ./scripts/hedera-apply-h5ai-nginx-patch.sh
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -59,22 +59,22 @@ jobs:
           file: ./ui/Dockerfile
           platforms: linux/amd64, linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:ui-${{env.TAG}}
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/ui:${{env.TAG}}
 
       - name: Build and push SERVER image
         uses: docker/build-push-action@v2
         with:
-          context: .
-          file: ./src/Dockerfile.server
-          platforms: linux/amd64
+          context: ./sourcify
+          file: ./sourcify/services/server/Dockerfile
+          platforms: linux/amd64, linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:server-${{env.TAG}}
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/server:${{env.TAG}}
 
       - name: Build and Push REPOSITORY Image
         uses: docker/build-push-action@v2
         with:
           context: ./h5ai-nginx
           file: ./h5ai-nginx/Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64, linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:repository-${{env.TAG}}
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/repository:${{env.TAG}}
