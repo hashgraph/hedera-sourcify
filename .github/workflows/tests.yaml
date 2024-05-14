@@ -1,4 +1,4 @@
-name: Tests
+name: Integration Tests
 
 on:
   workflow_dispatch:
@@ -6,19 +6,7 @@ on:
 
 jobs:
 
-  server-ganache-its:
-    name: server over Ganache integration tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: npm ci
-      - run: npx lerna bootstrap && npx lerna run build
-      - run: npm run test:server
-
-  server-local-node-its:
+  server-local-node:
     name: server over Hedera's local node integration tests
     runs-on: ubuntu-latest
     steps:
@@ -28,22 +16,20 @@ jobs:
           node-version: 18
       - run: npm ci
 
-      - name: Provide environment variables
-        run: cp environments/.env.dev.hedera environments/.env
-
-      - name: Build hedera-sourcify server
-        run: npx lerna bootstrap && npx lerna run build
-
       - name: Start Hedera Local Node
         run: npm run local-node:start
 
       - name: Start hedera-sourcify server
-        run: (npm run server:start&)
+        working-directory: ./sourcify
+        run: |
+          npm ci
+          npm run build:lerna
+          (npm run server:start&)
 
       - name: Wait for hedera-sourcify server
         uses: iFaxity/wait-on-action@v1
         with:
-          resource: http://127.0.0.1:5002/chains
+          resource: http://127.0.0.1:5555/chains
 
       - name: Start tests
         run: npm run test:hedera

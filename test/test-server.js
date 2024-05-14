@@ -4,11 +4,11 @@ const {describe, it} = require("mocha");
 const {expect} = require("chai");
 const SdkClient = require("./helpers/sdkClient");
 const fs = require("fs");
-require('dotenv').config({path: './environments/.env'});
+require('dotenv').config({path: './test/.env.test'});
 
 describe('Basic non-regression of hedera-sourcify server', function () {
 
-  const SERVER_URL = process.env.SERVER_URL ?? "http://localhost:5002"
+  const SERVER_URL = process.env.SERVER_URL ?? "http://localhost:5555"
   this.timeout(20000) // Overwrite Mocha timeout of 2sec -> 20sec
 
   it('Should return correct verification status for newly created contract', async function () {
