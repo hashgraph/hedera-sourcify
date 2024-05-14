@@ -27,6 +27,7 @@ describe('Basic non-regression of hedera-sourcify server', function () {
 
     const client = new SdkClient(network, accountId,privateKey )
     const chainId = client.getChainId()
+    console.log('Chain ID', chainId);
 
     // Import the compiled contract from the HelloHedera.json file
     const solcJsonOutput = JSON.parse(fs.readFileSync("./test/hello-hedera/HelloHedera.json").toString())

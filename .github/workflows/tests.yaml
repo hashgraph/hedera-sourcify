@@ -27,9 +27,8 @@ jobs:
         run: |
           npm ci
           npm run build:lerna
+          cp ../test/sourcify-chains.json ./services/server/dist/ 
           (npm run server:start&)
-        env:
-          NODE_ENV: 'development'
 
       - name: Wait for hedera-sourcify server
         uses: iFaxity/wait-on-action@v1
