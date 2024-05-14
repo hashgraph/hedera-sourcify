@@ -59,7 +59,7 @@ jobs:
           file: ./ui/Dockerfile
           platforms: linux/amd64, linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/ui:${{env.TAG}}
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:ui-${{env.TAG}}
 
       - name: Build and push SERVER image
         uses: docker/build-push-action@v2
@@ -68,7 +68,7 @@ jobs:
           file: ./sourcify/services/server/Dockerfile
           platforms: linux/amd64, linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/server:${{env.TAG}}
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:server-${{env.TAG}}
 
       - name: Build and Push REPOSITORY Image
         uses: docker/build-push-action@v2
@@ -77,4 +77,4 @@ jobs:
           file: ./h5ai-nginx/Dockerfile
           platforms: linux/amd64, linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/repository:${{env.TAG}}
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:repository-${{env.TAG}}
