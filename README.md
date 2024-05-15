@@ -166,13 +166,13 @@ docker compose build
 To reset **testnet**
 
 ```sh
-docker exec server-latest /home/app/hedera-reset-docker.sh testnet
+docker exec server-main /home/app/hedera-reset-docker.sh testnet
 ```
 
 To reset **previewnet**
 
 ```sh
-docker exec server-latest /home/app/hedera-reset-docker.sh previewnet
+docker exec server-main /home/app/hedera-reset-docker.sh previewnet
 ```
 
 ## Configuration

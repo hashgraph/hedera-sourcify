@@ -45,7 +45,9 @@ services:
     image: ghcr.io/hashgraph/hedera-sourcify/server:${TAG}
     build:
       context: ./sourcify
-      dockerfile: ./services/server/Dockerfile
+      additional_contexts:
+        - scripts=./scripts
+      dockerfile: ../Dockerfile.server
     container_name: server-${TAG}
     environment:
       - NODE_ENV=development
