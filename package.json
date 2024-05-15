@@ -15,7 +15,7 @@
     "server:start": "node ./dist/server/server.js",
     "server:reset-previewnet": "./scripts/hedera-reset.sh previewnet",
     "server:reset-testnet": "./scripts/hedera-reset.sh testnet",
-    "local-node:start": "hedera start --network local -d"
+    "local-node:start": "hedera start --network local --detached"
   },
   "keywords": [
     "ethereum",
