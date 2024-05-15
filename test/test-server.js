@@ -37,7 +37,7 @@ describe('Basic non-regression of hedera-sourcify server', function () {
     const contractId = await client.contractDeploy(
       byteCode,
       new ContractFunctionParameters().addString("Hello from Hedera!"),
-      100000,
+      140000,
       "HelloHedera.sol"
     );
     const contractAddress = contractId.toSolidityAddress()

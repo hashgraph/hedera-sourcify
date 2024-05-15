@@ -31,8 +31,8 @@
   },
   "homepage": "https://github.com/hashgraph/hedera-sourcify#readme",
   "dependencies": {
-    "@hashgraph/hedera-local": "^2.12.1",
-    "@hashgraph/sdk": "^2.31.0",
+    "@hashgraph/hedera-local": "^2.25.0",
+    "@hashgraph/sdk": "^2.43.0",
     "axios": "^1.4.0",
     "dotenv": "^8.2.0",
     "ethers": "^6.6.2",
