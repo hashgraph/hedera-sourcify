@@ -154,12 +154,12 @@ docker compose build
 
 ### Run
 
-1. Run `docker compose --file environments/docker-compose-hedera.yaml up --detach repository server ui`
-2. Open <http://localhost:1234> to bring up the Verifier page.
+1. Run `docker compose up --detach`
+2. Open <http://localhost:3001> to bring up the Verifier page.
 
 ### Stop
 
-- Run `docker-compose -f environments/docker-compose-hedera.yaml down`
+- Run `docker compose down`
 
 ### Reset networks
 
@@ -285,24 +285,30 @@ even though the only useful item for the _repository_ is the following:
 
 ## Test
 
-### Basic non-regression server test
+Given we leverage the Sourcify code base as is, we maintain only a basic non-regression server test.
 
-1. Make sure the variables `HEDERA_NETWORK`, `OPERATOR_ACCOUNT_ID` and `OPERATOR_KEY` are defined in `environments/.env`
-2. Run `hedera start --network local -d`
-3. Run `npm run server:start`
-4. Run `npm run test:hedera`
+The Hedera local node variables `HEDERA_NETWORK`, `OPERATOR_ACCOUNT_ID` and `OPERATOR_KEY` are defined in [`test/.env.test`](./test/.env.test).
 
-Moreover, to run the server tests against a local Ganache instance run
+Start Hedera Local Node with
 
 ```sh
-npm run test:server
+npm run local-node:start
 ```
 
-> [!NOTE]
-> Note that there is no need to spin up a Ganache instance separately.
-> It is automatically started and stopped by the server test.
->
-> We use the `USE_LOCAL_NODE` environment variable to enable Ganache as a local chain.
+In another terminal session, `cd` to `./sourcify` and run
+
+```sh
+npm ci
+npm run build:lerna
+cp ../test/sourcify-chains.json ./services/server/dist/ 
+npm run server:start
+```
+
+Finally, run the server tests
+
+```sh
+npm run test:hedera
+```
 
 ## Images
 
