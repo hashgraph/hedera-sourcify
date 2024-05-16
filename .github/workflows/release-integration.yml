@@ -62,7 +62,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./sourcify
-          file: ./sourcify/services/server/Dockerfile
+          build-contexts: |
+            scripts=./scripts
+          file: ./Dockerfile.server
           platforms: linux/amd64, linux/arm64
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/server:${{env.TAG}}
@@ -71,6 +73,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./h5ai-nginx
+          build-args: |
+            HIDE_OPEN_IN_REMIX=1
           file: ./h5ai-nginx/Dockerfile
           platforms: linux/amd64, linux/arm64
           push: true
