@@ -16,12 +16,24 @@ services:
     build:
       context: ./h5ai-nginx
       args:
+        # From https://github.com/ethereum/sourcify/issues/1385
+        #
+        # The `repository` service provides a link to open each verified contract in Remix.
+        # However, for public self-hosted Sourcify instances (like in the case of Hedera) the _Open repo in Remix_ link does not work,
+        # given the Remix plugin only fetches contracts from https://repo.sourcify.dev.
+        # 
+        # When `HIDE_OPEN_IN_REMIX` is set to 1, a patch to remove the link is applied.
+        # See https://github.com/sourcifyeth/h5ai-nginx/pull/5 for more details.
         HIDE_OPEN_IN_REMIX: 1
  
     container_name: repository-${TAG}
     environment:
-      # https://github.com/ethereum/sourcify/issues/1330
-      # https://github.com/sourcifyeth/h5ai-nginx/pull/3
+      # This variable is used to replace static file access with Sourcify `server` API.
+      # See https://github.com/sourcifyeth/h5ai-nginx/pull/3 for more details.
+      #
+      # This makes the `server` the unique point to serve source files,
+      # useful to allow us to migrate to either repoV2 or database in the future without breaking the `repository`.
+      # See https://github.com/ethereum/sourcify/issues/1330 for more details.
       - SOURCIFY_SERVER=http://host.docker.internal:5555
 
       # URL of the server that provides the `chains` endpoint, i.e., $SERVER_URL/chains.
@@ -45,8 +57,13 @@ services:
     image: ghcr.io/hashgraph/hedera-sourcify/server:${TAG}
     build:
       context: ./sourcify
+      # The `scripts` context is used to `COPY` the reset network script into the `server` container.
+      # Use `additional_contexts` to access the `scripts` folder outside main context.
+      # See https://docs.docker.com/compose/compose-file/build/#additional_contexts for more details.
       additional_contexts:
         - scripts=./scripts
+      # The `Dockerfile.server` used here is basically the same as the one provided by Sourcify.
+      # It adds instructions to include the reset network script into the container.
       dockerfile: ../Dockerfile.server
     container_name: server-${TAG}
     environment:
