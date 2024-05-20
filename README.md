@@ -295,7 +295,7 @@ Start Hedera Local Node with
 npm run local-node:start
 ```
 
-In another terminal session, `cd` to `./sourcify` and run
+In another terminal session, `cd ./sourcify` and run
 
 ```sh
 npm ci
@@ -304,10 +304,13 @@ cp ../test/sourcify-chains.json ./services/server/dist/
 npm run server:start
 ```
 
-Finally, run the server tests
+> [!NOTE]
+> The `sourcify-chains.json` is used to setup both the chain ID and JSON-RPC for the `Hedera Localnet` network.
+
+Finally (from the repo root) run the server tests
 
 ```sh
-npm run test:hedera
+npm run test
 ```
 
 ## Images
@@ -447,12 +450,11 @@ Add this network entry to the array at `/app/networks-config.json`
     "sourcifySetup": {
       "activate": true,
       "repoURL": "http://repository.local/contracts/",
-      "serverURL": "http://localhost:5555",
+      "serverURL": "http://localhost:5555/",
       "verifierURL": "https://localhost/#/",
       "chainID": 298
     }
   }
-
 ```
 
 Customize OpenAPI servers <https://github.com/ethereum/sourcify/issues/1345>

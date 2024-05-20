@@ -8,11 +8,9 @@
     "url": "git+https://github.com/hashgraph/hedera-sourcify.git"
   },
   "scripts": {
-    "test": "TESTING=true DOTENV_CONFIG_PATH=./environments/.env c8 --reporter=none mocha -r dotenv/config --exit",
-    "test:server": "TESTING=true DOTENV_CONFIG_PATH=./environments/.env mocha -r dotenv/config test/server.js --exit",
-    "test:hedera": "mocha test/test-server.js --exit",
-    "server:build": "npm run clean && npm run build",
-    "server:start": "node ./dist/server/server.js",
+    "test": "mocha",
+    "server:build": "cd sourcify && npm run build:lerna",
+    "server:start": "cd sourcify && npm run server:start",
     "server:reset-previewnet": "./scripts/hedera-reset.sh previewnet",
     "server:reset-testnet": "./scripts/hedera-reset.sh testnet",
     "local-node:start": "hedera start --network local --detached"
