@@ -966,10 +966,7 @@ describe("Server", function () {
 
     it("should fail if too many files uploaded, but should succeed after deletion", async () => {
       const MAX_FILE_SIZE = config.get("server.maxFileSize");
-
-const MAX_SESSION_SIZE =
-  // require("../dist/server/controllers/verification/verification.common").MAX_SESSION_SIZE;
-  require("../sourcify/services/server/dist/server/controllers/verification/verification.common").MAX_SESSION_SIZE;
+      const MAX_SESSION_SIZE = require("../sourcify/services/server/dist/server/controllers/verification/verification.common").MAX_SESSION_SIZE;
 
       const agent = chai.request.agent(server.app);
       let res;
@@ -1003,7 +1000,7 @@ const MAX_SESSION_SIZE =
       expectedStatus,
       shouldHaveTimestamp
     ) => {
-      chai.expect(res.status).to.equal(StatusCodes.OK);
+      chai.expect(res.status, JSON.stringify(res, null, 2)).to.equal(StatusCodes.OK);
       chai.expect(res.body).to.haveOwnProperty("contracts");
       const contracts = res.body.contracts;
       chai.expect(contracts).to.have.a.lengthOf(1);
@@ -1135,6 +1132,49 @@ const MAX_SESSION_SIZE =
               });
           });
       });
+
+      it('should not store the successful verification of multi-contract hardhat build-info when dryrun=true', done => {
+        const hardhatOutputJSON = require("./sources/hardhat-output/multiContracts.json");
+        const {abi, evm} = hardhatOutputJSON.output.contracts["contracts/SupraOracle.sol"].SupraOracle;
+        deployFromAbiAndBytecode(localSigner, abi, evm.bytecode.object).then(address => waitSecs(3).then(() => {
+          const agent = chai.request.agent(server.app);
+          agent
+            .post("/session/input-files?dryrun=true")
+            .attach("files", Buffer.from(JSON.stringify(hardhatOutputJSON)))
+            .then(res => {
+              chai.expect(res.status).to.equal(StatusCodes.OK);
+              chai.expect(res.body).to.haveOwnProperty("contracts");
+              const contracts = res.body.contracts;
+              console.log(contracts);
+
+              chai.expect(contracts).to.have.lengthOf(3);
+              contracts.forEach(contract => {
+                chai.expect(contract.status).to.equal("error");
+                contract.address = address;
+                contract.chainId = CHAIN_ID;
+              });
+
+              agent
+                .post("/session/verify-checked?dryrun=true")
+                .send({contracts})
+                .then(res => {
+                  console.log(res.body);
+
+                  chai.expect(res.status).to.equal(StatusCodes.OK);
+                  chai.expect(res.body).to.haveOwnProperty("contracts");
+                  const contracts = res.body.contracts;
+
+                  chai.expect(contracts[0].status).to.equal("error");
+                  chai.expect(contracts[1].status).to.equal("error");
+                  chai.expect(contracts[2].status).to.equal("perfect");
+                  chai.expect(contracts[2].name).to.equal("SupraOracle");
+
+                  assertContractNotSaved(address, CHAIN_ID);
+                  done();
+                });
+            });
+        }));
+      });
     });
 
     it("should fetch missing sources", (done) => {
@@ -1188,6 +1228,7 @@ const MAX_SESSION_SIZE =
           chai.expect(res.body.contracts).to.have.lengthOf(3);
           done();
         });
+
       it("should correctly handle when uploaded 0/2 and then 1/2 sources", (done) => {
         const metadataPath = path.join("test", "sources", "metadata", "child-contract.meta.object.json");
         const metadataBuffer = fs.readFileSync(metadataPath);

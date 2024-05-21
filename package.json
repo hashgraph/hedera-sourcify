@@ -10,6 +10,7 @@
   "scripts": {
     "test:server": "mocha test/server.test.js --exit",
     "test:hedera": "mocha test/hedera.test.js --exit",
+    "sourcify:patch": "cd sourcify && git apply --verbose ../server.patch",
     "sourcify:build": "cd sourcify && npm run build:lerna",
     "sourcify:start": "cd sourcify && npm run server:start",
     "server:reset-previewnet": "./scripts/hedera-reset.sh previewnet",

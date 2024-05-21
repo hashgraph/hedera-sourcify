@@ -16,6 +16,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: Apply Sourcify patch customizations
+        run: npm run sourcify:patch
+
       - name: Compile Sourcify server
         working-directory: ./sourcify
         run: |
@@ -31,10 +34,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: Apply Sourcify patch customizations
+        run: npm run sourcify:patch
+
       - run: npm ci
 
       - name: Start Hedera Local Node
