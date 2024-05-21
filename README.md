@@ -283,19 +283,48 @@ even though the only useful item for the _repository_ is the following:
 | `TESTING`                         | `false`                 | DO NOT CHANGE                                                                          |
 | `TAG`                             | `latest`                | Added to the docker image tags (e.g. ui-latest, server-latest, repository-latest)      |
 
-## Test
+## Tests
 
-Given we leverage the Sourcify code base as is, we maintain only a basic non-regression server test.
+Given we leverage the Sourcify code base as is,
+we maintain only a subset of Sourcify server tests against a local chain and a basic non-regression server test using Hedera local node.
+
+### Sourcify Server
+
+First compile the Sourcify server.
+`cd ./sourcify` and run
+
+```sh
+npm ci
+npm run build:lerna
+```
+
+Then (from the repo root) run the Sourcify server tests with
+
+```sh
+npm run test:server
+```
+
+> [!IMPORTANT]
+> **Do not update** the `ganache` dependency.
+> Its latest version `7.9.2` (and most probably the last one given Ganache is no longer supported)
+> has some dependency issues that for some reason makes `fsevents` non-optional.
+> This in turn makes non-`darwin` installations, _e.g._, Github Actions jobs, to fail when running `npm ci` with
+>
+> ```console
+> npm ERR! notsup Unsupported platform for fsevents@2.3.2: wanted {"os":"darwin"} (current: {"os":"linux"})
+> ```
+
+### Hedera
 
 The Hedera local node variables `HEDERA_NETWORK`, `OPERATOR_ACCOUNT_ID` and `OPERATOR_KEY` are defined in [`test/.env.test`](./test/.env.test).
 
-Start Hedera Local Node with
+Start Hedera local node with
 
 ```sh
 npm run local-node:start
 ```
 
-In another terminal session, `cd ./sourcify` and run
+In another terminal session, `cd ./sourcify` and start the Sourcify server with
 
 ```sh
 npm ci
@@ -310,7 +339,7 @@ npm run server:start
 Finally (from the repo root) run the server tests
 
 ```sh
-npm run test
+npm run test:hedera
 ```
 
 ## Images
