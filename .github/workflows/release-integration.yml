@@ -29,6 +29,8 @@ jobs:
           submodules: true
       - name: Apply Sourcify patch customizations
         run: npm run sourcify:patch
+      - name: Apply Repository patch customizations
+        run: npm run repository:patch
       
       - name: Get tag
         run: |
