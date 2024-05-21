@@ -79,6 +79,9 @@ services:
         source: ./sourcify-chains.json
         target: /home/app/services/server/dist/sourcify-chains.json
       - type: bind
+        source: ./local.js
+        target: /home/app/services/server/dist/config/local.js
+      - type: bind
         source: ./data
         target: /tmp/sourcify/repository
     healthcheck:
