@@ -1,6 +1,4 @@
 const {ContractFunctionParameters} = require("@hashgraph/sdk");
-const axios = require("axios");
-const {describe, it} = require("mocha");
 const {expect} = require("chai");
 const SdkClient = require("./helpers/sdkClient");
 const fs = require("fs");
@@ -14,8 +12,8 @@ describe('Basic non-regression of hedera-sourcify server', function () {
   it('Should return correct verification status for newly created contract', async function () {
 
     console.log(`Contacting server at URL: ${SERVER_URL}`)
-    let health = await axios.get(`${SERVER_URL}/health`)
-    console.log(`Server health: ${JSON.stringify(health.data)}`)
+    const health = await fetch(`${SERVER_URL}/health`)
+    console.log(`Server health: ${await health.text()}`)
 
     // Grab Hedera network, account ID and private key from .env file
     const network = process.env.HEDERA_NETWORK ?? 'local'
@@ -46,10 +44,11 @@ describe('Basic non-regression of hedera-sourcify server', function () {
     // Make call to Sourcify to check that contract is not verified
     const checkUrl = `${SERVER_URL}/check-by-addresses?addresses=${contractAddress}&chainIds=${chainId}`
 
-    let response = await axios.get(checkUrl)
-    // console.log(`Verification status for contract ${response.data[0].address} is: ${response.data[0].status}`);
-    expect(response.data[0].status).to.equal('false');
-
+    {
+      const data = await (await fetch(checkUrl)).json()
+      console.log(`Verification status for contract ${data[0].address} is: ${data[0].status}`);
+      expect(data[0].status).to.equal('false');
+    }
 
     // Make call to Sourcify to submit contract verification
     const solidityFileContent = fs.readFileSync("./test/hello-hedera/HelloHedera.sol");
@@ -64,14 +63,24 @@ describe('Basic non-regression of hedera-sourcify server', function () {
       }
     }
 
-    response = await axios.post(`${SERVER_URL}/verify`, verificationData)
-    // console.log(`Verification response: ${JSON.stringify(response.data)}`);
-    expect(response.data.result[0].status).to.equal('perfect');
+    {
+      const data = await (await fetch(`${SERVER_URL}/verify`, {
+        method: "POST", 
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(verificationData)
+      })).json()
+      console.log(`Verification response: ${JSON.stringify(data)}`);
+      expect(data.result[0].status).to.equal('perfect');
+    }
 
-    // Make call to Sourcify to check that contract is now verified
-    response = await axios.get(checkUrl)
-    // console.log(`Verification status for contract ${response.data[0].address} is: ${response.data[0].status}`);
-    expect(response.data[0].status).to.equal('perfect');
+    {
+      // Make call to Sourcify to check that contract is now verified
+      const data = await (await fetch(checkUrl)).json()
+      console.log(`Verification status for contract ${data[0].address} is: ${data[0].status}`);
+      expect(data[0].status).to.equal('perfect');
+    }
 
     return Promise.resolve();
   });
