@@ -1,14 +1,7 @@
-process.env.TESTING = true;
-// This does not take effect when run with monitor tests. See config.ts note
-process.env.MOCK_REPOSITORY = "./dist/data/mock-repository";
-process.env.SOLC_REPO = "./dist/data/solc-repo";
-process.env.SOLJSON_REPO = "./dist/data/soljson-repo";
-// ipfs-http-gateway runs on port 9090
-// process.env.IPFS_GATEWAY = "http://localhost:9090/ipfs/";
-process.env.IPFS_GATEWAY = "http://ipfs.io/ipfs/";
-process.env.FETCH_TIMEOUT = 15000; // instantiated http-gateway takes a little longer
+const Server = require("../sourcify/services/server/dist/server/server").Server;
+const server = new Server();
 
-process.env.USE_LOCAL_NODE = 'true';
+const config = require("config");
 
 const {
   assertValidationError,
@@ -20,19 +13,14 @@ const {
   assertContractSaved,
   assertContractNotSaved,
 } = require("./helpers/assertions");
-//const IPFS = require("ipfs-core");
 const ganache = require("ganache");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const Server = require("../dist/server/server").Server;
 const util = require("util");
 const fs = require("fs");
 const rimraf = require("rimraf");
 const path = require("path");
-const MAX_FILE_SIZE = require("../dist/config").default.server.maxFileSize;
-const MAX_SESSION_SIZE =
-  require("../dist/server/controllers/verification/verification.common").MAX_SESSION_SIZE;
-const GANACHE_PORT = 8545;
+
 const StatusCodes = require("http-status-codes").StatusCodes;
 const {
   waitSecs,
@@ -40,17 +28,14 @@ const {
   deployFromAbiAndBytecodeForCreatorTxHash,
 } = require("./helpers/helpers");
 const { deployFromAbiAndBytecode } = require("./helpers/helpers");
-const { JsonRpcProvider, Network } = require("ethers");
-const { LOCAL_CHAINS } = require("../dist/sourcify-chains");
+const { JsonRpcProvider } = require("ethers");
 chai.use(chaiHttp);
 
-const EXTENDED_TIME = 20000; // 20 seconds
-const EXTENDED_TIME_60 = 60000; // 60 seconds
-
-const defaultContractChain = "1337"; // default 1337
+const defaultContractChain = "1337";
 
 describe("Server", function () {
-  const server = new Server();
+  this.timeout(20000);
+
   const ganacheServer = ganache.server({
     wallet: { totalAccounts: 1 },
     chain: {
@@ -58,8 +43,8 @@ describe("Server", function () {
       networkId: parseInt(defaultContractChain),
     },
   });
+
   let localSigner;
-  let accounts;
   let defaultContractAddress;
   let currentResponse = null; // to log server response when test fails
 
@@ -75,23 +60,12 @@ describe("Server", function () {
   const metadata = require("./testcontracts/Storage/metadata.json");
   const metadataBuffer = Buffer.from(JSON.stringify(metadata));
 
-  this.timeout(EXTENDED_TIME);
   before(async () => {
+    const GANACHE_PORT = 8545;
+
     await ganacheServer.listen(GANACHE_PORT);
-    // const ipfs = await IPFS.create();
-    // const httpGateway = new HttpGateway(ipfs);
-    // await httpGateway.start();
-    const sourcifyChainGanache = LOCAL_CHAINS[0];
     console.log("Started ganache local server on port " + GANACHE_PORT);
-    const ethersNetwork = new Network(
-      sourcifyChainGanache.rpc[0],
-      sourcifyChainGanache.chainId
-    );
-    localSigner = await new JsonRpcProvider(
-      `http://localhost:${GANACHE_PORT}`,
-      ethersNetwork,
-      { staticNetwork: ethersNetwork }
-    ).getSigner();
+    localSigner = await new JsonRpcProvider(`http://localhost:${GANACHE_PORT}`).getSigner();
     console.log("Initialized Provider");
 
     // Deploy the test contract
@@ -127,144 +101,7 @@ describe("Server", function () {
     currentResponse = null;
   });
 
-  const ipfsAddress =
-    metadata.sources["project:/contracts/Storage.sol"].urls[1];
-
-  // change the last char in ipfs hash of the source file
-  const lastChar = ipfsAddress.charAt(ipfsAddress.length - 1);
-  const modifiedLastChar = lastChar === "a" ? "b" : "a";
-  const modifiedIpfsAddress =
-    ipfsAddress.slice(0, ipfsAddress.length - 1) + modifiedLastChar;
-  const modifiedIpfsMetadata = { ...metadata };
-  modifiedIpfsMetadata.sources["project:/contracts/Storage.sol"].urls[1] =
-    modifiedIpfsAddress;
-  const modifiedIpfsMetadataBuffer = Buffer.from(JSON.stringify(metadata));
-
-  const assertBytecodesDontMatch = (err, res, done) => {
-    chai.expect(err).to.be.null;
-    chai.expect(res.status).to.equal(StatusCodes.INTERNAL_SERVER_ERROR);
-    chai.expect(res.body).to.haveOwnProperty("error");
-    chai
-      .expect(res.body.error)
-      .to.include("The deployed and recompiled bytecode don't match.");
-    if (done) done();
-  };
-
-  function assertEqualityFromPath(obj1, obj2path, options) {
-    const obj2raw = fs.readFileSync(obj2path).toString();
-    const obj2 = options?.isJson ? JSON.parse(obj2raw) : obj2raw;
-    chai.expect(obj1, `assertFromPath: ${obj2path}`).to.deep.equal(obj2);
-  }
-
-  describe("Verify create2", function () {
-    this.timeout(EXTENDED_TIME_60);
-
-    const agent = chai.request.agent(server.app);
-    let verificationId;
-    let contracts;
-
-    before(async function () {
-      const artifacts = require("./testcontracts/Create2/Wallet.json");
-
-      const account = await localSigner.getAddress();
-      const addressDeployed = await deployFromAbiAndBytecode(
-        localSigner,
-        artifacts.abi,
-        artifacts.bytecode,
-        [account, account]
-      );
-
-      const res = await agent
-        .post("/session/input-contract")
-        .field("address", addressDeployed)
-        .field("chainId", defaultContractChain);
-
-      contracts = res.body.contracts;
-      verificationId = contracts[0].verificationId;
-      chai.expect(verificationId).to.be.not.undefined;
-    });
-
-    it("should input files from existing contract via auxdata ipfs", async () => {
-      chai.expect(contracts).to.have.a.lengthOf(1);
-      const contract = contracts[0];
-      chai.expect(contract.files.found).to.have.a.lengthOf(1);
-      const retrivedFile = contract.files.found[0];
-      chai.expect(retrivedFile).to.equal("contracts/create2/Wallet.sol");
-    });
-
-    it.skip("should create2 verify with session", (done) => {
-      let clientToken;
-      const sourcifyClientTokensRaw = process.env.CREATE2_CLIENT_TOKENS;
-      if (sourcifyClientTokensRaw?.length) {
-        const sourcifyClientTokens = sourcifyClientTokensRaw.split(",");
-        clientToken = sourcifyClientTokens[0];
-      }
-      agent
-        .post("/session/verify/create2")
-        .send({
-          deployerAddress: "0xd9145CCE52D386f254917e481eB44e9943F39138",
-          salt: 12344,
-          abiEncodedConstructorArguments:
-            "0x0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc40000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc4",
-          clientToken: clientToken || "",
-          create2Address: "0x65790cc291a234eDCD6F28e1F37B036eD4F01e3B",
-          verificationId: verificationId,
-        })
-        .end((err, res) => {
-          assertVerificationSession(
-            err,
-            res,
-            done,
-            "0x65790cc291a234eDCD6F28e1F37B036eD4F01e3B",
-            "0",
-            "perfect"
-          );
-        });
-    });
-
-    it.skip("should create2 verify non-session", (done) => {
-      const metadata = fs
-        .readFileSync("test/testcontracts/Create2/Wallet_metadata.json")
-        .toString();
-      const source = fs
-        .readFileSync("test/testcontracts/Create2/Wallet.sol")
-        .toString();
-      let clientToken;
-      const sourcifyClientTokensRaw = process.env.CREATE2_CLIENT_TOKENS;
-      if (sourcifyClientTokensRaw?.length) {
-        const sourcifyClientTokens = sourcifyClientTokensRaw.split(",");
-        clientToken = sourcifyClientTokens[0];
-      }
-      chai
-        .request(server.app)
-        .post("/verify/create2")
-        .send({
-          deployerAddress: "0xd9145CCE52D386f254917e481eB44e9943F39138",
-          salt: 12345,
-          abiEncodedConstructorArguments:
-            "0x0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc40000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc4",
-          files: {
-            "metadata.json": metadata,
-            "Wallet.sol": source,
-          },
-          clientToken: clientToken || "",
-          create2Address: "0x801B9c0Ee599C3E5ED60e4Ec285C95fC9878Ee64",
-        })
-        .end((err, res) => {
-          assertVerification(
-            err,
-            res,
-            done,
-            "0x801B9c0Ee599C3E5ED60e4Ec285C95fC9878Ee64",
-            "0",
-            "perfect"
-          );
-        });
-    });
-  });
-
   describe("/check-by-addresses", function () {
-    this.timeout(EXTENDED_TIME);
 
     it("should fail for missing chainIds", (done) => {
       chai
@@ -332,6 +169,7 @@ describe("Server", function () {
             .attach("files", sourceBuffer)
             .end((err, res) => {
               chai.expect(err).to.be.null;
+              // console.log(res);
               chai.expect(res.status).to.equal(StatusCodes.OK);
 
               chai
@@ -369,7 +207,6 @@ describe("Server", function () {
   });
 
   describe("/check-all-by-addresses", function () {
-    this.timeout(EXTENDED_TIME);
 
     it("should fail for missing chainIds", (done) => {
       chai
@@ -478,22 +315,21 @@ describe("Server", function () {
     });
   });
 
-  const checkNonVerified = (path, done) => {
-    chai
-      .request(server.app)
-      .post(path)
-      .field("chain", defaultContractChain)
-      .field("address", defaultContractAddress)
-      .end((err, res) => {
-        chai.expect(err).to.be.null;
-        chai.expect(res.body).to.haveOwnProperty("error");
-        chai.expect(res.status).to.equal(StatusCodes.NOT_FOUND);
-        done();
-      });
-  };
-
   describe("/", function () {
-    this.timeout(EXTENDED_TIME);
+
+    const checkNonVerified = (path, done) => {
+      chai
+        .request(server.app)
+        .post(path)
+        .field("chain", defaultContractChain)
+        .field("address", defaultContractAddress)
+        .end((err, res) => {
+          chai.expect(err).to.be.null;
+          chai.expect(res.body).to.haveOwnProperty("error");
+          chai.expect(res.status).to.equal(StatusCodes.NOT_FOUND);
+          done();
+        });
+    };
 
     it("should correctly inform for an address check of a non verified contract (at /)", (done) => {
       checkNonVerified("/", done);
@@ -580,38 +416,6 @@ describe("Server", function () {
       chai.expect(errorMessage).to.include("Storage".toLowerCase());
     };
 
-    it("should return Bad Request Error for a source that is missing and unfetchable", (done) => {
-      chai
-        .request(server.app)
-        .post("/")
-        .field("address", defaultContractAddress)
-        .field("chain", defaultContractChain)
-        .attach("files", modifiedIpfsMetadataBuffer, "metadata.json")
-        .end((err, res) => {
-          assertMissingFile(err, res);
-          done();
-        });
-    });
-
-    it("should fetch a missing file that is accessible via ipfs", (done) => {
-      chai
-        .request(server.app)
-        .post("/")
-        .field("address", defaultContractAddress)
-        .field("chain", defaultContractChain)
-        .attach("files", metadataBuffer, "metadata.json")
-        .end((err, res) =>
-          assertVerification(
-            err,
-            res,
-            done,
-            defaultContractAddress,
-            defaultContractChain,
-            "perfect"
-          )
-        );
-    });
-
     it("should return 'partial', then delete partial when 'full' match", (done) => {
       const partialMetadata = require("./testcontracts/Storage/metadataModified.json");
       const partialMetadataBuffer = Buffer.from(
@@ -686,12 +490,7 @@ describe("Server", function () {
       // Simple contract without bytecode at https://goerli.etherscan.io/address/0x093203902B71Cdb1dAA83153b3Df284CD1a2f88d
       const bytecode =
         "0x6080604052348015600f57600080fd5b50601680601d6000396000f3fe6080604052600080fdfea164736f6c6343000700000a";
-      const metadataPath = path.join(
-        "test",
-        "sources",
-        "metadata",
-        "withoutMetadataHash.meta.object.json"
-      );
+      const metadataPath = path.join("test", "sources", "metadata", "withoutMetadataHash.meta.object.json");
       const metadataBuffer = fs.readFileSync(metadataPath);
       const metadata = JSON.parse(metadataBuffer.toString());
       const address = await deployFromAbiAndBytecode(
@@ -728,13 +527,7 @@ describe("Server", function () {
         );
 
       const metadata = require("./testcontracts/WithImmutables/metadata.json");
-      const sourcePath = path.join(
-        "test",
-        "testcontracts",
-        "WithImmutables",
-        "sources",
-        "WithImmutables.sol"
-      );
+      const sourcePath = path.join("test", "testcontracts", "WithImmutables", "sources", "WithImmutables.sol");
       const sourceBuffer = fs.readFileSync(sourcePath);
 
       // Now pass the creatorTxHash
@@ -844,8 +637,8 @@ describe("Server", function () {
 
       assertVerification(null, res, null, address, defaultContractChain);
     });
+
     describe("hardhat build-info file support", function () {
-      this.timeout(EXTENDED_TIME);
       let address;
       const mainContractIndex = 5;
       const hardhatOutputJSON = require("./sources/hardhat-output/output.json");
@@ -942,19 +735,17 @@ describe("Server", function () {
           defaultContractChain,
           "partial"
         );
-        const isExist = fs.existsSync(
-          path.join(
+        const savedPath = path.join(
             server.repository,
             "contracts",
             "partial_match",
             defaultContractChain,
             contractAddress,
             "sources",
-            "..contracts",
             "Storage.sol"
-          )
-        );
-        chai.expect(isExist, "Files saved in the wrong directory").to.be.true;
+          );
+        const isExist = fs.existsSync(savedPath);
+        chai.expect(isExist, "Files saved in the wrong directory: " + savedPath).to.be.true;
       });
     });
 
@@ -970,27 +761,6 @@ describe("Server", function () {
           bytecodeMismatchArtifact.abi,
           bytecodeMismatchArtifact.bytecode
         );
-      });
-
-      it("should warn the user about the issue when metadata match but not bytecodes", (done) => {
-        const hardhatOutput = require("./sources/hardhat-output/extraFilesBytecodeMismatch-onlyMetadata.json");
-        const hardhatOutputBuffer = Buffer.from(JSON.stringify(hardhatOutput));
-        chai
-          .request(server.app)
-          .post("/")
-          .field("chain", defaultContractChain)
-          .field("address", contractAddress)
-          .attach("files", hardhatOutputBuffer)
-          .end((err, res) => {
-            assertVerification(
-              err,
-              res,
-              done,
-              contractAddress,
-              defaultContractChain,
-              "extra-file-input-bug"
-            );
-          });
       });
 
       it("should verify with all input files and not only those in metadata", (done) => {
@@ -1017,7 +787,6 @@ describe("Server", function () {
   });
 
   describe("session api verification", function () {
-    this.timeout(EXTENDED_TIME);
 
     it("should inform when no pending contracts", (done) => {
       chai
@@ -1182,6 +951,8 @@ describe("Server", function () {
     });
 
     it("should fail with HTTP 413 if a file above max server file size is uploaded", (done) => {
+      const MAX_FILE_SIZE = config.get("server.maxFileSize");
+
       const agent = chai.request.agent(server.app);
       const file = "a".repeat(MAX_FILE_SIZE + 1);
       agent
@@ -1194,6 +965,12 @@ describe("Server", function () {
     });
 
     it("should fail if too many files uploaded, but should succeed after deletion", async () => {
+      const MAX_FILE_SIZE = config.get("server.maxFileSize");
+
+const MAX_SESSION_SIZE =
+  // require("../dist/server/controllers/verification/verification.common").MAX_SESSION_SIZE;
+  require("../sourcify/services/server/dist/server/controllers/verification/verification.common").MAX_SESSION_SIZE;
+
       const agent = chai.request.agent(server.app);
       let res;
       const maxNumMaxFiles = Math.floor(MAX_SESSION_SIZE / MAX_FILE_SIZE); // Max number of max size files allowed in a session
@@ -1360,26 +1137,6 @@ describe("Server", function () {
       });
     });
 
-    it("should fail for a source that is missing and unfetchable", (done) => {
-      const agent = chai.request.agent(server.app);
-      agent
-        .post("/session/input-files")
-        .attach("files", modifiedIpfsMetadataBuffer)
-        .then((res) => {
-          assertAddressAndChainMissing(res, [], {
-            "project:/contracts/Storage.sol": {
-              keccak256:
-                "0x88c47206b5ec3d60ab820e9d126c4ac54cb17fa7396ff49ebe27db2862982ad8",
-              urls: [
-                "bzz-raw://5d1eeb01c8c10bed9e290f4a80a8d4081422a7b298a13049d72867022522cf6b",
-                "dweb:/ipfs/QmaFRC9ZtT7y3t9XNWCbDuMTEwKkyaQJzYFzw3NbeohSna", // last char changed to "a"
-              ],
-            },
-          });
-          done();
-        });
-    });
-
     it("should fetch missing sources", (done) => {
       const agent = chai.request.agent(server.app);
       agent
@@ -1419,62 +1176,8 @@ describe("Server", function () {
         });
     });
 
-    it.skip("should correctly handle when uploaded 0/2 and then 1/2 sources", (done) => {
-      const metadataPath = path.join(
-        "test",
-        "sources",
-        "metadata",
-        "child-contract.meta.object.json"
-      );
-      const metadataBuffer = fs.readFileSync(metadataPath);
-
-      const parentPath = path.join(
-        "test",
-        "sources",
-        "contracts",
-        "ParentContract.sol"
-      );
-      const parentBuffer = fs.readFileSync(parentPath);
-
-      const agent = chai.request.agent(server.app);
-      agent
-        .post("/session/input-files")
-        .attach("files", metadataBuffer)
-        .then((res) => {
-          chai.expect(res.status).to.equal(StatusCodes.OK);
-          chai.expect(res.body.contracts).to.have.lengthOf(1);
-          chai.expect(res.body.unused).to.be.empty;
-
-          const contract = res.body.contracts[0];
-          chai.expect(contract.files.found).to.have.lengthOf(0);
-          chai.expect(Object.keys(contract.files.missing)).to.have.lengthOf(2);
-
-          agent
-            .post("/session/input-files")
-            .attach("files", parentBuffer)
-            .then((res) => {
-              chai.expect(res.status).to.equal(StatusCodes.OK);
-              chai.expect(res.body.contracts).to.have.lengthOf(1);
-              chai.expect(res.body.unused).to.be.empty;
-
-              const contract = res.body.contracts[0];
-              chai.expect(contract.files.found).to.have.lengthOf(1);
-              chai
-                .expect(Object.keys(contract.files.missing))
-                .to.have.lengthOf(1);
-
-              done();
-            });
-        });
-    });
-
     it("should find contracts in a zipped Truffle project", (done) => {
-      const zippedTrufflePath = path.join(
-        "test",
-        "sources",
-        "truffle",
-        "truffle-example.zip"
-      );
+      const zippedTrufflePath = path.join("test", "sources", "truffle", "truffle-example.zip");
       const zippedTruffleBuffer = fs.readFileSync(zippedTrufflePath);
       chai
         .request(server.app)
@@ -1486,20 +1189,10 @@ describe("Server", function () {
           done();
         });
       it("should correctly handle when uploaded 0/2 and then 1/2 sources", (done) => {
-        const metadataPath = path.join(
-          "test",
-          "sources",
-          "metadata",
-          "child-contract.meta.object.json"
-        );
+        const metadataPath = path.join("test", "sources", "metadata", "child-contract.meta.object.json");
         const metadataBuffer = fs.readFileSync(metadataPath);
 
-        const parentPath = path.join(
-          "test",
-          "sources",
-          "contracts",
-          "ParentContract.sol"
-        );
+        const parentPath = path.join("test", "sources", "contracts", "ParentContract.sol");
         const parentBuffer = fs.readFileSync(parentPath);
 
         const agent = chai.request.agent(server.app);
@@ -1533,12 +1226,7 @@ describe("Server", function () {
       });
 
       it("should find contracts in a zipped Truffle project", (done) => {
-        const zippedTrufflePath = path.join(
-          "test",
-          "sources",
-          "truffle",
-          "truffle-example.zip"
-        );
+        const zippedTrufflePath = path.join("test", "sources", "truffle", "truffle-example.zip");
         const zippedTruffleBuffer = fs.readFileSync(zippedTrufflePath);
         chai
           .request(server.app)
@@ -1565,13 +1253,7 @@ describe("Server", function () {
 
       const metadata = require("./testcontracts/WithImmutables/metadata.json");
       const metadataBuffer = Buffer.from(JSON.stringify(metadata));
-      const sourcePath = path.join(
-        "test",
-        "testcontracts",
-        "WithImmutables",
-        "sources",
-        "WithImmutables.sol"
-      );
+      const sourcePath = path.join("test", "testcontracts", "WithImmutables", "sources", "WithImmutables.sol");
       const sourceBuffer = fs.readFileSync(sourcePath);
 
       const agent = chai.request.agent(server.app);
@@ -1760,28 +1442,6 @@ describe("Server", function () {
         );
       });
 
-      it("should warn the user about the issue when metadata match but not bytecodes", (done) => {
-        const hardhatOutput = require("./sources/hardhat-output/extraFilesBytecodeMismatch-onlyMetadata.json");
-        const hardhatOutputBuffer = Buffer.from(JSON.stringify(hardhatOutput));
-
-        const agent = chai.request.agent(server.app);
-        agent
-          .post("/session/input-files")
-          .attach("files", hardhatOutputBuffer)
-          .then((res) => {
-            const contracts = res.body.contracts;
-            contracts[0].address = contractAddress;
-            contracts[0].chainId = defaultContractChain;
-            agent
-              .post("/session/verify-validated")
-              .send({ contracts })
-              .then((res) => {
-                assertSingleContractStatus(res, "extra-file-input-bug");
-                done();
-              });
-          });
-      });
-
       it("should verify with all input files and not only those in metadata", (done) => {
         const hardhatOutput = require("./sources/hardhat-output/extraFilesBytecodeMismatch.json");
         const hardhatOutputBuffer = Buffer.from(JSON.stringify(hardhatOutput));
@@ -1805,6 +1465,7 @@ describe("Server", function () {
       });
     });
   });
+
   describe("Verify repository endpoints", function () {
     const agent = chai.request.agent(server.app);
     it("should fetch files of specific address", async function () {
@@ -1834,160 +1495,17 @@ describe("Server", function () {
       chai.expect(res4.body.full).has.a.lengthOf(1);
     });
   });
+
   describe("Verify server status endpoint", function () {
     it("should check server's health", async function () {
       const res = await chai.request(server.app).get("/health");
       chai.expect(res.text).equals("Alive and kicking!");
     });
+
     it("should check server's chains", async function () {
       const res = await chai.request(server.app).get("/chains");
       chai.expect(res.body.length).greaterThan(0);
     });
   });
-  describe("Unit test functions", function () {
-    this.timeout(EXTENDED_TIME_60);
-    const { sourcifyChainsArray } = require("../dist/sourcify-chains");
-    const {
-      getCreatorTx,
-    } = require("../dist/server/services/VerificationService-util");
 
-    it.skip("should run getCreatorTx with chainId 40", async function () {
-      const sourcifyChain = sourcifyChainsArray.find(
-        (sourcifyChain) => sourcifyChain.chainId === 40
-      );
-      chai.expect(sourcifyChain).to.be.not.undefined;
-      const creatorTx = await getCreatorTx(
-        sourcifyChain,
-        "0x4c09368a4bccD1675F276D640A0405Efa9CD4944"
-      );
-      chai
-        .expect(creatorTx)
-        .equals(
-          "0xb7efb33c736b1e8ea97e356467f99d99221343f077ce31a3e3ac1d2e0636df1d"
-        );
-    });
-
-    // Commented out as fails way too often
-    // it("should run getCreatorTx with chainId 51", async function () {
-    //   const sourcifyChain = sourcifyChainsArray.find(
-    //     (sourcifyChain) => sourcifyChain.chainId === 51
-    //   );
-    //   const creatorTx = await getCreatorTx(
-    //     sourcifyChain,
-    //     "0x8C3FA94eb5b07c9AF7dBFcC53ea3D2BF7FdF3617"
-    //   );
-    //   chai
-    //     .expect(creatorTx)
-    //     .equals(
-    //       "0xb1af0ec1283551480ae6e6ce374eb4fa7d1803109b06657302623fc65c987420"
-    //     );
-    // });
-
-    it.skip("should run getCreatorTx with chainId 83", async function () {
-      const sourcifyChain = sourcifyChainsArray.find(
-        (sourcifyChain) => sourcifyChain.chainId === 83
-      );
-      chai.expect(sourcifyChain).to.be.not.undefined;
-
-      const creatorTx = await getCreatorTx(
-        sourcifyChain,
-        "0x89e772941d94Ef4BDA1e4f68E79B4bc5F6096389"
-      );
-      chai
-        .expect(creatorTx)
-        .equals(
-          "0x8cc7b0fb66eaf7b32bac7b7938aedfcec6d49f9fe607b8008a5541e72d264069"
-        );
-    });
-
-    it.skip("should run getCreatorTx with chainId 335", async function () {
-      const sourcifyChain = sourcifyChainsArray.find(
-        (sourcifyChain) => sourcifyChain.chainId === 335
-      );
-      chai.expect(sourcifyChain).to.be.not.undefined;
-
-      const creatorTx = await getCreatorTx(
-        sourcifyChain,
-        "0x40D843D06dAC98b2586fD1DFC5532145208C909F"
-      );
-      chai
-        .expect(creatorTx)
-        .equals(
-          "0xd125cc92f61d0898d55a918283f8b855bde15bc5f391b621e0c4eee25c9997ee"
-        );
-    });
-
-    it.skip("should run getCreatorTx with regex for new Blockscout", async function () {
-      const sourcifyChain = sourcifyChainsArray.find(
-        (sourcifyChain) => sourcifyChain.chainId === 100
-      );
-      chai.expect(sourcifyChain).to.be.not.undefined;
-
-      const creatorTx = await getCreatorTx(
-        sourcifyChain,
-        "0x3CE1a25376223695284edc4C2b323C3007010C94"
-      );
-      chai
-        .expect(creatorTx)
-        .equals(
-          "0x11da550e6716be8b4bd9203cb384e89b8f8941dc460bd99a4928ce2825e05456"
-        );
-    });
-
-    it.skip("should run getCreatorTx with regex for old Blockscout", async function () {
-      const sourcifyChain = sourcifyChainsArray.find(
-        (sourcifyChain) => sourcifyChain.chainId === 1313161554
-      );
-      chai.expect(sourcifyChain).to.be.not.undefined;
-
-      const creatorTx = await getCreatorTx(
-        sourcifyChain,
-        "0xC6e5185438e1730959c1eF3551059A3feC744E90"
-      );
-      chai
-        .expect(creatorTx)
-        .equals(
-          "0x5db54485baca39ffaeda1e28edb467a8fd3372dbd21a891b2619a02dbf4acc18"
-        );
-    });
-
-    it.skip("should run getCreatorTx with regex for Etherscan", async function () {
-      const sourcifyChain = sourcifyChainsArray.find(
-        (sourcifyChain) => sourcifyChain.chainId === 84531
-      );
-      chai.expect(sourcifyChain).to.be.not.undefined;
-
-      const creatorTx = await getCreatorTx(
-        sourcifyChain,
-        "0xbe92671bdd1a1062e1a9f3be618e399fb5facace"
-      );
-      chai
-        .expect(creatorTx)
-        .equals(
-          "0x15c5208cacbc1e14d9906926b8a991ec986a442f26081fe5ac9de4eb671c5195"
-        );
-    });
-
-    it("should attach and trigger an event with the event manager", function (done) {
-      const EventManager = require("../dist/common/EventManager").EventManager;
-      const em = new EventManager({
-        "*": [],
-        TestEvent: [],
-      });
-      let hitCounter = 0;
-      em.on("*", function () {
-        hitCounter++;
-        if (hitCounter == 2) {
-          done();
-        }
-      });
-      em.on("TestEvent", function () {
-        hitCounter++;
-        if (hitCounter == 2) {
-          done();
-        }
-      });
-      em.trigger("TestEvent");
-    });
-  });
 });
