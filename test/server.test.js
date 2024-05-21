@@ -31,7 +31,7 @@ const { deployFromAbiAndBytecode } = require("./helpers/helpers");
 const { JsonRpcProvider } = require("ethers");
 chai.use(chaiHttp);
 
-const defaultContractChain = "1337";
+const CHAIN_ID = "1337";
 
 describe("Server", function () {
   this.timeout(20000);
@@ -39,8 +39,8 @@ describe("Server", function () {
   const ganacheServer = ganache.server({
     wallet: { totalAccounts: 1 },
     chain: {
-      chainId: parseInt(defaultContractChain),
-      networkId: parseInt(defaultContractChain),
+      chainId: parseInt(CHAIN_ID),
+      networkId: parseInt(CHAIN_ID),
     },
   });
 
@@ -118,7 +118,7 @@ describe("Server", function () {
       chai
         .request(server.app)
         .get("/check-by-addresses")
-        .query({ chainIds: defaultContractChain })
+        .query({ chainIds: CHAIN_ID })
         .end((err, res) => {
           assertValidationError(err, res, "addresses");
           done();
@@ -130,7 +130,7 @@ describe("Server", function () {
         .request(server.app)
         .get("/check-by-addresses")
         .query({
-          chainIds: defaultContractChain,
+          chainIds: CHAIN_ID,
           addresses: defaultContractAddress,
         })
         .end((err, res) => {
@@ -143,7 +143,7 @@ describe("Server", function () {
       chai
         .request(server.app)
         .get("/check-by-addresses")
-        .query({ chainIds: defaultContractChain, addresses: invalidAddress })
+        .query({ chainIds: CHAIN_ID, addresses: invalidAddress })
         .end((err, res) => {
           assertValidationError(err, res, "addresses");
           done();
@@ -155,7 +155,7 @@ describe("Server", function () {
         .request(server.app)
         .get("/check-by-addresses")
         .query({
-          chainIds: defaultContractChain,
+          chainIds: CHAIN_ID,
           addresses: defaultContractAddress,
         })
         .end((err, res) => {
@@ -164,7 +164,7 @@ describe("Server", function () {
             .request(server.app)
             .post("/")
             .field("address", defaultContractAddress)
-            .field("chain", defaultContractChain)
+            .field("chain", CHAIN_ID)
             .attach("files", metadataBuffer, "metadata.json")
             .attach("files", sourceBuffer)
             .end((err, res) => {
@@ -176,7 +176,7 @@ describe("Server", function () {
                 .request(server.app)
                 .get("/check-by-addresses")
                 .query({
-                  chainIds: defaultContractChain,
+                  chainIds: CHAIN_ID,
                   addresses: defaultContractAddress,
                 })
                 .end((err, res) =>
@@ -197,7 +197,7 @@ describe("Server", function () {
         .request(server.app)
         .get("/check-by-addresses")
         .query({
-          chainIds: defaultContractChain,
+          chainIds: CHAIN_ID,
           addresses: defaultContractAddress.toLowerCase(),
         })
         .end((err, res) => {
@@ -223,7 +223,7 @@ describe("Server", function () {
       chai
         .request(server.app)
         .get("/check-all-by-addresses")
-        .query({ chainIds: defaultContractChain })
+        .query({ chainIds: CHAIN_ID })
         .end((err, res) => {
           assertValidationError(err, res, "addresses");
           done();
@@ -235,7 +235,7 @@ describe("Server", function () {
         .request(server.app)
         .get("/check-all-by-addresses")
         .query({
-          chainIds: defaultContractChain,
+          chainIds: CHAIN_ID,
           addresses: defaultContractAddress,
         })
         .end((err, res) =>
@@ -247,7 +247,7 @@ describe("Server", function () {
       chai
         .request(server.app)
         .get("/check-all-by-addresses")
-        .query({ chainIds: defaultContractChain, addresses: invalidAddress })
+        .query({ chainIds: CHAIN_ID, addresses: invalidAddress })
         .end((err, res) => {
           assertValidationError(err, res, "addresses");
           done();
@@ -259,7 +259,7 @@ describe("Server", function () {
         .request(server.app)
         .get("/check-all-by-addresses")
         .query({
-          chainIds: defaultContractChain,
+          chainIds: CHAIN_ID,
           addresses: defaultContractAddress,
         })
         .end((err, res) => {
@@ -268,7 +268,7 @@ describe("Server", function () {
             .request(server.app)
             .post("/")
             .field("address", defaultContractAddress)
-            .field("chain", defaultContractChain)
+            .field("chain", CHAIN_ID)
             .attach("files", metadataBuffer, "metadata.json")
             .attach("files", sourceBuffer)
             .end((err, res) => {
@@ -279,7 +279,7 @@ describe("Server", function () {
                 .request(server.app)
                 .get("/check-all-by-addresses")
                 .query({
-                  chainIds: defaultContractChain,
+                  chainIds: CHAIN_ID,
                   addresses: defaultContractAddress,
                 })
                 .end((err, res) =>
@@ -287,7 +287,7 @@ describe("Server", function () {
                     err,
                     res,
                     defaultContractAddress,
-                    [{ chainId: defaultContractChain, status: "perfect" }],
+                    [{ chainId: CHAIN_ID, status: "perfect" }],
                     done
                   )
                 );
@@ -300,7 +300,7 @@ describe("Server", function () {
         .request(server.app)
         .get("/check-all-by-addresses")
         .query({
-          chainIds: defaultContractChain,
+          chainIds: CHAIN_ID,
           addresses: defaultContractAddress.toLowerCase(),
         })
         .end((err, res) => {
@@ -321,7 +321,7 @@ describe("Server", function () {
       chai
         .request(server.app)
         .post(path)
-        .field("chain", defaultContractChain)
+        .field("chain", CHAIN_ID)
         .field("address", defaultContractAddress)
         .end((err, res) => {
           chai.expect(err).to.be.null;
@@ -344,7 +344,7 @@ describe("Server", function () {
         .request(server.app)
         .post("/")
         .field("address", defaultContractAddress)
-        .field("chain", defaultContractChain)
+        .field("chain", CHAIN_ID)
         .attach("files", metadataBuffer, "metadata.json")
         .attach("files", sourceBuffer, "Storage.sol")
         .end((err, res) =>
@@ -353,7 +353,7 @@ describe("Server", function () {
             res,
             done,
             defaultContractAddress,
-            defaultContractChain,
+            CHAIN_ID,
             "perfect"
           )
         );
@@ -365,7 +365,7 @@ describe("Server", function () {
         .post("/")
         .send({
           address: defaultContractAddress,
-          chain: defaultContractChain,
+          chain: CHAIN_ID,
           files: {
             "metadata.json": metadataBuffer.toString(),
             "Storage.sol": sourceBuffer.toString(),
@@ -377,7 +377,7 @@ describe("Server", function () {
             res,
             done,
             defaultContractAddress,
-            defaultContractChain,
+            CHAIN_ID,
             "perfect"
           )
         );
@@ -389,7 +389,7 @@ describe("Server", function () {
         .post("/")
         .send({
           address: defaultContractAddress,
-          chain: defaultContractChain,
+          chain: CHAIN_ID,
           files: {
             "metadata.json": metadataBuffer,
             "Storage.sol": sourceBuffer,
@@ -401,7 +401,7 @@ describe("Server", function () {
             res,
             done,
             defaultContractAddress,
-            defaultContractChain,
+            CHAIN_ID,
             "perfect"
           )
         );
@@ -430,13 +430,13 @@ describe("Server", function () {
       );
       const partialSourceBuffer = fs.readFileSync(partialSourcePath);
 
-      const partialMetadataURL = `/repository/contracts/partial_match/${defaultContractChain}/${defaultContractAddress}/metadata.json`;
+      const partialMetadataURL = `/repository/contracts/partial_match/${CHAIN_ID}/${defaultContractAddress}/metadata.json`;
 
       chai
         .request(server.app)
         .post("/")
         .field("address", defaultContractAddress)
-        .field("chain", defaultContractChain)
+        .field("chain", CHAIN_ID)
         .attach("files", partialMetadataBuffer, "metadata.json")
         .attach("files", partialSourceBuffer)
         .end((err, res) => {
@@ -445,7 +445,7 @@ describe("Server", function () {
             res,
             null,
             defaultContractAddress,
-            defaultContractChain,
+            CHAIN_ID,
             "partial"
           );
 
@@ -460,7 +460,7 @@ describe("Server", function () {
                 .request(server.app)
                 .post("/")
                 .field("address", defaultContractAddress)
-                .field("chain", defaultContractChain)
+                .field("chain", CHAIN_ID)
                 .attach("files", metadataBuffer, "metadata.json")
                 .attach("files", sourceBuffer)
                 .end(async (err, res) => {
@@ -469,7 +469,7 @@ describe("Server", function () {
                     res,
                     null,
                     defaultContractAddress,
-                    defaultContractChain
+                    CHAIN_ID
                   );
 
                   await waitSecs(2); // allow server some time to execute the deletion (it started *after* the last response)
@@ -503,7 +503,7 @@ describe("Server", function () {
         .request(server.app)
         .post("/")
         .field("address", address)
-        .field("chain", defaultContractChain)
+        .field("chain", CHAIN_ID)
         .attach("files", metadataBuffer, "metadata.json");
 
       assertVerification(
@@ -511,7 +511,7 @@ describe("Server", function () {
         res,
         null,
         address,
-        defaultContractChain,
+        CHAIN_ID,
         "partial"
       );
     });
@@ -536,7 +536,7 @@ describe("Server", function () {
         .post("/")
         .send({
           address: contractAddress,
-          chain: defaultContractChain,
+          chain: CHAIN_ID,
           files: {
             "metadata.json": JSON.stringify(metadata),
             "WithImmutables.sol": sourceBuffer.toString(),
@@ -547,14 +547,14 @@ describe("Server", function () {
         res,
         null,
         contractAddress,
-        defaultContractChain
+        CHAIN_ID
       );
       const isExist = fs.existsSync(
         path.join(
           server.repository,
           "contracts",
           "full_match",
-          defaultContractChain,
+          CHAIN_ID,
           contractAddress,
           "immutable-references.json"
         )
@@ -581,7 +581,7 @@ describe("Server", function () {
         .post("/verify/solc-json")
         .attach("files", solcJsonBuffer, "solc.json")
         .field("address", address)
-        .field("chain", defaultContractChain)
+        .field("chain", CHAIN_ID)
         .field("contractName", "Storage");
 
       assertValidationError(null, res, "compilerVersion");
@@ -606,7 +606,7 @@ describe("Server", function () {
         .post("/verify/solc-json")
         .attach("files", solcJsonBuffer)
         .field("address", address)
-        .field("chain", defaultContractChain)
+        .field("chain", CHAIN_ID)
         .field("compilerVersion", "0.8.4+commit.c7e474f2");
 
       assertValidationError(null, res, "contractName");
@@ -631,11 +631,11 @@ describe("Server", function () {
         .post("/verify/solc-json")
         .attach("files", solcJsonBuffer, "solc.json")
         .field("address", address)
-        .field("chain", defaultContractChain)
+        .field("chain", CHAIN_ID)
         .field("compilerVersion", "0.8.4+commit.c7e474f2")
         .field("contractName", "Storage");
 
-      assertVerification(null, res, null, address, defaultContractChain);
+      assertVerification(null, res, null, address, CHAIN_ID);
     });
 
     describe("hardhat build-info file support", function () {
@@ -662,7 +662,7 @@ describe("Server", function () {
         chai
           .request(server.app)
           .post("/")
-          .field("chain", defaultContractChain)
+          .field("chain", CHAIN_ID)
           .field("address", address)
           .attach("files", hardhatOutputBuffer)
           .then((res) => {
@@ -680,7 +680,7 @@ describe("Server", function () {
         chai
           .request(server.app)
           .post("/")
-          .field("chain", defaultContractChain)
+          .field("chain", CHAIN_ID)
           .field("address", address)
           .field("chosenContract", mainContractIndex)
           .attach("files", hardhatOutputBuffer)
@@ -690,7 +690,7 @@ describe("Server", function () {
               res,
               done,
               address,
-              defaultContractChain,
+              CHAIN_ID,
               "perfect"
             );
           });
@@ -721,7 +721,7 @@ describe("Server", function () {
           .post("/")
           .send({
             address: contractAddress,
-            chain: defaultContractChain,
+            chain: CHAIN_ID,
             files: {
               "metadata.json": JSON.stringify(metadata),
               "Storage.sol": sourceBuffer.toString(),
@@ -732,14 +732,14 @@ describe("Server", function () {
           res,
           null,
           contractAddress,
-          defaultContractChain,
+          CHAIN_ID,
           "partial"
         );
         const savedPath = path.join(
             server.repository,
             "contracts",
             "partial_match",
-            defaultContractChain,
+            CHAIN_ID,
             contractAddress,
             "sources",
             "Storage.sol"
@@ -769,7 +769,7 @@ describe("Server", function () {
         chai
           .request(server.app)
           .post("/")
-          .field("chain", defaultContractChain)
+          .field("chain", CHAIN_ID)
           .field("address", contractAddress)
           .attach("files", hardhatOutputBuffer)
           .end((err, res) => {
@@ -778,7 +778,7 @@ describe("Server", function () {
               res,
               done,
               contractAddress,
-              defaultContractChain,
+              CHAIN_ID,
               "perfect"
             );
           });
@@ -855,7 +855,7 @@ describe("Server", function () {
             {}
           );
           contracts[0].address = defaultContractAddress;
-          contracts[0].chainId = defaultContractChain;
+          contracts[0].chainId = CHAIN_ID;
 
           agent
             .post("/session/verify-validated")
@@ -866,7 +866,7 @@ describe("Server", function () {
                 res,
                 done,
                 defaultContractAddress,
-                defaultContractChain,
+                CHAIN_ID,
                 "perfect"
               );
             });
@@ -922,7 +922,7 @@ describe("Server", function () {
             .post("/session/input-files")
             .attach("files", sourceBuffer, "Storage.sol")
             .end((err, res) => {
-              contracts[0].chainId = defaultContractChain;
+              contracts[0].chainId = CHAIN_ID;
               contracts[0].address = defaultContractAddress;
               assertVerificationSession(
                 err,
@@ -942,7 +942,7 @@ describe("Server", function () {
                     res,
                     done,
                     defaultContractAddress,
-                    defaultContractChain,
+                    CHAIN_ID,
                     "perfect"
                   );
                 });
@@ -1028,7 +1028,7 @@ const MAX_SESSION_SIZE =
             .send({ contracts })
             .then((res) => {
               assertSingleContractStatus(res, "error");
-              contracts[0].chainId = defaultContractChain;
+              contracts[0].chainId = CHAIN_ID;
 
               agent
                 .post("/session/verify-validated")
@@ -1064,14 +1064,14 @@ const MAX_SESSION_SIZE =
               .send({contracts})
               .then((res) => {
                 assertSingleContractStatus(res, "error");
-                contracts[0].chainId = defaultContractChain;
+                contracts[0].chainId = CHAIN_ID;
 
                 agent
                   .post("/session/verify-checked?dryrun=true")
                   .send({contracts})
                   .then((res) => {
                     assertSingleContractStatus(res, "perfect");
-                    assertContractNotSaved(defaultContractAddress, defaultContractChain);
+                    assertContractNotSaved(defaultContractAddress, CHAIN_ID);
                     done();
                   });
               });
@@ -1093,14 +1093,14 @@ const MAX_SESSION_SIZE =
               .send({contracts})
               .then((res) => {
                 assertSingleContractStatus(res, "error");
-                contracts[0].chainId = defaultContractChain;
+                contracts[0].chainId = CHAIN_ID;
 
                 agent
                   .post("/session/verify-checked?dryrun=false")
                   .send({contracts})
                   .then((res) => {
                     assertSingleContractStatus(res, "perfect");
-                    assertContractSaved(defaultContractAddress, defaultContractChain, "perfect");
+                    assertContractSaved(defaultContractAddress, CHAIN_ID, "perfect");
                     done();
                   });
               });
@@ -1122,14 +1122,14 @@ const MAX_SESSION_SIZE =
               .send({contracts})
               .then((res) => {
                 assertSingleContractStatus(res, "error");
-                contracts[0].chainId = defaultContractChain;
+                contracts[0].chainId = CHAIN_ID;
 
                 agent
                   .post("/session/verify-checked")
                   .send({contracts})
                   .then((res) => {
                     assertSingleContractStatus(res, "perfect");
-                    assertContractSaved(defaultContractAddress, defaultContractChain, "perfect");
+                    assertContractSaved(defaultContractAddress, CHAIN_ID, "perfect");
                     done();
                   });
               });
@@ -1164,7 +1164,7 @@ const MAX_SESSION_SIZE =
             {}
           );
           contracts[0].address = defaultContractAddress;
-          contracts[0].chainId = defaultContractChain;
+          contracts[0].chainId = CHAIN_ID;
 
           agent
             .post("/session/verify-validated")
@@ -1266,7 +1266,7 @@ const MAX_SESSION_SIZE =
       let contracts = assertSingleContractStatus(res1, "error");
 
       contracts[0].address = contractAddress;
-      contracts[0].chainId = defaultContractChain;
+      contracts[0].chainId = CHAIN_ID;
       const res2 = await agent
         .post("/session/verify-validated")
         .send({ contracts });
@@ -1277,7 +1277,7 @@ const MAX_SESSION_SIZE =
           server.repository,
           "contracts",
           "full_match",
-          defaultContractChain,
+          CHAIN_ID,
           contractAddress,
           "immutable-references.json"
         )
@@ -1325,7 +1325,7 @@ const MAX_SESSION_SIZE =
       const contracts = assertSingleContractStatus(res1, "error");
 
       contracts[0].address = childAddress;
-      contracts[0].chainId = defaultContractChain;
+      contracts[0].chainId = CHAIN_ID;
 
       const res = await agent
         .post("/session/verify-validated")
@@ -1371,7 +1371,7 @@ const MAX_SESSION_SIZE =
       const contracts = assertSingleContractStatus(res1, "error");
 
       contracts[0].address = childAddress;
-      contracts[0].chainId = defaultContractChain;
+      contracts[0].chainId = CHAIN_ID;
       const res = await agent
         .post("/session/verify-validated")
         .send({ contracts });
@@ -1419,7 +1419,7 @@ const MAX_SESSION_SIZE =
       const contracts = assertSingleContractStatus(res, "error");
 
       contracts[0].address = address;
-      contracts[0].chainId = defaultContractChain;
+      contracts[0].chainId = CHAIN_ID;
 
       const res2 = await agent
         .post("/session/verify-validated")
@@ -1453,7 +1453,7 @@ const MAX_SESSION_SIZE =
           .then((res) => {
             const contracts = res.body.contracts;
             contracts[0].address = contractAddress;
-            contracts[0].chainId = defaultContractChain;
+            contracts[0].chainId = CHAIN_ID;
             agent
               .post("/session/verify-validated")
               .send({ contracts })
@@ -1472,26 +1472,26 @@ const MAX_SESSION_SIZE =
       await agent
         .post("/")
         .field("address", defaultContractAddress)
-        .field("chain", defaultContractChain)
+        .field("chain", CHAIN_ID)
         .attach("files", metadataBuffer, "metadata.json")
         .attach("files", sourceBuffer, "Storage.sol");
       const res0 = await agent.get(
-        `/files/${defaultContractChain}/${defaultContractAddress}`
+        `/files/${CHAIN_ID}/${defaultContractAddress}`
       );
       chai.expect(res0.body).has.a.lengthOf(2);
       const res1 = await agent.get(
-        `/files/tree/any/${defaultContractChain}/${defaultContractAddress}`
+        `/files/tree/any/${CHAIN_ID}/${defaultContractAddress}`
       );
       chai.expect(res1.body?.status).equals("full");
       const res2 = await agent.get(
-        `/files/any/${defaultContractChain}/${defaultContractAddress}`
+        `/files/any/${CHAIN_ID}/${defaultContractAddress}`
       );
       chai.expect(res2.body?.status).equals("full");
       const res3 = await agent.get(
-        `/files/tree/${defaultContractChain}/${defaultContractAddress}`
+        `/files/tree/${CHAIN_ID}/${defaultContractAddress}`
       );
       chai.expect(res3.body).has.a.lengthOf(2);
-      const res4 = await agent.get(`/files/contracts/${defaultContractChain}`);
+      const res4 = await agent.get(`/files/contracts/${CHAIN_ID}`);
       chai.expect(res4.body.full).has.a.lengthOf(1);
     });
   });
