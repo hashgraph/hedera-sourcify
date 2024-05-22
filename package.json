@@ -1,7 +1,7 @@
 {
   "name": "@hashgraph/hedera-sourcify",
   "version": "0.3.0-SNAPSHOT",
-  "description": "A Hedera fork of ethereum sourcify that provides a Solidity metadata-based re-compilation and source verification tool",
+  "description": "A Hedera fork of Ethereum Sourcify that provides a Solidity metadata-based re-compilation and source verification tool",
   "private": true,
   "repository": {
     "type": "git",
@@ -10,10 +10,10 @@
   "scripts": {
     "test:server": "mocha test/server.test.js --exit",
     "test:hedera": "mocha test/hedera.test.js --exit",
-    "sourcify:patch": "cd sourcify && git apply --verbose ../server.patch",
+    "server:patch": "cd sourcify && git apply --verbose ../server.patch",
     "repository:patch": "cd h5ai-nginx && git apply --verbose ../repository.patch",
-    "sourcify:build": "cd sourcify && npm run build:lerna",
-    "sourcify:start": "cd sourcify && npm run server:start",
+    "server:build": "cd sourcify && npm run build:lerna",
+    "server:start": "cd sourcify && npm run server:start",
     "server:reset-previewnet": "./scripts/hedera-reset.sh previewnet",
     "server:reset-testnet": "./scripts/hedera-reset.sh testnet",
     "local-node:start": "hedera start --network local --detached"

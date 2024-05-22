@@ -27,9 +27,9 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Apply Sourcify patch customizations
-        run: npm run sourcify:patch
-      - name: Apply Repository patch customizations
+      - name: Apply Sourcify server patch customizations
+        run: npm run server:patch
+      - name: Apply Sourcify repository patch customizations
         run: npm run repository:patch
       
       - name: Get tag

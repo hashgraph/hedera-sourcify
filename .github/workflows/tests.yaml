@@ -16,8 +16,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Apply Sourcify patch customizations
-        run: npm run sourcify:patch
+      - name: Apply Sourcify server patch customizations
+        run: npm run server:patch
 
       - name: Compile Sourcify server
         working-directory: ./sourcify
@@ -37,8 +37,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Apply Sourcify patch customizations
-        run: npm run sourcify:patch
+      - name: Apply Sourcify server patch customizations
+        run: npm run server:patch
 
       - run: npm ci
 
