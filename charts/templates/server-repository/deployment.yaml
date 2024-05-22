@@ -9,7 +9,7 @@ metadata:
   {{- if .Values.serverRepository.annotations }}
   annotations:
   {{ toYaml .Values.serverRepository.annotations | indent 4 }}
-  {{- end }}    
+  {{- end }}
 spec:
   {{- if not .Values.serverRepository.autoscaling.enabled }}
   replicas: {{ .Values.serverRepository.replicaCount }}
@@ -34,12 +34,12 @@ spec:
       {{- if .Values.serverRepository.podSecurityContext }}
       securityContext:
         {{- toYaml .Values.serverRepository.podSecurityContext | nindent 8 }}
-      {{- end }}  
-      containers:        
+      {{- end }}
+      containers:
         - name: {{ printf "%s-%s" .Chart.Name "server" }}
           securityContext:
             {{- toYaml .Values.serverRepository.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.server.tag | default "server-latest" }}"
+          image: "{{ .Values.serverRepository.image.server.repository }}:{{ .Values.serverRepository.image.server.tag | default "server-latest" }}"
           imagePullPolicy: {{ .Values.serverRepository.image.pullPolicy }}
           envFrom:
             - configMapRef:
@@ -58,7 +58,7 @@ spec:
               path: /health
               port: serverport
             periodSeconds: 10
-            failureThreshold: 6            
+            failureThreshold: 6
           {{- if .Values.serverRepository.server.resources }}
           resources:
             {{- toYaml .Values.serverRepository.server.resources | nindent 12 }}
@@ -66,14 +66,23 @@ spec:
           volumeMounts:
             - name: {{ .Chart.Name }}
               mountPath: /data
+            - name: {{ printf "%s-%s" .Chart.Name "repository" }}
+              mountPath: /home/app/services/server/dist/config/local.js
+              subPath: local.js
+            - name: {{ printf "%s-%s" .Chart.Name "repository" }}
+              mountPath: /home/app/services/server/dist/sourcify-chains.json
+              subPath: sourcify-chains.json
+            - name: {{ printf "%s-%s" .Chart.Name "repository" }}
+              mountPath: /home/app/services/server/dist/servers.yaml
+              subPath: servers.yaml
         - name: {{ printf "%s-%s" .Chart.Name "repository" }}
           securityContext:
             {{- toYaml .Values.serverRepository.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.serverRepository.image.repository.tag | default "repository-latest" }}"
+          image: "{{ .Values.serverRepository.image.repository.repository }}:{{ .Values.serverRepository.image.repository.tag | default "repository-latest" }}"
           imagePullPolicy: {{ .Values.serverRepository.image.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: {{ template "sourcify.name" . }}          
+                name: {{ template "sourcify.name" . }}
           ports:
             - name: repositoryport
               containerPort: {{ .Values.serverRepository.service.repository.port }}
@@ -87,7 +96,7 @@ spec:
             httpGet:
               path: /select-contract/health
               port: repositoryport
-            periodSeconds: 10             
+            periodSeconds: 10
           {{- if .Values.serverRepository.repository.resources }}
           resources:
             {{- toYaml .Values.serverRepository.repository.resources | nindent 12 }}
@@ -98,7 +107,7 @@ spec:
               readOnly: true
             - name: {{ printf "%s-%s" .Chart.Name "repository" }}
               mountPath: /redirects/config.json
-              subPath: config.json                         
+              subPath: config.json
       {{- if .Values.serverRepository.nodeSelector }}
       nodeSelector:
         {{- toYaml .Values.serverRepository.nodeSelector | nindent 8 }}
@@ -117,11 +126,11 @@ spec:
           persistentVolumeClaim:
             claimName: {{ template "sourcify.name" . }}-pvc
         {{- else }}
-      volumes:        
+      volumes:
         - name: {{ .Chart.Name }}
           emptyDir: {}
       {{- end }}
         - configMap:
             name: {{ printf "%s-%s" .Chart.Name "repository" }}
-          name: {{ printf "%s-%s" .Chart.Name "repository" }}        
+          name: {{ printf "%s-%s" .Chart.Name "repository" }}
 {{- end -}}

@@ -8,7 +8,7 @@ metadata:
   {{- if .Values.serverRepository.annotations }}
   annotations:
   {{ toYaml .Values.serverRepository.annotations | indent 4 }}
-  {{- end }}    
+  {{- end }}
 data:
   REPOSITORY_PATH: {{ .Values.serverRepository.config.REPOSITORY_PATH }}
   SERVER_URL: {{ .Values.serverRepository.config.SERVER_URL }}
@@ -20,7 +20,7 @@ data:
   TESTING: {{ .Values.serverRepository.config.TESTING | quote }}
   NODE_ENV: {{ .Values.serverRepository.config.NODE_ENV | default "development" }}
   UI_DOMAIN_NAME: {{ .Values.serverRepository.config.UI_DOMAIN_NAME }}
-
+  SOURCIFY_SERVER: {{ .Values.serverRepository.config.SERVER_URL }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -36,3 +36,19 @@ metadata:
 data:
   config.json: |-
   {{- .Values.serverRepository.config.repository | toJson  | nindent 4 }}
+  servers.yaml: |-
+  {{- .Values.serverRepository.config.servers | toYaml | nindent 4 }}
+  sourcify-chains.json: |-
+  {{- .Values.serverRepository.config.sourcifyChains | toJson | nindent 4 }}
+  local.js: |
+    module.exports = {
+      corsAllowedOrigins: [
+          /^https?:\/\/(?:.+\.)?sourcify.dev$/, // sourcify.dev and subdomains
+          /^https?:\/\/(?:.+\.)?sourcify.eth$/, // sourcify.eth and subdomains
+          /^https?:\/\/(?:.+\.)?sourcify.eth.link$/, // sourcify.eth.link and subdomains
+          /^https?:\/\/(?:.+\.)?ipfs.dweb.link$/, // dweb links used by Brave browser etc.
+          /^https?:\/\/(?:.+\.)?hedera-devops.com$/, // swirldslabs-devops
+          /^https?:\/\/(?:.+\.)?hashscan.io$/, // hashscan
+          process.env.NODE_ENV !== "production" && /^https?:\/\/localhost(?::\d+)?$/, // localhost on any port /^{{ .Values.serverRepository.config.SERVER_URL }}$/
+      ],
+    };

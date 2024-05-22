@@ -1,8 +1,6 @@
 nameoOverride: ""
 fullnameOverride: ""
 imagePullSecrets: []
-image:
-  repository: "ghcr.io/hashgraph/hedera-sourcify"
 
 serverRepository:
   ## Deploy sourcify server-repository
@@ -41,9 +39,11 @@ serverRepository:
   ## server-repository image configuration, image repository is defined in the global image section above
   image:
     server:
-      tag: "server-latest"
+      repository: ghcr.io/hashgraph/hedera-sourcify/server
+      tag: "test"
     repository:
-      tag: "repository-latest"  
+      repository: ghcr.io/hashgraph/hedera-sourcify/repository
+      tag: "test"
     pullPolicy: "IfNotPresent"
 
   ## server-repository serviceAccount creation and configuration
@@ -86,7 +86,37 @@ serverRepository:
       "REPOSITORY_SERVER_URL": "http://127.0.0.1:10000",
       "EXPLORER_URL": "http://127.0.0.1:8080",
       }
-
+    servers:
+      - description: The current REST API server
+        url: ""
+      - description: The production REST API server
+        url: "https://server-verify.hashscan.io"
+      - description: The staging REST API server
+        url: "https://server-sourcify.hedera-devops.com"
+      - description: Local development server address on default port 5555
+        url: "http://localhost:5555"
+    sourcifyChains:
+      {
+        "295": {
+          "sourcifyName": "Hedera Mainnet",
+          "supported": true
+        },
+        "296": {
+          "sourcifyName": "Hedera Testnet",
+          "supported": true
+        },
+        "297": {
+          "sourcifyName": "Hedera Previewnet",
+          "supported": true
+        },
+        "298": {
+          "sourcifyName": "Hedera Localnet",
+          "supported": true,
+          "rpc": [
+            "http://host.docker.internal:7546"
+          ]
+        }
+      }
 ui:
   ## Deploy sourcify ui
   enabled: true
@@ -119,7 +149,8 @@ ui:
 
   ## UI image configuration, image repository is defined in the global image section above
   image:
-    tag: "ui-latest"
+    repository: ghcr.io/hashgraph/hedera-sourcify/ui
+    tag: "test"
     pullPolicy: "IfNotPresent"
 
   ## UI serviceAccount creation and configuration
@@ -152,14 +183,13 @@ ui:
 
 reset:
   ## Previewnet reset job, default is to disable
-  previewnet_reset: 
+  previewnet_reset:
     enabled: false
   ## Testnet reset job, default is to disable
   testnet_reset:
-    enabled: false  
+    enabled: false
   ## Set default immage repository, tag, and pull policy
   image:
     repository: "bitnami/kubectl"
     tag: "1.28.7"
     pullPolicy: "IfNotPresent"
-
