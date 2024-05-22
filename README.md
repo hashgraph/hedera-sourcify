@@ -504,43 +504,31 @@ Customize OpenAPI servers <https://github.com/ethereum/sourcify/issues/1345>
 
 ## Tools
 
-See [tools](./TOOLS.md)
+See [TOOLS](./TOOLS.md) to setup development environments to work with a custom verification deployment.
 
 ## Releases
 
-- Create a release branch, minor release 0.2, name of the branch, _e.g._,`release/0.2`
+To release a new version `X.Y.Z` follow the next steps.
 
-The repo has Github Actions automation to generate docker images based on the latest changes in a branch.
-To initiate the release for version `x.y.z` simply checkout branch `release/x.y` and run the following commands
+First, create a release branch.
+For example use the name `release/X.Y` for a minor release.
+Bump versions in a new PR against this release branch to the target version, `X.Y.Z-rc1` and merge it back into the release branch, _i.e._, `release/X.Y`.
+
+Create another PR against `main` for snapshot bumping, _i.e._,`X.(Y+1).0-SNAPSHOT`.
+Only perform this step for `rc` releases, for `ga` releases there should be already a `release/X.Y` branch.
+
+The repo has Github Actions automation to generate Docker images based on the latest changes in a branch.
+To trigger image generation in GitHub Actions for release version `X.Y.Z` push a new tag using the following commands
 
 ```sh
-git tag vx.y.z
-git push origin vx.y.z
-```
-
-- Bump versions in a new PR against release branch to the target version, `0.2.0-rc1` and merge it back into the release branch, _e.g._, `release/0.2`
-- Create PR against `main` for snapshot bump, _e.g._,`0.3.0-SNAPSHOT` (only for `rc` releases, for `ga` releases there is already a `release/*` branch)
-- Tag new version, this will trigger image creation in the `hedera-sourcify` GitHub Actions
-
-```bash
-git checkout release/0.2
+git checkout release/X.Y
 git pull
-git tag v0.2.0
-git push origin v0.2.0
+git tag vX.Y.Z
+git push origin vX.Y.Z
 ```
 
-- When the workflow is done, the images should be published under <https://github.com/hashgraph/hedera-sourcify/pkgs/container/hedera-sourcify>
-- Verify that everything works as expected, make a contract verification using the UI
-
-# Hotfix
-
-Bump to version 0.1.1 against release branch
-
-Tag new version (this will trigger image creation for target version)
-
-Deploy on Kubernetes
-
-Test
+When the workflow is done, the images should be published under <https://github.com/orgs/hashgraph/packages?repo_name=hedera-sourcify>.
+Verify that everything works as expected, for example by making a contract verification using both the UI and Hashscan.
 
 ## Support
 
