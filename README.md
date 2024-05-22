@@ -17,11 +17,15 @@ Install
 - [`node`](https://nodejs.org/en/about/) and [`npm`](https://www.npmjs.com/)
 - [Docker](https://docs.docker.com/engine/reference/commandline/docker/)
 
-Make sure both the server submodule `sourcify` and the repository submodule `h5ai-nginx` are present with
+Make sure both the `server` submodule [`sourcify`](./sourcify/) and the `repository` submodule [`h5ai-nginx`](./h5ai-nginx/) are present with
 
 ```sh
 git submodule update --init --recursive
 ```
+
+These repo submodules are the `server` and `repository` Sourcify upstream services.
+Instead of forking those repos, we attach them here directly in order to consume upstream updates more easily.
+Given that the `ui` changes are Hedera specific, we decided to keep our [`ui`](./ui/) fork with custom modifications.
 
 ## Quick Start
 
@@ -38,11 +42,11 @@ docker compose up --detach
 Verify all the services are up and running.
 This assumes the default ports (per `.env`) are used.
 
+- Open <http://localhost:5555/chains>.
+  This should return a JSON value containing the 3 Hedera public networks, **Hedera Mainnet**, **Hedera Testnet** and **Hedera Previewnet**, in addition to a few well-known development networks.
 - Open <http://localhost:10000>.
   This should open the Repository `select-contract-form`.
-  The options available for the Chain should be the 3 Hedera networks (**Hedera Mainnet**, **Hedera Testnet** and **Hedera Previewnet**).
-- Open <http://localhost:5555/chains>.
-  This should return a JSON value containing the 3 Hedera networks
+  The options available for the _Chain_ selection should be networks described above.
 - Open <http://localhost:5555/api-docs>.
   This should open the Open API docs showcasing all endpoints offered by the `server` service.
 - Open <http://localhost:5555/files/contracts/296>.
@@ -50,36 +54,35 @@ This assumes the default ports (per `.env`) are used.
 - Open <http://localhost:3001>.
   This should bring up the Verifier page.
 
-## Local build for development
-
-### Steps
-
-From the root of the project workspace:
-
-1. Run `npm ci`. This will create populate and link `node_modules`.
-2. `cp environments/.env.dev.hedera  environments/.env`
-3. Make sure the following variables defined in `.env` point to directories which exist on the file system: `REPOSITORY_PATH, SOLC_REPO, SOLJSON_REPO` (paths relative to the environments/ directory)
-4. `cp environments/example-docker-config.json environments/docker-config.json`
-   - Adjust as needed. With local build, this is used by the repository container, which only needs the SERVER_URL
-5. Run `npx lerna bootstrap && npx lerna run build`. This will build the server and ui as well as needed libraries.
-6. Run `docker-compose -f environments/build-repository.yaml build`. This will build the docker image for the repository service.
+## Local Development
 
 ### Run
 
 To start the repository service, run
 
 ```sh
-docker compose up --detach server repository
+docker compose up --detach repository
 ```
 
-Run `npm run server:start`. This will start the server.
+To start the `server` run
+
+```sh
+cd sourcify
+npm ci
+npm run build:lerna
+cp ../test/sourcify-chains.json ./services/server/dist/ 
+npm run server:start
+```
 
 To start and bring up the UI, run in a different terminal
 
 ```sh
 cd ui
+npm ci
 npm run start
 ```
+
+See [README in `ui`](./ui/README.md) for more details.
 
 ## Use Docker Images
 
@@ -449,7 +452,7 @@ Use the following `ui-config.json` to configure the `SERVER_URL` set up in the p
 ```
 
 ```bash
-docker pull ghcr.io/hashgraph/hedera-sourcify:ui-main
+docker pull ghcr.io/hashgraph/hedera-sourcify/ui:main
 ```
 
 ```bash
@@ -503,11 +506,9 @@ Customize OpenAPI servers <https://github.com/ethereum/sourcify/issues/1345>
 
 See [tools](./TOOLS.md)
 
-## UI Development
-
-See [README in ui](./ui/README.md)
-
 ## Releases
+
+- Create a release branch, minor release 0.2, name of the branch, _e.g._,`release/0.2`
 
 The repo has Github Actions automation to generate docker images based on the latest changes in a branch.
 To initiate the release for version `x.y.z` simply checkout branch `release/x.y` and run the following commands
@@ -517,11 +518,6 @@ git tag vx.y.z
 git push origin vx.y.z
 ```
 
----
-
-# Release Plan
-
-- Create a release branch, minor release 0.2, name of the branch, _e.g._,`release/0.2`
 - Bump versions in a new PR against release branch to the target version, `0.2.0-rc1` and merge it back into the release branch, _e.g._, `release/0.2`
 - Create PR against `main` for snapshot bump, _e.g._,`0.3.0-SNAPSHOT` (only for `rc` releases, for `ga` releases there is already a `release/*` branch)
 - Tag new version, this will trigger image creation in the `hedera-sourcify` GitHub Actions
