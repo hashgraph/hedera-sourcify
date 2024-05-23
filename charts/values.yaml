@@ -108,13 +108,6 @@ serverRepository:
         "297": {
           "sourcifyName": "Hedera Previewnet",
           "supported": true
-        },
-        "298": {
-          "sourcifyName": "Hedera Localnet",
-          "supported": true,
-          "rpc": [
-            "http://host.docker.internal:7546"
-          ]
         }
       }
 ui:
