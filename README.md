@@ -84,6 +84,24 @@ npm run start
 
 See [README in `ui`](./ui/README.md) for more details.
 
+To use the Mirror Node explorer with your verification instance, add this network entry to the array at `/app/networks-config.json`
+
+```json
+  {
+    "name": "localnet2",
+    "displayName": "LOCALNET2",
+    "url": "http://localhost:5551/",
+    "ledgerID": "02",
+    "sourcifySetup": {
+      "activate": true,
+      "repoURL": "http://repository.local/contracts/",
+      "serverURL": "http://localhost:5555/",
+      "verifierURL": "https://localhost/#/",
+      "chainID": 298
+    }
+  }
+```
+
 ## Use Docker Images
 
 > [!TIP]
@@ -134,6 +152,8 @@ Both use the verification API <https://server-verify.hashscan.io/api-docs/>.
     Rel_Back(repo, repo_vol, "Mounts, read", "/data")
 ```
 
+See [`compose.yaml`](./compose.yaml) for more details on how to setup and customize each service.
+
 ### Pulling pre-built images
 
 Pull all needed images
@@ -163,6 +183,9 @@ docker compose up --detach
 ```
 
 Open <http://localhost:3001> to bring up the UI Verifier page.
+You can visit <http://localhost:5555/api-docs/> to see the OpenAPI docs.
+Verify your chain configuration is visible from <http://localhost:5555/chains>.
+The repository path is `/tmp/sourcify/repository`
 
 ### Stop
 
@@ -184,141 +207,6 @@ To reset **previewnet**
 
 ```sh
 docker exec server-main /home/app/hedera-reset-docker.sh previewnet
-```
-
-### Start the verification server <https://docs.sourcify.dev/docs/running-server/>
-
-This `sourcify-chains.json` should be used to configure Hedera chains.
-The `host.docker.internal` hostname is used to make connections between containers.
-See <https://docs.docker.com/desktop/networking/#use-cases-and-workarounds> for more details.
-
-```json
-{
-  "295": {
-    "sourcifyName": "Hedera Mainnet",
-    "supported": true
-  },
-  "296": {
-    "sourcifyName": "Hedera Testnet",
-    "supported": true
-  },
-  "297": {
-    "sourcifyName": "Hedera Previewnet",
-    "supported": true
-  },
-  "298": {
-    "sourcifyName": "Hedera Localnet",
-    "supported": true,
-    "rpc": [
-      "http://host.docker.internal:7546"
-    ]
-  }
-}
-```
-
-Use this environment file `.env.sourcify.dev` to avoid CORS errors
-
-```bash
-NODE_ENV=development
-```
-
-and run it
-
-```sh
-docker run \
-  --detach \
-  --publish 5555:5555 \
-  --volume ./sourcify-chains.json:/home/app/services/server/dist/sourcify-chains.json \
-  --volume ./servers.yaml:/home/app/services/server/dist/servers.yaml \
-  --volume ./data:/tmp/sourcify/repository \
-  --env-file .env.sourcify.dev \
-  --name sourcify-server \
-  ghcr.io/ethereum/sourcify/server:staging
-```
-
-You can visit <http://localhost:5555/api-docs/> to see the OpenAPI docs. Verify your configuration is visible from <http://localhost:5555/chains>.
-
-- The repository path is `/tmp/sourcify/repository`
-
-### Start the repository service
-
-**The repository is needed, but probably we want to use the DB image which is not published yet.**
-
-```sh
-docker pull ghcr.io/ethereum/sourcify/repository:staging
-```
-
-```sh
-docker run \
-  --detach \
-  --publish 10000:80 \
-  --env SERVER_URL='http://localhost:5555' \
-  -v ./dat2:/data
-  --name repo \
-  ghcr.io/ethereum/sourcify/repository:staging
-```
-
-<https://github.com/sourcifyeth/h5ai-nginx?tab=readme-ov-file#h5ai-nginx-docker>
-
-The `SERVER_URL` is injected at `run` time.
-
-### Start the UI service `hedera-sourcify`
-
-Use the following `ui-config.json` to configure the `SERVER_URL` set up in the previous step
-
-```json
-  {
-    "SERVER_URL": "http://localhost:5555",
-    "REPOSITORY_SERVER_URL": "http://localhost:10000",
-    "EXPLORER_URL": "http://localhost:8080",
-    "BRAND_PRODUCT_LOGO_URL": "",
-    "TERMS_OF_SERVICE_URL": "",
-    "REMOTE_IMPORT": false,
-    "GITHUB_IMPORT": false,
-    "CONTRACT_IMPORT": false,
-    "JSON_IMPORT": false,
-    "OPEN_IN_REMIX": false,
-    "CREATE2_VERIFICATION": false
-  }
-```
-
-```bash
-docker pull ghcr.io/hashgraph/hedera-sourcify/ui:main
-```
-
-```bash
-docker run --detach --publish 80:80 --volume ./ui-config.json:/usr/share/nginx/html/config.json --name ui ghcr.io/hashgraph/hedera-sourcify:ui-main
-```
-
-Add this network entry to the array at `/app/networks-config.json`
-
-```json
-  {
-    "name": "localnet2",
-    "displayName": "LOCALNET2",
-    "url": "http://localhost:5551/",
-    "ledgerID": "02",
-    "sourcifySetup": {
-      "activate": true,
-      "repoURL": "http://repository.local/contracts/",
-      "serverURL": "http://localhost:5555/",
-      "verifierURL": "https://localhost/#/",
-      "chainID": 298
-    }
-  }
-```
-
-Customize OpenAPI servers <https://github.com/ethereum/sourcify/issues/1345>
-
-```yaml
-- description: The current REST API server
-  url: ""
-- description: The production REST API server
-  url: "https://server-verify.hashscan.io"
-- description: The staging REST API server
-  url: "https://server-sourcify.hedera-devops.com"
-- description: Local development server address on default port 5002
-  url: "http://localhost:5002"
 ```
 
 ## Configuration
@@ -366,11 +254,9 @@ The following properties can be provided in `config.json`
 | `OPEN_IN_REMIX`             | Flag to activate link "Open in Remix" (default is false)                                        |
 | `CREATE2_VERIFICATION`      | Flag to activate create2 verification (default is false)                                        |
 
-#### Customizing the favicon
+The favicon may be customized by providing alternative versions of the 3 following files: `manifest.json`, `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` and passing them to the `ui` service via mount points.
 
-The favicon may be modified by providing alternative versions of the 3 following files: `manifest.json`, `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` and passing them to the `ui` service via mount points.
-
-This can be done for instance by adding the following to the definition of the `ui` service in the `docker-compose` yaml file used:
+This can be done for instance by adding the following to the definition of the `ui` service in the `compose.yaml` file used
 
 ```yaml
 volumes:
@@ -409,6 +295,48 @@ The following environment variables are needed by the _server_ at runtime:
 
 > [!TIP]
 > See server's [`README`](./sourcify/services/server/README.md) for more details.
+
+This [`sourcify-chains.json`](./sourcify-chains.json) should be used to configure Hedera chains.
+The `host.docker.internal` hostname is used to make connections between containers.
+See <https://docs.docker.com/desktop/networking/#use-cases-and-workarounds> for more details.
+
+```json
+{
+  "295": {
+    "sourcifyName": "Hedera Mainnet",
+    "supported": true
+  },
+  "296": {
+    "sourcifyName": "Hedera Testnet",
+    "supported": true
+  },
+  "297": {
+    "sourcifyName": "Hedera Previewnet",
+    "supported": true
+  },
+  "298": {
+    "sourcifyName": "Hedera Localnet",
+    "supported": true,
+    "rpc": [
+      "http://host.docker.internal:7546"
+    ]
+  }
+}
+```
+
+You can customize OpenAPI _Servers_ list by changing the `servers.yaml` file.
+For example
+
+```yaml
+- description: The current REST API server
+  url: ""
+- description: The production REST API server
+  url: "https://server-verify.hashscan.io"
+- description: The staging REST API server
+  url: "https://server-sourcify.hedera-devops.com"
+- description: Local development server address on default port 5002
+  url: "http://localhost:5002"
+```
 
 ### _repository_ service
 
