@@ -46,6 +46,9 @@ services:
     volumes:
       - type: bind
         source: ./data
+        # The target mount path in the `repository` is always `/data`.
+        # It is hardcoded in the `h5ai-nginx` app here
+        # https://github.com/sourcifyeth/h5ai-nginx/commit/6277abe8381974470fa2e850c5897955d04d22b8#diff-b7048f2fdd37aec9c062e2bb226871b2c72e8c402fcf2bf57aaa17297238a4beR102
         target: /data
         read_only: true
     ports:
@@ -67,6 +70,8 @@ services:
       dockerfile: ../Dockerfile.server
     container_name: server-${TAG}
     environment:
+      # Change this to `production` if needed.
+      # The logs in `production` are json formatted instead of being human readable.
       - NODE_ENV=development
     ports:
       # Value is set in `services/server/src/config/default.js`
