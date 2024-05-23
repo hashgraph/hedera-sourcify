@@ -74,12 +74,9 @@ serverRepository:
 
   ## Configurations for the server-repository containers
   config:
-    REPOSITORY_PATH: "/data"
     SERVER_URL: "http://127.0.0.1:5555"
     REPOSITORY_SERVER_URL: "http://127.0.0.1:10000"
-    TESTING: true
-    NODE_ENV: "development"
-    UI_DOMAIN_NAME: verify.example.com
+    NODE_ENV: "production"
     repository:
       {
       "SERVER_URL": "http://127.0.0.1:5555",
