@@ -50,6 +50,8 @@ services:
         # It is hardcoded in the `h5ai-nginx` app here
         # https://github.com/sourcifyeth/h5ai-nginx/commit/6277abe8381974470fa2e850c5897955d04d22b8#diff-b7048f2fdd37aec9c062e2bb226871b2c72e8c402fcf2bf57aaa17297238a4beR102
         target: /data
+        # Note the `repository` is only a UI to browse verified contracts.
+        # Thus, it should be mounted as read only.
         read_only: true
     ports:
       # The `repository` app is exposed under port `:80` through `h5ai-nginx.conf.template`
@@ -74,20 +76,35 @@ services:
       # The logs in `production` are json formatted instead of being human readable.
       - NODE_ENV=development
     ports:
-      # Value is set in `services/server/src/config/default.js`
+      # `server`'s internal port is set in `services/server/src/config/default.js` and
+      # it can be overriden in `local.js`
       - "${SERVER_PORT}:5555"
     volumes:
+      # Use the `servers.yaml` file to customize the OpenAPI servers list.
+      # See https://github.com/ethereum/sourcify/pull/1346 for more details.
       - type: bind
         source: ./servers.yaml
         target: /home/app/services/server/dist/servers.yaml
+      # The list of actual chains to be used by the `server`.
+      # Go to http://localhost:5555/chains to see the effective list displayed to the user.
+      #
+      # The RPCs for Hedera public networks (mainnet, testnet and previewnet)
+      # are already configured in `sourcify/services/server/src/chains.json`.
+      #
+      # Note that when `NODE_ENV=development` Sourcify enables two more development networks:
+      # - (1337) Ganache Localhost - http://localhost:8545
+      # - (31337) Hardhat Network Localhost - http://localhost:8545
       - type: bind
         source: ./sourcify-chains.json
         target: /home/app/services/server/dist/sourcify-chains.json
+      # Place to configure the `server` service.
       - type: bind
         source: ./local.js
         target: /home/app/services/server/dist/config/local.js
       - type: bind
         source: ./data
+        # `server`'s repository V1 path is set in `services/server/src/config/default.js` and
+        # it can be overriden in `local.js`.
         target: /tmp/sourcify/repository
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5555/health"]

@@ -35,7 +35,8 @@ To start the services `server`, `repository` and `ui` run
 docker compose up --detach
 ```
 
-> This command uses the `compose.yaml` located in the root folder of the repo.
+> This command uses the [`compose.yaml`](./compose.yaml) located in the root folder of the repo.
+> Go to [Use Docker Images](#use-docker-images) for more details.
 
 ### Sanity Check the Configuration
 
@@ -276,22 +277,15 @@ volumes:
 
 ### _server_ service
 
-The following environment variables are needed by the _server_ at runtime:
+The following settings are set in a `local.js` file needed by the _server_ at runtime
 
 | Name                          | Example value                   | Description                                                                       |
 |-------------------------------|---------------------------------|-----------------------------------------------------------------------------------|
-| `REPOSITORY_PATH`             | /data                           | Path of the mount point of the verified contract repository (inside container)    |
-| `REPOSITORY_PATH_HOST`        | ../../data/repository           | Path of the verified contract repository (on host machine)                        |
-| `SOLC_REPO`                   | /home/data/solc-bin/linux-amd64 | Path where Solidity compiler binaries will be saved (inside container)            |
-| `SOLJSON_REPO`                | /home/data/solc-bin/soljson     | Path where Solidity JS compilers will be saved (inside container)                 |
-| `SOLC_REPO_HOST`              | ../../data/solc-bin/linux-amd64 | Path for the Solidity compiler binaries downloaded (on host machine)              |
-| `SOLJSON_REPO_HOST`           | ../../data/solc-bin/soljson     | Path for the Solidity JS compilers downloaded (on host machine)                   |
-| `SERVER_PORT`                 | 80                              | HTTP port used inside container                                                   |
-| `SERVER_EXTERNAL_PORT`        | 5002                            | HTTP port exposed by container                                                    |
-| `UI_DOMAIN_NAME`              | example.com                     | Fully qualified domain name of the host running the ui                            |
-| `REPOSITORY_SERVER_URL`       | repository.example.com          | URL of repository server (from outside the cluster)                               |
-| `TESTING`                     | false                           | DO NOT CHANGE                                                                     |
-| `TAG`                         | latest                          | Added to the docker image tags (e.g. ui-latest, server-latest, repository-latest) |
+| `server.port`                 | `5555`                              | HTTP port used inside container                                                   |
+| `repositoryV1.path`             | /data                           | Path of the mount point of the verified contract repository (inside container)    |
+| `solcRepo`                   | /home/data/solc-bin/linux-amd64 | Path where Solidity compiler binaries will be saved (inside container)            |
+| `solJsonRepo`                | /home/data/solc-bin/soljson     | Path where Solidity JS compilers will be saved (inside container)                 |
+| `corsAllowdOrigins`              | `[/^https?:\/\/(?:.+\.)?sourcify.dev$/]`                     | List of regexes that will be allowed by CORS inside the server |
 
 > [!TIP]
 > See server's [`README`](./sourcify/services/server/README.md) for more details.
@@ -342,20 +336,9 @@ For example
 
 The _repository_ service encompasses a single page application based on React and a web server.
 
-- Similar to the _ui_, the React part reads it configuration from a file located at the following path: `/redirects/config.json`
 In deployment, the actual configuration can be provided to the container via the same mount point as the one provided to the _ui_,
-even though the only useful item for the _repository_ is the following:
-`"SERVER_URL": "https://server.sourcify-integration.hedera-devops.com"` value
-
-- The web server part needs the following environment variables at runtime:
-
-| Name                              | Example value         | Description                                                                            |
-|-----------------------------------|-----------------------|----------------------------------------------------------------------------------------|
-| `REPOSITORY_PATH`                 | `../../data/repository` | Path of the contract repository on the host.                                           |
-| `REPOSITORY_SERVER_EXTERNAL_PORT` | `10000`                 | HTTP port exposed by container                                                         |
-| `UI_DOMAIN_NAME`                  | `example.com`           | Fully qualified domain name of the host running the ui                                 |
-| `TESTING`                         | `false`                 | DO NOT CHANGE                                                                          |
-| `TAG`                             | `latest`                | Added to the docker image tags (e.g. ui-latest, server-latest, repository-latest)      |
+even though the only useful item for the _repository_ is the following
+`"SERVER_URL": "https://server.sourcify-integration.hedera-devops.com"` value.
 
 ## Tests
 
@@ -450,6 +433,9 @@ You can use the following checklist to make sure the new release, either integra
 - [ ] **Verify a contract using Hashscan.** Deploy a contract with your favorite tool. Verify it using the `VERIFY CONTRACT` button in the _Contract_ view in Hashscan. Make sure the verified contract is visible from the `repository`. See [How to Verify a Smart Contract on HashScan](https://docs.hedera.com/hedera/tutorials/smart-contracts/how-to-verify-a-smart-contract-on-hashscan) for more details.
 - [ ] **Verify a contract using the Verifier UI**. Deploy a contract with your favorite tool. Verify it using the Verifier UI. Make sure the verified contract is visible from the `repository`. Make sure the verified contract is visible as such in the _Contract_ view in Hashscan.
 - [ ] **Ensure your deployed contracts are listed.**. Use the endpoint <https://server-verify.hashscan.io/files/contracts/296> (change the domain if necessary) and make sure the deployed contracts are listed here.
+
+Once you ensure the new release works properly, create a GitHub Release to let users and developers of what has changed.
+Go to <https://github.com/hashgraph/hedera-sourcify/releases> and follow the steps under _Draft a new release_.
 
 ## Support
 
