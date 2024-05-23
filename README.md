@@ -86,6 +86,9 @@ See [README in `ui`](./ui/README.md) for more details.
 
 ## Use Docker Images
 
+> [!TIP]
+> You may need to authenticate to the GitHub container registry `ghcr.io` using a Personal Access Token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) to pull the Docker images.
+
 You can either use pre-built Docker images from the GitHub container repository
 or build the images locally.
 
@@ -131,21 +134,19 @@ Both use the verification API <https://server-verify.hashscan.io/api-docs/>.
     Rel_Back(repo, repo_vol, "Mounts, read", "/data")
 ```
 
-### Set-up
-
-1. `cp environments/.env.docker.hedera  environments/.env`
-2. Adjust the configuration in `environments/.env` as follows:
-    - Replace all occurrences of `localhost` by the fully qualified hostname if not running locally
-3. `cp environments/example-docker-config.json  environments/docker-config.json`
-    - Adjust the URLs in `docker-config.json` as needed
-4. You may need to authenticate to the GitHub container registry at `ghcr.io` using a personal access token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
-
 ### Pulling pre-built images
 
-- Run `docker pull ghcr.io/hashgraph/hedera-sourcify/ui:main`
-- Run `docker pull ghcr.io/hashgraph/hedera-sourcify/server:main`
-- Run `docker pull ghcr.io/hashgraph/hedera-sourcify/repository:main`
-- Then follow _Run_ step below.
+Pull all needed images
+
+```sh
+docker compose pull
+```
+
+or each one individually
+
+- `docker pull ghcr.io/hashgraph/hedera-sourcify/ui:main`
+- `docker pull ghcr.io/hashgraph/hedera-sourcify/server:main`
+- `docker pull ghcr.io/hashgraph/hedera-sourcify/repository:main`
 
 ### Build images
 
@@ -157,12 +158,19 @@ docker compose build
 
 ### Run
 
-1. Run `docker compose up --detach`
-2. Open <http://localhost:3001> to bring up the Verifier page.
+```sh
+docker compose up --detach
+```
+
+Open <http://localhost:3001> to bring up the UI Verifier page.
 
 ### Stop
 
-- Run `docker compose down`
+Run
+
+```sh
+docker compose down
+```
 
 ### Reset networks
 
@@ -176,6 +184,141 @@ To reset **previewnet**
 
 ```sh
 docker exec server-main /home/app/hedera-reset-docker.sh previewnet
+```
+
+### Start the verification server <https://docs.sourcify.dev/docs/running-server/>
+
+This `sourcify-chains.json` should be used to configure Hedera chains.
+The `host.docker.internal` hostname is used to make connections between containers.
+See <https://docs.docker.com/desktop/networking/#use-cases-and-workarounds> for more details.
+
+```json
+{
+  "295": {
+    "sourcifyName": "Hedera Mainnet",
+    "supported": true
+  },
+  "296": {
+    "sourcifyName": "Hedera Testnet",
+    "supported": true
+  },
+  "297": {
+    "sourcifyName": "Hedera Previewnet",
+    "supported": true
+  },
+  "298": {
+    "sourcifyName": "Hedera Localnet",
+    "supported": true,
+    "rpc": [
+      "http://host.docker.internal:7546"
+    ]
+  }
+}
+```
+
+Use this environment file `.env.sourcify.dev` to avoid CORS errors
+
+```bash
+NODE_ENV=development
+```
+
+and run it
+
+```sh
+docker run \
+  --detach \
+  --publish 5555:5555 \
+  --volume ./sourcify-chains.json:/home/app/services/server/dist/sourcify-chains.json \
+  --volume ./servers.yaml:/home/app/services/server/dist/servers.yaml \
+  --volume ./data:/tmp/sourcify/repository \
+  --env-file .env.sourcify.dev \
+  --name sourcify-server \
+  ghcr.io/ethereum/sourcify/server:staging
+```
+
+You can visit <http://localhost:5555/api-docs/> to see the OpenAPI docs. Verify your configuration is visible from <http://localhost:5555/chains>.
+
+- The repository path is `/tmp/sourcify/repository`
+
+### Start the repository service
+
+**The repository is needed, but probably we want to use the DB image which is not published yet.**
+
+```sh
+docker pull ghcr.io/ethereum/sourcify/repository:staging
+```
+
+```sh
+docker run \
+  --detach \
+  --publish 10000:80 \
+  --env SERVER_URL='http://localhost:5555' \
+  -v ./dat2:/data
+  --name repo \
+  ghcr.io/ethereum/sourcify/repository:staging
+```
+
+<https://github.com/sourcifyeth/h5ai-nginx?tab=readme-ov-file#h5ai-nginx-docker>
+
+The `SERVER_URL` is injected at `run` time.
+
+### Start the UI service `hedera-sourcify`
+
+Use the following `ui-config.json` to configure the `SERVER_URL` set up in the previous step
+
+```json
+  {
+    "SERVER_URL": "http://localhost:5555",
+    "REPOSITORY_SERVER_URL": "http://localhost:10000",
+    "EXPLORER_URL": "http://localhost:8080",
+    "BRAND_PRODUCT_LOGO_URL": "",
+    "TERMS_OF_SERVICE_URL": "",
+    "REMOTE_IMPORT": false,
+    "GITHUB_IMPORT": false,
+    "CONTRACT_IMPORT": false,
+    "JSON_IMPORT": false,
+    "OPEN_IN_REMIX": false,
+    "CREATE2_VERIFICATION": false
+  }
+```
+
+```bash
+docker pull ghcr.io/hashgraph/hedera-sourcify/ui:main
+```
+
+```bash
+docker run --detach --publish 80:80 --volume ./ui-config.json:/usr/share/nginx/html/config.json --name ui ghcr.io/hashgraph/hedera-sourcify:ui-main
+```
+
+Add this network entry to the array at `/app/networks-config.json`
+
+```json
+  {
+    "name": "localnet2",
+    "displayName": "LOCALNET2",
+    "url": "http://localhost:5551/",
+    "ledgerID": "02",
+    "sourcifySetup": {
+      "activate": true,
+      "repoURL": "http://repository.local/contracts/",
+      "serverURL": "http://localhost:5555/",
+      "verifierURL": "https://localhost/#/",
+      "chainID": 298
+    }
+  }
+```
+
+Customize OpenAPI servers <https://github.com/ethereum/sourcify/issues/1345>
+
+```yaml
+- description: The current REST API server
+  url: ""
+- description: The production REST API server
+  url: "https://server-verify.hashscan.io"
+- description: The staging REST API server
+  url: "https://server-sourcify.hedera-devops.com"
+- description: Local development server address on default port 5002
+  url: "http://localhost:5002"
 ```
 
 ## Configuration
@@ -345,163 +488,6 @@ Finally (from the repo root) run the server tests
 npm run test:hedera
 ```
 
-## Images
-
-### Start the verification server <https://docs.sourcify.dev/docs/running-server/>
-
-This `sourcify-chains.json` should be used to configure Hedera chains.
-The `host.docker.internal` hostname is used to make connections between containers.
-See <https://docs.docker.com/desktop/networking/#use-cases-and-workarounds> for more details.
-
-```json
-{
-  "295": {
-    "sourcifyName": "Hedera Mainnet",
-    "supported": true
-  },
-  "296": {
-    "sourcifyName": "Hedera Testnet",
-    "supported": true
-  },
-  "297": {
-    "sourcifyName": "Hedera Previewnet",
-    "supported": true
-  },
-  "298": {
-    "sourcifyName": "Hedera Localnet",
-    "supported": true,
-    "rpc": [
-      "http://host.docker.internal:7546"
-    ]
-  }
-}
-```
-
-Use this environment file `.env.sourcify.dev` to avoid CORS errors
-
-```bash
-NODE_ENV=development
-```
-
-Then run pull the image
-
-```bash
-docker pull ghcr.io/ethereum/sourcify/server:staging
-```
-
-and run it
-
-```sh
-docker run \
-  --detach \
-  --publish 5555:5555 \
-  --volume ./sourcify-chains.json:/home/app/services/server/dist/sourcify-chains.json \
-  --volume ./servers.yaml:/home/app/services/server/dist/servers.yaml \
-  --volume ./data:/tmp/sourcify/repository \
-  --env-file .env.sourcify.dev \
-  --name sourcify-server \
-  ghcr.io/ethereum/sourcify/server:staging
-```
-
-You can visit <http://localhost:5555/api-docs/> to see the OpenAPI docs. Verify your configuration is visible from <http://localhost:5555/chains>.
-
-- The repository path is `/tmp/sourcify/repository`
-
-### Start the repository service
-
-**The repository is needed, but probably we want to use the DB image which is not published yet.**
-
-```sh
-docker pull ghcr.io/ethereum/sourcify/repository:staging
-```
-
-```sh
-docker run \
-  --detach \
-  --publish 10000:80 \
-  --env SERVER_URL='http://localhost:5555' \
-  -v ./dat2:/data
-  --name repo \
-  ghcr.io/ethereum/sourcify/repository:staging
-```
-
-<https://github.com/sourcifyeth/h5ai-nginx?tab=readme-ov-file#h5ai-nginx-docker>
-
-> Not sure when they are going to move database (their own, not the alliance) into production.
-
-- The `SERVER_URL` is injected at `run` time.
-
-### Start the UI service `hedera-sourcify`
-
-Use the following `ui-config.json` to configure the `SERVER_URL` set up in the previous step
-
-```json
-  {
-    "SERVER_URL": "http://localhost:5555",
-    "REPOSITORY_SERVER_URL": "http://localhost:10000",
-    "EXPLORER_URL": "http://localhost:8080",
-    "BRAND_PRODUCT_LOGO_URL": "",
-    "TERMS_OF_SERVICE_URL": "",
-    "REMOTE_IMPORT": false,
-    "GITHUB_IMPORT": false,
-    "CONTRACT_IMPORT": false,
-    "JSON_IMPORT": false,
-    "OPEN_IN_REMIX": false,
-    "CREATE2_VERIFICATION": false
-  }
-```
-
-```bash
-docker pull ghcr.io/hashgraph/hedera-sourcify/ui:main
-```
-
-```bash
-docker run --detach --publish 80:80 --volume ./ui-config.json:/usr/share/nginx/html/config.json --name ui ghcr.io/hashgraph/hedera-sourcify:ui-main
-```
-
-### Start the upstream UI service <https://docs.sourcify.dev/docs/running-ui/>
-
-```bash
-docker pull ghcr.io/ethereum/sourcify/ui:staging
-```
-
-```bash
-docker run --detach --publish 80:80 ghcr.io/ethereum/sourcify/ui:staging
-```
-
-Visit homepage at <http://localhost/> and the verifier page <http://localhost/#/verifier>.
-
-Add this network entry to the array at `/app/networks-config.json`
-
-```json
-  {
-    "name": "localnet2",
-    "displayName": "LOCALNET2",
-    "url": "http://localhost:5551/",
-    "ledgerID": "02",
-    "sourcifySetup": {
-      "activate": true,
-      "repoURL": "http://repository.local/contracts/",
-      "serverURL": "http://localhost:5555/",
-      "verifierURL": "https://localhost/#/",
-      "chainID": 298
-    }
-  }
-```
-
-Customize OpenAPI servers <https://github.com/ethereum/sourcify/issues/1345>
-
-```yaml
-- description: The current REST API server
-  url: ""
-- description: The production REST API server
-  url: "https://server-verify.hashscan.io"
-- description: The staging REST API server
-  url: "https://server-sourcify.hedera-devops.com"
-- description: Local development server address on default port 5002
-  url: "http://localhost:5002"
-```
-
 ## Tools
 
 See [TOOLS](./TOOLS.md) to setup development environments to work with a custom verification deployment.
@@ -528,7 +514,14 @@ git push origin vX.Y.Z
 ```
 
 When the workflow is done, the images should be published under <https://github.com/orgs/hashgraph/packages?repo_name=hedera-sourcify>.
-Verify that everything works as expected, for example by making a contract verification using both the UI and Hashscan.
+Verify that everything works as expected.
+You can use the following checklist to make sure the new release, either integration or production, was successful.
+
+- [ ] **Check available Hedera public networks.** Make sure the endpoint <https://server-verify.hashscan.io/chains> returns the Hedera public networks, `mainnet`, `testnet` and `previewnet`.
+- [ ] **Check `servers` list.** Make sure _Servers_ listed in ` <https://server-verify.hashscan.io/api-docs/> are properly set to Hedera and local servers.
+- [ ] **Verify a contract using Hashscan.** Deploy a contract with your favorite tool. Verify it using the `VERIFY CONTRACT` button in the _Contract_ view in Hashscan. Make sure the verified contract is visible from the `repository`. See [How to Verify a Smart Contract on HashScan](https://docs.hedera.com/hedera/tutorials/smart-contracts/how-to-verify-a-smart-contract-on-hashscan) for more details.
+- [ ] **Verify a contract using the Verifier UI**. Deploy a contract with your favorite tool. Verify it using the Verifier UI. Make sure the verified contract is visible from the `repository`. Make sure the verified contract is visible as such in the _Contract_ view in Hashscan.
+- [ ] **Ensure your deployed contracts are listed.**. Use the endpoint <https://server-verify.hashscan.io/files/contracts/296> (change the domain if necessary) and make sure the deployed contracts are listed here.
 
 ## Support
 
