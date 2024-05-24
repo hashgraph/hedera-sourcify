@@ -405,7 +405,7 @@ npm run test:hedera
 
 ## Tools
 
-See [TOOLS](./TOOLS.md) to setup development environments to work with a custom verification deployment.
+See [`tools`](./tools/README.md) to setup development environments to work with a custom verification deployment.
 
 ## Releases
 
