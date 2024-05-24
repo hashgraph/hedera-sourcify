@@ -198,6 +198,10 @@ docker compose down
 
 ### Reset networks
 
+> [!IMPORTANT]
+> The reset script for Docker works by deleting the repository of verified contracts on the specified network (`testnet` and `previewnet`) through the `server` service.
+> In order for it to work properly, the contracts repository **must** be mounted on `/data` in the `server` service.
+
 To reset **testnet**
 
 ```sh
@@ -428,8 +432,8 @@ When the workflow is done, the images should be published under <https://github.
 Verify that everything works as expected.
 You can use the following checklist to make sure the new release, either integration or production, was successful.
 
-- [ ] **Check available Hedera public networks.** Make sure the endpoint <https://server-verify.hashscan.io/chains> returns the Hedera public networks, `mainnet`, `testnet` and `previewnet`.
-- [ ] **Check `servers` list.** Make sure _Servers_ listed in ` <https://server-verify.hashscan.io/api-docs/> are properly set to Hedera and local servers.
+- [ ] **Check available Hedera public networks.** Make sure both the endpoint <https://server-verify.hashscan.io/chains> and _Chain_ select list in <https://repository-verify.hashscan.io/select-contract/> returns the Hedera public networks, `mainnet`, `testnet` and `previewnet`.
+- [ ] **Check `servers` list.** Make sure _Servers_ listed in <https://server-verify.hashscan.io/api-docs/> are properly set to Hedera and local servers.
 - [ ] **Verify a contract using Hashscan.** Deploy a contract with your favorite tool. Verify it using the `VERIFY CONTRACT` button in the _Contract_ view in Hashscan. Make sure the verified contract is visible from the `repository`. See [How to Verify a Smart Contract on HashScan](https://docs.hedera.com/hedera/tutorials/smart-contracts/how-to-verify-a-smart-contract-on-hashscan) for more details.
 - [ ] **Verify a contract using the Verifier UI**. Deploy a contract with your favorite tool. Verify it using the Verifier UI. Make sure the verified contract is visible from the `repository`. Make sure the verified contract is visible as such in the _Contract_ view in Hashscan.
 - [ ] **Ensure your deployed contracts are listed.**. Use the endpoint <https://server-verify.hashscan.io/files/contracts/296> (change the domain if necessary) and make sure the deployed contracts are listed here.
