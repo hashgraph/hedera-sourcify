@@ -1,0 +1,17 @@
+{
+  "name": "hardhat-sourcify-example",
+  "version": "1.0.0",
+  "description": "Hardhat project example to work with a custom Sourcify instance",
+  "private": true,
+  "scripts": {
+    "deploy": "hardhat run scripts/deploy.js",
+    "verify": "hardhat verify"
+  },
+  "author": "Hedera Mirror Node Explorer & Smart Contracts Teams",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.19.4"
+  }
+}
