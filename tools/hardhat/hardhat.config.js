@@ -1,6 +1,8 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
+const accounts = pk => pk ? [pk] : undefined;
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.19",
@@ -10,17 +12,17 @@ module.exports = {
   networks: {
     testnet: {
       url: 'https://testnet.hashio.io/api',
-      accounts: [process.env.TESTNET_PK],
+      accounts: accounts(process.env.TESTNET_PK),
       chainId: 296,
     },
     previewnet: {
       url: 'https://previewnet.hashio.io/api',
-      accounts: [process.env.PREVIEWNET_PK],
+      accounts: accounts(process.env.PREVIEWNET_PK),
       chainId: 297,
     },
     localnet: {
       url: 'http://localhost:7546',
-      accounts: [process.env.LOCALNET_PK],
+      accounts: accounts(process.env.LOCALNET_PK),
       chainId: 298,
     },
   },
