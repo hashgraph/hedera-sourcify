@@ -36,14 +36,8 @@ module.exports = {
     // Doesn't need an API key
     enabled: true,
     // Optional: specify a different Sourcify server
-    apiUrl: "https://server-verify.hashscan.io",
+    apiUrl: process.env.SOURCIFY_API_URL,
     // Optional: specify a different Sourcify repository
-    browserUrl: "https://repository-verify.hashscan.io",
-
-    // apiUrl: "https://server-sourcify.hedera-devops.com",
-    // browserUrl: "https://repository-sourcify.hedera-devops.com",
-
-    // apiUrl: "http://localhost:5555",
-    // browserUrl: "http://localhost:10000",
+    browserUrl: process.env.SOURCIFY_BROWSER_URL,
   }
 };
