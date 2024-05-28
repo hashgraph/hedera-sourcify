@@ -1,0 +1,104 @@
+name: Release Integration Environment
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ v* ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag:"
+        type: string
+        required: true
+
+env:
+  OWNER: hashgraph
+  REGISTRY: ghcr.io
+
+jobs:
+  docker-image-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Apply Sourcify server patch customizations
+        run: npm run server:patch
+      - name: Apply Sourcify repository patch customizations
+        run: npm run repository:patch
+      
+      - name: Get tag
+        run: |
+          if [[ "${{ github.event.inputs.version }}" ]]; then
+            echo "TAG=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          elif [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            echo "TAG=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          else
+            echo "TAG=main" >> $GITHUB_ENV
+          fi
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Qemu
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push UI image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./ui
+          file: ./ui/Dockerfile
+          platforms: linux/amd64, linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/ui:${{env.TAG}}
+
+      - name: Build and push SERVER image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./sourcify
+
+          # The `scripts` context is used to `COPY` the reset network script into the `server` container.
+          # Use `additional_contexts` to access the `scripts` folder outside main context.
+          # See https://docs.docker.com/compose/compose-file/build/#additional_contexts for more details.
+          build-contexts: |
+            scripts=./scripts
+
+          # The `Dockerfile.server` used here is basically the same as the one provided by Sourcify.
+          # It adds instructions to include the reset network script into the container.
+          file: ./Dockerfile.server
+          platforms: linux/amd64, linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/server:${{env.TAG}}
+
+      - name: Build and Push REPOSITORY Image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./h5ai-nginx
+
+          # From https://github.com/ethereum/sourcify/issues/1385
+          #
+          # The `repository` service provides a link to open each verified contract in Remix.
+          # However, for public self-hosted Sourcify instances (like in the case of Hedera) the _Open repo in Remix_ link does not work,
+          # given the Remix plugin only fetches contracts from https://repo.sourcify.dev.
+          # 
+          # When `HIDE_OPEN_IN_REMIX` is set to 1, a patch to remove the link is applied.
+          # See https://github.com/sourcifyeth/h5ai-nginx/pull/5 for more details.
+          build-args: |
+            HIDE_OPEN_IN_REMIX=1
+          file: ./h5ai-nginx/Dockerfile
+          platforms: linux/amd64, linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/repository:${{env.TAG}}
