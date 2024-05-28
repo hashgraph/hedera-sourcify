@@ -23,9 +23,16 @@ Make sure both the `server` submodule [`sourcify`](./sourcify/) and the `reposit
 git submodule update --init --recursive
 ```
 
-These repo submodules are the `server` and `repository` Sourcify upstream services.
+These repo submodules are `sourcify` and `h5ai-nginx`, which corresponds to the `server` and `repository` Sourcify upstream services respectively.
 Instead of forking those repos, we attach them here directly in order to consume upstream updates more easily.
 Given that the `ui` changes are Hedera specific, we decided to keep our [`ui`](./ui/) fork with custom modifications.
+
+Apply the Hedera customization patch to both the `sourcify` and `h5ai-nginx` submodules **(execute this only once)**
+
+```sh
+npm run server:patch
+npm run repository:patch
+```
 
 ## Quick Start
 

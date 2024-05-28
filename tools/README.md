@@ -82,6 +82,10 @@ module.exports = {
 };
 ```
 
+> [!NOTE]
+> Both `apiUrl` and `browserUrl` expect an URL without a trailing slash.
+> Having a trailing slash in the Sourcify URLs may cause unexpected errors.
+
 Note that the `hardhat-verify` plugin has Etherscan enabled by default, and Sourcify disabled by default, hence you need to set both flags as above in the configuration.
 
 Then run
