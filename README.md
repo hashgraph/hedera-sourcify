@@ -7,6 +7,8 @@
 ## Overview
 
 Tools for verifying Hedera smart contracts using standard open source libraries.
+The verification solution is based on Sourcify,
+the Smart Contract verification service part of Ethereum.
 
 ## Prerequisites
 
@@ -15,52 +17,103 @@ Install
 - [`node`](https://nodejs.org/en/about/) and [`npm`](https://www.npmjs.com/)
 - [Docker](https://docs.docker.com/engine/reference/commandline/docker/)
 
-Make sure the repository submodule `h5ai-nginx` is present
+Make sure both the `server` submodule [`sourcify`](./sourcify/) and the `repository` submodule [`h5ai-nginx`](./h5ai-nginx/) are present with
 
 ```sh
 git submodule update --init --recursive
 ```
 
-Apply the Hedera patch to the `h5ai-nginx` submodule **(execute this only once)**
+These repo submodules are `sourcify` and `h5ai-nginx`, which corresponds to the `server` and `repository` Sourcify upstream services respectively.
+Instead of forking those repos, we attach them here directly in order to consume upstream updates more easily.
+Given that the `ui` changes are Hedera specific, we decided to keep our [`ui`](./ui/) fork with custom modifications.
+
+Apply the Hedera customization patch to both the `sourcify` and `h5ai-nginx` submodules **(execute this only once)**
 
 ```sh
-./scripts/hedera-apply-h5ai-nginx-patch.sh
+npm run server:patch
+npm run repository:patch
 ```
 
-## Local build for development
+## Quick Start
 
-### Steps
+To start the services `server`, `repository` and `ui` run
 
-From the root of the project workspace:
+```sh
+docker compose up --detach
+```
 
-1. Run `npm ci`. This will create populate and link `node_modules`.
-2. `cp environments/.env.dev.hedera  environments/.env`
-3. Make sure the following variables defined in `.env` point to directories which exist on the file system: `REPOSITORY_PATH, SOLC_REPO, SOLJSON_REPO` (paths relative to the environments/ directory)
-4. `cp environments/example-docker-config.json environments/docker-config.json`
-   - Adjust as needed. With local build, this is used by the repository container, which only needs the SERVER_URL
-5. Run `npx lerna bootstrap && npx lerna run build`. This will build the server and ui as well as needed libraries.
-6. Run `docker-compose -f environments/build-repository.yaml build`. This will build the docker image for the repository service.
+> This command uses the [`compose.yaml`](./compose.yaml) located in the root folder of the repo.
+> Go to [Use Docker Images](#use-docker-images) for more details.
+
+### Sanity Check the Configuration
+
+Verify all the services are up and running.
+This assumes the default ports (per `.env`) are used.
+
+- Open <http://localhost:5555/chains>.
+  This should return a JSON value containing the 3 Hedera public networks, **Hedera Mainnet**, **Hedera Testnet** and **Hedera Previewnet**, in addition to a few well-known development networks.
+- Open <http://localhost:10000>.
+  This should open the Repository `select-contract-form`.
+  The options available for the _Chain_ selection should be networks described above.
+- Open <http://localhost:5555/api-docs>.
+  This should open the Open API docs showcasing all endpoints offered by the `server` service.
+- Open <http://localhost:5555/files/contracts/296>.
+  This should return a JSON value containing the addresses of all contracts verified on testnet (or report error `"Contracts have not been found!"` if nothing has been verified yet)
+- Open <http://localhost:3001>.
+  This should bring up the Verifier page.
+
+## Local Development
 
 ### Run
 
-- Run `docker-compose -f environments/repository.yaml up -d`. This will start repository service.
-- Run `npm run server:start`. This will start the server.
-- In a different terminal, run `cd ui; npm run start`. This will start and bring up the UI.
+To start the repository service, run
 
-### Sanity check the configuration
+```sh
+docker compose up --detach repository
+```
 
-This assumes the default ports (per `environments/.env.dev.hedera`) are used:
+To start the `server` run
 
-- Open <http://localhost:10000>.
-This should open the Repository `select-contract-form`. The options available for the Chain should be the 3 Hedera networks (mainnet, testnet, previewnet).
-- Open <http://localhost:5002/chains>.
-This should return a JSON value containing the 3 Hedera networks
-- Open <http://localhost:5555/files/contracts/296>.
-This should return a JSON value containing the addresses of all contracts verified on testnet (or report error `"Contracts have not been found!"` if nothing has been verified yet)
-- Open <http://localhost:3000>.
-This should bring up the Verifier page.
+```sh
+cd sourcify
+npm ci
+npm run build:lerna
+cp ../test/sourcify-chains.json ./services/server/dist/ 
+npm run server:start
+```
 
-## Use Docker images
+To start and bring up the UI, run in a different terminal
+
+```sh
+cd ui
+npm ci
+npm run start
+```
+
+See [README in `ui`](./ui/README.md) for more details.
+
+To use the Mirror Node explorer with your verification instance, add this network entry to the array at `/app/networks-config.json`
+
+```json
+  {
+    "name": "localnet2",
+    "displayName": "LOCALNET2",
+    "url": "http://localhost:5551/",
+    "ledgerID": "02",
+    "sourcifySetup": {
+      "activate": true,
+      "repoURL": "http://repository.local/contracts/",
+      "serverURL": "http://localhost:5555/",
+      "verifierURL": "https://localhost/#/",
+      "chainID": 298
+    }
+  }
+```
+
+## Use Docker Images
+
+> [!TIP]
+> You may need to authenticate to the GitHub container registry `ghcr.io` using a Personal Access Token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) to pull the Docker images.
 
 You can either use pre-built Docker images from the GitHub container repository
 or build the images locally.
@@ -78,6 +131,12 @@ A successful verification stores the contracts sources under _Repository Volume_
 
 > [!NOTE]
 > Note that unlike Sourcify, we do not use the [`monitor`](https://docs.sourcify.dev/docs/running-monitor/) service given that we do not use IPFS verification.
+> That is, we only use `server` and `repository` services from upstream Sourcify.
+
+Currently we host two UIs for contract verification, our custom UI <https://verify.hashscan.io/> and the `VERIFY CONTRACT` within <https://hashscan.io/>.
+Both use the verification API <https://server-verify.hashscan.io/api-docs/>.
+
+> The `ui` image needs some front-end customizations, therefore we keep our own fork of the image.
 
 ```mermaid
     C4Container
@@ -101,49 +160,65 @@ A successful verification stores the contracts sources under _Repository Volume_
     Rel_Back(repo, repo_vol, "Mounts, read", "/data")
 ```
 
-### Set-up
-
-1. `cp environments/.env.docker.hedera  environments/.env`
-2. Adjust the configuration in `environments/.env` as follows:
-    - Replace all occurrences of `localhost` by the fully qualified hostname if not running locally
-3. `cp environments/example-docker-config.json  environments/docker-config.json`
-    - Adjust the URLs in `docker-config.json` as needed
-4. You may need to authenticate to the GitHub container registry at `ghcr.io` using a personal access token [as described here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
+See [`compose.yaml`](./compose.yaml) for more details on how to setup and customize each service.
 
 ### Pulling pre-built images
 
-- Run `docker pull ghcr.io/hashgraph/hedera-sourcify:ui-main`
-- Run `docker pull ghcr.io/hashgraph/hedera-sourcify:server-main`
-- Run `docker pull ghcr.io/hashgraph/hedera-sourcify:repository-main`
-- Then follow _Run_ step below.
+Pull all needed images
+
+```sh
+docker compose pull
+```
+
+or each one individually
+
+- `docker pull ghcr.io/hashgraph/hedera-sourcify/ui:main`
+- `docker pull ghcr.io/hashgraph/hedera-sourcify/server:main`
+- `docker pull ghcr.io/hashgraph/hedera-sourcify/repository:main`
 
 ### Build images
 
-1. Run `docker-compose -f environments/build-ui.yaml build`
-2. Run `docker-compose -f environments/build-server.yaml build`
-3. Run `docker-compose -f environments/build-repository.yaml build`
+Run the following to build the `server`, `repository` and `ui` images locally
+
+```sh
+docker compose build
+```
 
 ### Run
 
-1. Run `docker-compose -f environments/docker-compose-hedera.yaml up -d repository server ui`
-2. Open <http://localhost:1234> to bring up the Verifier page.
+```sh
+docker compose up --detach
+```
+
+Open <http://localhost:3001> to bring up the UI Verifier page.
+You can visit <http://localhost:5555/api-docs/> to see the OpenAPI docs.
+Verify your chain configuration is visible from <http://localhost:5555/chains>.
+The repository path is `/tmp/sourcify/repository`
 
 ### Stop
 
-- Run `docker-compose -f environments/docker-compose-hedera.yaml down`
+Run
+
+```sh
+docker compose down
+```
 
 ### Reset networks
+
+> [!IMPORTANT]
+> The reset script for Docker works by deleting the repository of verified contracts on the specified network (`testnet` and `previewnet`) through the `server` service.
+> In order for it to work properly, the contracts repository **must** be mounted on `/data` in the `server` service.
 
 To reset **testnet**
 
 ```sh
-docker exec server-latest /home/app/hedera-reset-docker.sh testnet
+docker exec server-main /home/app/hedera-reset-docker.sh testnet
 ```
 
 To reset **previewnet**
 
 ```sh
-docker exec server-latest /home/app/hedera-reset-docker.sh previewnet
+docker exec server-main /home/app/hedera-reset-docker.sh previewnet
 ```
 
 ## Configuration
@@ -152,8 +227,9 @@ The following tables describe the configuration items used by the different serv
 
 ### _ui_ service
 
-The _ui_ service is a single page application based on React. As such, it cannot be configured by environment variables at runtime.
-It reads it configuration from a file located at the following path: `/usr/share/nginx/html/config.json`
+The _ui_ service is a single page application based on React.
+As such, it cannot be configured by environment variables at runtime.
+It reads its configuration from a file located at the following path `/usr/share/nginx/html/config.json`.
 In deployment, the actual configuration can be provided to the container via a mount point.
 
 Example contents for `config.json`
@@ -190,11 +266,9 @@ The following properties can be provided in `config.json`
 | `OPEN_IN_REMIX`             | Flag to activate link "Open in Remix" (default is false)                                        |
 | `CREATE2_VERIFICATION`      | Flag to activate create2 verification (default is false)                                        |
 
-#### Customizing the favicon
+The favicon may be customized by providing alternative versions of the 3 following files: `manifest.json`, `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` and passing them to the `ui` service via mount points.
 
-The favicon may be modified by providing alternative versions of the 3 following files: `manifest.json`, `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` and passing them to the `ui` service via mount points.
-
-This can be done for instance by adding the following to the definition of the `ui` service in the `docker-compose` yaml file used:
+This can be done for instance by adding the following to the definition of the `ui` service in the `compose.yaml` file used
 
 ```yaml
 volumes:
@@ -214,79 +288,165 @@ volumes:
 
 ### _server_ service
 
-The following environment variables are needed by the _server_ at runtime:
+The following settings are set in a `local.js` file needed by the _server_ at runtime
 
 | Name                          | Example value                   | Description                                                                       |
 |-------------------------------|---------------------------------|-----------------------------------------------------------------------------------|
-| `REPOSITORY_PATH`             | /data                           | Path of the mount point of the verified contract repository (inside container)    |
-| `REPOSITORY_PATH_HOST`        | ../../data/repository           | Path of the verified contract repository (on host machine)                        |
-| `SOLC_REPO`                   | /home/data/solc-bin/linux-amd64 | Path where Solidity compiler binaries will be saved (inside container)            |
-| `SOLJSON_REPO`                | /home/data/solc-bin/soljson     | Path where Solidity JS compilers will be saved (inside container)                 |
-| `SOLC_REPO_HOST`              | ../../data/solc-bin/linux-amd64 | Path for the Solidity compiler binaries downloaded (on host machine)              |
-| `SOLJSON_REPO_HOST`           | ../../data/solc-bin/soljson     | Path for the Solidity JS compilers downloaded (on host machine)                   |
-| `SERVER_PORT`                 | 80                              | HTTP port used inside container                                                   |
-| `SERVER_EXTERNAL_PORT`        | 5002                            | HTTP port exposed by container                                                    |
-| `UI_DOMAIN_NAME`              | example.com                     | Fully qualified domain name of the host running the ui                            |
-| `SERVER_CREATE2_VERIFICATION` | false                           | Flag to activate server API endpoints related to create2 {true, false}            |
-| `REPOSITORY_SERVER_URL`       | repository.example.com          | URL of repository server (from outside the cluster)                               |
-| `TESTING`                     | false                           | DO NOT CHANGE                                                                     |
-| `TAG`                         | latest                          | Added to the docker image tags (e.g. ui-latest, server-latest, repository-latest) |
+| `server.port`                 | `5555`                              | HTTP port used inside container                                                   |
+| `repositoryV1.path`             | /data                           | Path of the mount point of the verified contract repository (inside container)    |
+| `solcRepo`                   | /home/data/solc-bin/linux-amd64 | Path where Solidity compiler binaries will be saved (inside container)            |
+| `solJsonRepo`                | /home/data/solc-bin/soljson     | Path where Solidity JS compilers will be saved (inside container)                 |
+| `corsAllowdOrigins`              | `[/^https?:\/\/(?:.+\.)?sourcify.dev$/]`                     | List of regexes that will be allowed by CORS inside the server |
+
+> [!TIP]
+> See server's [`README`](./sourcify/services/server/README.md) for more details.
+
+This [`sourcify-chains.json`](./sourcify-chains.json) should be used to configure Hedera chains.
+The `host.docker.internal` hostname is used to make connections between containers.
+See <https://docs.docker.com/desktop/networking/#use-cases-and-workarounds> for more details.
+
+```json
+{
+  "295": {
+    "sourcifyName": "Hedera Mainnet",
+    "supported": true
+  },
+  "296": {
+    "sourcifyName": "Hedera Testnet",
+    "supported": true
+  },
+  "297": {
+    "sourcifyName": "Hedera Previewnet",
+    "supported": true
+  },
+  "298": {
+    "sourcifyName": "Hedera Localnet",
+    "supported": true,
+    "rpc": [
+      "http://host.docker.internal:7546"
+    ]
+  }
+}
+```
+
+You can customize OpenAPI _Servers_ list by changing the `servers.yaml` file.
+For example
+
+```yaml
+- description: The current REST API server
+  url: ""
+- description: The production REST API server
+  url: "https://server-verify.hashscan.io"
+- description: The staging REST API server
+  url: "https://server-sourcify.hedera-devops.com"
+- description: Local development server address on default port 5002
+  url: "http://localhost:5002"
+```
 
 ### _repository_ service
 
 The _repository_ service encompasses a single page application based on React and a web server.
 
-- Similar to the _ui_, the React part reads it configuration from a file located at the following path: `/redirects/config.json`
 In deployment, the actual configuration can be provided to the container via the same mount point as the one provided to the _ui_,
-even though the only useful item for the _repository_ is the following:
-`"SERVER_URL": "https://server.sourcify-integration.hedera-devops.com"` value
+even though the only useful item for the _repository_ is the following
+`"SERVER_URL": "https://server.sourcify-integration.hedera-devops.com"` value.
 
-- The web server part needs the following environment variables at runtime:
+## Tests
 
-| Name                              | Example value         | Description                                                                            |
-|-----------------------------------|-----------------------|----------------------------------------------------------------------------------------|
-| `REPOSITORY_PATH`                 | `../../data/repository` | Path of the contract repository on the host.                                           |
-| `REPOSITORY_SERVER_EXTERNAL_PORT` | `10000`                 | HTTP port exposed by container                                                         |
-| `UI_DOMAIN_NAME`                  | `example.com`           | Fully qualified domain name of the host running the ui                                 |
-| `TESTING`                         | `false`                 | DO NOT CHANGE                                                                          |
-| `TAG`                             | `latest`                | Added to the docker image tags (e.g. ui-latest, server-latest, repository-latest)      |
+Given we leverage the Sourcify code base as is,
+we maintain only a subset of Sourcify server tests against a local chain and a basic non-regression server test using Hedera local node.
 
-## Test
+### Sourcify Server
 
-### Basic non-regression server test
+First compile the Sourcify server.
+`cd ./sourcify` and run
 
-1. Make sure the variables `HEDERA_NETWORK`, `OPERATOR_ACCOUNT_ID` and `OPERATOR_KEY` are defined in `environments/.env`
-2. Run `hedera start --network local -d`
-3. Run `npm run server:start`
-4. Run `npm run test:hedera`
+```sh
+npm ci
+npm run build:lerna
+```
 
-Moreover, to run the server tests against a local Ganache instance run
+Then (from the repo root) run the Sourcify server tests with
 
 ```sh
 npm run test:server
 ```
 
-> [!NOTE]
-> Note that there is no need to spin up a Ganache instance separately.
-> It is automatically started and stopped by the server test.
+> [!IMPORTANT]
+> **Do not update** the `ganache` dependency.
+> Its latest version `7.9.2` (and most probably the last one given Ganache is no longer supported)
+> has some dependency issues that for some reason makes `fsevents` non-optional.
+> This in turn makes non-`darwin` installations, _e.g._, Github Actions jobs, to fail when running `npm ci` with
 >
-> We use the `USE_LOCAL_NODE` environment variable to enable Ganache as a local chain.
+> ```console
+> npm ERR! notsup Unsupported platform for fsevents@2.3.2: wanted {"os":"darwin"} (current: {"os":"linux"})
+> ```
 
-### Unit Tests
+### Hedera
 
-Under `packages/` there are dependencies that are used by the verification services and need to be unit-tested separately.
-To test them run `cd packages/<package> && npm run test`.
-The corresponding job that runs these tests in CI is `unit-tests`.
+The Hedera local node variables `HEDERA_NETWORK`, `OPERATOR_ACCOUNT_ID` and `OPERATOR_KEY` are defined in [`test/.env.test`](./test/.env.test).
+
+Start Hedera local node with
+
+```sh
+npm run local-node:start
+```
+
+In another terminal session, `cd ./sourcify` and start the Sourcify server with
+
+```sh
+npm ci
+npm run build:lerna
+cp ../test/sourcify-chains.json ./services/server/dist/ 
+npm run server:start
+```
+
+> [!NOTE]
+> The `sourcify-chains.json` is used to setup both the chain ID and JSON-RPC for the `Hedera Localnet` network.
+
+Finally (from the repo root) run the server tests
+
+```sh
+npm run test:hedera
+```
+
+## Tools
+
+See [`tools`](./tools/README.md) folder to setup development environments to work with a custom verification deployment.
 
 ## Releases
 
-The repo has Github Actions automation to generate docker images based on the latest changes in a branch.
-To initiate the release for version `x.y.z` simply checkout branch `release/x.y` and run the following commands
+To release a new version `X.Y.Z` follow the next steps.
+
+First, create a release branch.
+For example use the name `release/X.Y` for a minor release.
+Bump versions in a new PR against this release branch to the target version, `X.Y.Z-rc1` and merge it back into the release branch, _i.e._, `release/X.Y`.
+
+Create another PR against `main` for snapshot bumping, _i.e._,`X.(Y+1).0-SNAPSHOT`.
+Only perform this step for `rc` releases, for `ga` releases there should be already a `release/X.Y` branch.
+
+The repo has Github Actions automation to generate Docker images based on the latest changes in a branch.
+To trigger image generation in GitHub Actions for release version `X.Y.Z` push a new tag using the following commands
 
 ```sh
-git tag vx.y.z
-git push origin vx.y.z
+git checkout release/X.Y
+git pull
+git tag vX.Y.Z
+git push origin vX.Y.Z
 ```
+
+When the workflow is done, the images should be published under <https://github.com/orgs/hashgraph/packages?repo_name=hedera-sourcify>.
+Verify that everything works as expected.
+You can use the following checklist to make sure the new release, either integration or production, was successful.
+
+- [ ] **Check available Hedera public networks.** Make sure both the endpoint <https://server-verify.hashscan.io/chains> and _Chain_ select list in <https://repository-verify.hashscan.io/select-contract/> returns the Hedera public networks, `mainnet`, `testnet` and `previewnet`.
+- [ ] **Check `servers` list.** Make sure _Servers_ listed in <https://server-verify.hashscan.io/api-docs/> are properly set to Hedera and local servers.
+- [ ] **Verify a contract using Hashscan.** Deploy a contract with your favorite tool. Verify it using the `VERIFY CONTRACT` button in the _Contract_ view in Hashscan. Make sure the verified contract is visible from the `repository`. See [How to Verify a Smart Contract on HashScan](https://docs.hedera.com/hedera/tutorials/smart-contracts/how-to-verify-a-smart-contract-on-hashscan) for more details.
+- [ ] **Verify a contract using the Verifier UI**. Deploy a contract with your favorite tool. Verify it using the Verifier UI. Make sure the verified contract is visible from the `repository`. Make sure the verified contract is visible as such in the _Contract_ view in Hashscan.
+- [ ] **Ensure your deployed contracts are listed.**. Use the endpoint <https://server-verify.hashscan.io/files/contracts/296> (change the domain if necessary) and make sure the deployed contracts are listed here.
+
+Once you ensure the new release works properly, create a GitHub Release to let users and developers of what has changed.
+Go to <https://github.com/hashgraph/hedera-sourcify/releases> and follow the steps under _Draft a new release_.
 
 ## Support
 
@@ -302,9 +462,9 @@ to see how you can get involved.
 ## Code of Conduct
 
 This project is governed by the
-[Contributor Covenant Code of Conduct](https://github.com/hashgraph/.github/blob/main/CODE_OF_CONDUCT.md). By
-participating, you are expected to uphold this code of conduct. Please report unacceptable behavior
-to [oss@hedera.com](mailto:oss@hedera.com).
+[Contributor Covenant Code of Conduct](https://github.com/hashgraph/.github/blob/main/CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold this code of conduct.
+Please report unacceptable behavior to [oss@hedera.com](mailto:oss@hedera.com).
 
 ## License
 
@@ -312,4 +472,5 @@ to [oss@hedera.com](mailto:oss@hedera.com).
 
 ## 🔐 Security
 
-Please do not file a public ticket mentioning the vulnerability. Refer to the security policy defined in the [SECURITY.md](https://github.com/hashgraph/hedera-sourcify/blob/main/SECURITY.md).
+Please do not file a public ticket mentioning the vulnerability.
+Refer to the security policy defined in the [SECURITY.md](https://github.com/hashgraph/hedera-sourcify/blob/main/SECURITY.md).

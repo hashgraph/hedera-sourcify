@@ -1,20 +1,28 @@
-# Sourcify new UI
+# Hedera Sourcify UI
 
 Bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Environment variables
+## Install
 
-Set the environment variables in `.env.development` depending on your settings. `.env.production` contains the values to be passed during build time.
+Install with
+
+```sh
+npm install
+```
 
 ## Run
 
-Install with `npm install` and run the development server with `npm start`.
+Run the development server with
+
+```sh
+npm start
+```
 
 ## Build
 
 Build with
 
-```
+```sh
 npm run build
 ```
 
@@ -22,4 +30,4 @@ Resulting static assets will be stored at `build/` and ready to be served.
 
 ## Docker
 
-The `Dockerfile` installs,builds and serves the project on a minimal nginx container. When running with Docker, don't forget to pass the environment variables `SERVER_URL` and `REPOSITORY_SERVER_URL`.
+The `Dockerfile` installs, builds and serves the project on a minimal nginx container.

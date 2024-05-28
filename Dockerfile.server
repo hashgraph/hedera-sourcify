@@ -1,0 +1,48 @@
+#diff ./sourcify/services/server/Dockerfile Dockerfile.server
+# Needs to be run from the project root context
+
+# Builder image
+FROM node:16.17.0-bullseye as builder
+
+RUN mkdir -p /home/app
+WORKDIR /home/app
+
+COPY  . .
+
+# Install server's dependencies and build the server
+RUN npm ci --workspace=sourcify-server --include-workspace-root
+RUN npx lerna run build --scope sourcify-server
+
+######################
+## Production image ##
+######################
+FROM node:16.17.0-bullseye-slim as production
+
+RUN mkdir -p /home/app/services/server
+
+WORKDIR /home/app/
+COPY package.json ./package.json
+COPY package-lock.json ./package-lock.json
+COPY lerna.json ./lerna.json
+COPY nx.json ./nx.json
+
+# Use `additional_contexts` in `compose.yaml` to access the `scripts` folder outside main context
+# See https://docs.docker.com/compose/compose-file/build/#additional_contexts for more details
+COPY --from=scripts ./hedera-reset-docker.sh ./
+
+COPY --from=builder /home/app/packages/ ./packages/
+COPY --from=builder /home/app/services/server/ ./services/server/
+
+RUN npm ci --workspace=sourcify-server --include-workspace-root --omit=dev
+
+LABEL org.opencontainers.image.source https://github.com/ethereum/sourcify
+LABEL org.opencontainers.image.licenses MIT
+
+# Set default value for ARG
+ARG NODE_ENV=production
+
+# Set environment variable
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /home/app/services/server
+CMD ["npm", "start"]

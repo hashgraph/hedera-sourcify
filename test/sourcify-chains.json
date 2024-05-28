@@ -1,0 +1,9 @@
+{
+  "298": {
+    "sourcifyName": "Hedera Localnet",
+    "supported": true,
+    "rpc": [
+      "http://localhost:7546"
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+diff --git a/select-contract-form/src/App.js b/select-contract-form/src/App.js
+index 3979bb8..ded277e 100644
+--- a/select-contract-form/src/App.js
++++ b/select-contract-form/src/App.js
+@@ -31,7 +31,10 @@ function App() {
+       return chainsArray;
+     };
+     getSourcifyChains()
+-      .then((chains) => setChains(chains))
++      .then((chains) => {
++        setChains(chains);
++        setChainId(chains[0].chainId);
++      })
+       .catch((err) => alert(err));
+   }, []);
+ 
