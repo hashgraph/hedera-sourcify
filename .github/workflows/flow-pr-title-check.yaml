@@ -35,10 +35,15 @@ concurrency:
 jobs:
   title-check:
     name: Title Check
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, medium, ephemeral]
     permissions:
       statuses: write
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
+
       - name: Check PR Title
         uses: aslafy-z/conventional-pr-title-action@v3
         env:

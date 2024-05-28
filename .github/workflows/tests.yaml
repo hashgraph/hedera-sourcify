@@ -8,8 +8,13 @@ jobs:
 
   bytecode-utils-uts:
     name: bytecode-utils unit tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, medium, ephemeral]
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -20,8 +25,13 @@ jobs:
 
   contract-call-decoder-uts:
     name: contract-call-decoder unit tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, medium, ephemeral]
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -32,8 +42,13 @@ jobs:
 
   lib-sourcify-uts:
     name: lib-sourcify unit tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, medium, ephemeral]
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -44,8 +59,13 @@ jobs:
 
   server-ganache-its:
     name: server over Ganache integration tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, medium, ephemeral]
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -56,8 +76,13 @@ jobs:
 
   server-local-node-its:
     name: server over Hedera's local node integration tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, medium, ephemeral]
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
