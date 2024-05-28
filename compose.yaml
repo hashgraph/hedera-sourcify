@@ -1,0 +1,132 @@
+version: "3.7"
+
+x-project-base: &project-base
+  restart: always
+  networks:
+    - source-verify
+
+networks:
+  source-verify:
+
+services:
+
+  repository:
+    <<: *project-base
+    image: ghcr.io/hashgraph/hedera-sourcify/repository:${TAG}
+    build:
+      context: ./h5ai-nginx
+      args:
+        # From https://github.com/ethereum/sourcify/issues/1385
+        #
+        # The `repository` service provides a link to open each verified contract in Remix.
+        # However, for public self-hosted Sourcify instances (like in the case of Hedera) the _Open repo in Remix_ link does not work,
+        # given the Remix plugin only fetches contracts from https://repo.sourcify.dev.
+        # 
+        # When `HIDE_OPEN_IN_REMIX` is set to 1, a patch to remove the link is applied.
+        # See https://github.com/sourcifyeth/h5ai-nginx/pull/5 for more details.
+        HIDE_OPEN_IN_REMIX: 1
+ 
+    container_name: repository-${TAG}
+    environment:
+      # This variable is used to replace static file access with Sourcify `server` API.
+      # See https://github.com/sourcifyeth/h5ai-nginx/pull/3 for more details.
+      #
+      # This makes the `server` the unique point to serve source files,
+      # useful to allow us to migrate to either repoV2 or database in the future without breaking the `repository`.
+      # See https://github.com/ethereum/sourcify/issues/1330 for more details.
+      - SOURCIFY_SERVER=http://host.docker.internal:5555
+
+      # URL of the server that provides the `chains` endpoint, i.e., $SERVER_URL/chains.
+      # It is used to populate the `Chain` select list in the `select-contract-form`.
+      # Given this select list is populated on the client side,
+      # this URL should be accessible from the browser.
+      #
+      # See https://github.com/sourcifyeth/h5ai-nginx/pull/2 for more details.
+      - SERVER_URL=http://localhost:5555
+    volumes:
+      - type: bind
+        source: ./data
+        # The target mount path in the `repository` is always `/data`.
+        # It is hardcoded in the `h5ai-nginx` app here
+        # https://github.com/sourcifyeth/h5ai-nginx/commit/6277abe8381974470fa2e850c5897955d04d22b8#diff-b7048f2fdd37aec9c062e2bb226871b2c72e8c402fcf2bf57aaa17297238a4beR102
+        target: /data
+        # Note the `repository` is only a UI to browse verified contracts.
+        # Thus, it should be mounted as read only.
+        read_only: true
+    ports:
+      # The `repository` app is exposed under port `:80` through `h5ai-nginx.conf.template`
+      - "${REPOSITORY_PORT}:80"
+
+  server:
+    <<: *project-base
+    image: ghcr.io/hashgraph/hedera-sourcify/server:${TAG}
+    build:
+      context: ./sourcify
+      # The `scripts` context is used to `COPY` the reset network script into the `server` container.
+      # Use `additional_contexts` to access the `scripts` folder outside main context.
+      # See https://docs.docker.com/compose/compose-file/build/#additional_contexts for more details.
+      additional_contexts:
+        - scripts=./scripts
+      # The `Dockerfile.server` used here is basically the same as the one provided by Sourcify.
+      # It adds instructions to include the reset network script into the container.
+      dockerfile: ../Dockerfile.server
+    container_name: server-${TAG}
+    environment:
+      # Change this to `production` if needed.
+      # The logs in `production` are json formatted instead of being human readable.
+      - NODE_ENV=development
+    ports:
+      # `server`'s internal port is set in `services/server/src/config/default.js` and
+      # it can be overriden in `local.js`
+      - "${SERVER_PORT}:5555"
+    volumes:
+      # Use the `servers.yaml` file to customize the OpenAPI servers list.
+      # See https://github.com/ethereum/sourcify/pull/1346 for more details.
+      - type: bind
+        source: ./servers.yaml
+        target: /home/app/services/server/dist/servers.yaml
+      # The list of actual chains to be used by the `server`.
+      # Go to http://localhost:5555/chains to see the effective list displayed to the user.
+      #
+      # The RPCs for Hedera public networks (mainnet, testnet and previewnet)
+      # are already configured in `sourcify/services/server/src/chains.json`.
+      #
+      # Note that when `NODE_ENV=development` Sourcify enables two more development networks:
+      # - (1337) Ganache Localhost - http://localhost:8545
+      # - (31337) Hardhat Network Localhost - http://localhost:8545
+      - type: bind
+        source: ./sourcify-chains.json
+        target: /home/app/services/server/dist/sourcify-chains.json
+      # Place to configure the `server` service.
+      - type: bind
+        source: ./local.js
+        target: /home/app/services/server/dist/config/local.js
+      - type: bind
+        source: ./data
+        # `server`'s repository V1 path is set in `services/server/src/config/default.js` and
+        # it can be overriden in `local.js`.
+        target: /tmp/sourcify/repository
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5555/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+  ui:
+    <<: *project-base
+    image: ghcr.io/hashgraph/hedera-sourcify/ui:${TAG}
+    build:
+      context: ./ui
+    container_name: ui-${TAG}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - type: bind
+        source: ./ui-config.json
+        target: /usr/share/nginx/html/config.json
+    ports:
+      # The `ui` app is exposed under port `:80` through `nginx.conf`
+      - "${UI_PORT}:80"

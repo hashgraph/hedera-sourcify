@@ -1,6 +1,8 @@
 const { StatusCodes } = require("http-status-codes");
 const chai = require("chai");
-const config = require("../../dist/config").default;
+
+const config = require("config");
+
 const path = require("path");
 const fs = require("fs");
 const { getAddress } = require("ethers");
@@ -27,7 +29,6 @@ const assertVerification = (
   expectedStatus = "perfect"
 ) => {
   try {
-    // currentResponse = res;
     chai.expect(err).to.be.null;
     chai.expect(res.status).to.equal(StatusCodes.OK);
     chai.expect(res.body).to.haveOwnProperty("result");
@@ -132,7 +133,7 @@ const assertContractSaved = (expectedAddress, expectedChain, expectedStatus) => 
     const match = expectedStatus === "perfect" ? "full_match" : "partial_match";
     const isExist = fs.existsSync(
       path.join(
-        config.repository.path,
+        config.get("repositoryV1.path"),
         "contracts",
         match,
         expectedChain,
@@ -150,7 +151,7 @@ const assertContractSaved = (expectedAddress, expectedChain, expectedStatus) => 
 const assertContractNotSaved = (expectedAddress, expectedChain) => {
   // Check contract verification result was NOT saved to the disk
   const fullMatchPath = path.join(
-    config.repository.path,
+    config.get("repositoryV1.path"),
     "contracts",
     "full_match",
     expectedChain,
@@ -158,7 +159,7 @@ const assertContractNotSaved = (expectedAddress, expectedChain) => {
     "metadata.json"
   )
   const partialMatchPath = path.join(
-    config.repository.path,
+    config.get("repositoryV1.path"),
     "contracts",
     "partial_match",
     expectedChain,

@@ -1,10 +1,4 @@
 const { ContractFactory, Wallet, BaseContract } = require("ethers");
-const { etherscanAPIs } = require("../../dist/config");
-const { sourcifyChainsMap } = require("../../dist/sourcify-chains");
-const {
-  assertVerificationSession,
-  assertVerification,
-} = require("./assertions");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 
@@ -26,8 +20,8 @@ async function deployFromAbiAndBytecode(signer, abi, bytecode, args) {
 }
 
 /**
- * Creator tx hash is needed for tests. This function returns the tx hash in addition to the contract address.
- *
+ * Creator tx hash is needed for tests.
+ * This function returns the tx hash in addition to the contract address.
  */
 async function deployFromAbiAndBytecodeForCreatorTxHash(
   signer,
@@ -104,53 +98,6 @@ async function callContractMethodWithTx(
   return txReceipt;
 }
 
-function verifyAndAssertEtherscan(
-  serverApp,
-  chainId,
-  address,
-  expectedStatus,
-  type
-) {
-  it(`Non-Session: Should import a ${type} contract from  #${chainId} ${sourcifyChainsMap[chainId].name} (${etherscanAPIs[chainId].apiURL}) and verify the contract, finding a ${expectedStatus} match`, (done) => {
-    let request = chai
-      .request(serverApp)
-      .post("/verify/etherscan")
-      .field("address", address)
-      .field("chain", chainId);
-    request.end((err, res) => {
-      // currentResponse = res;
-      assertVerification(err, res, done, address, chainId, expectedStatus);
-    });
-  });
-}
-
-function verifyAndAssertEtherscanSession(
-  serverApp,
-  chainId,
-  address,
-  expectedStatus,
-  type
-) {
-  it(`Session: Should import a ${type} contract from  #${chainId} ${sourcifyChainsMap[chainId].name} (${etherscanAPIs[chainId].apiURL}) and verify the contract, finding a ${expectedStatus} match`, (done) => {
-    chai
-      .request(serverApp)
-      .post("/session/verify/etherscan")
-      .field("address", address)
-      .field("chainId", chainId)
-      .end((err, res) => {
-        // currentResponse = res;
-        assertVerificationSession(
-          err,
-          res,
-          done,
-          address,
-          chainId,
-          expectedStatus
-        );
-      });
-  });
-}
-
 module.exports = {
   deployFromAbiAndBytecode,
   deployFromAbiAndBytecodeForCreatorTxHash,
@@ -161,6 +108,4 @@ module.exports = {
   invalidAddress,
   unsupportedChain,
   unusedAddress,
-  verifyAndAssertEtherscan,
-  verifyAndAssertEtherscanSession,
 };

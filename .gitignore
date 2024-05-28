@@ -1,26 +1,7 @@
-.idea
-.DS_Store
-db/
-node_modules/
-mockRepository*
-server.log
-ui/node_modules/
-ui/dist/
-ui/.cache/
-source-verify.dab
-dist/
-**/.env
-**/.env-backup
-**/*.key
-stats**
-tmp
-metacoin-source-verify/
-**/synced
-**/sort.log
-logs
-**/too_big.txt
-chain-tests-report/
-coverage
-!src/server/controllers/repository
-environments/docker-config.json
+/node_modules/
 
+# Placeholder for volume mount point for the repository.
+/data/
+
+# Ignore .idea
+**/.idea
