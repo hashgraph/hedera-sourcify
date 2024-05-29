@@ -40,10 +40,10 @@ serverRepository:
   image:
     server:
       repository: ghcr.io/hashgraph/hedera-sourcify/server
-      tag: "test"
+      tag: "main"
     repository:
       repository: ghcr.io/hashgraph/hedera-sourcify/repository
-      tag: "test"
+      tag: "main"
     pullPolicy: "IfNotPresent"
 
   ## server-repository serviceAccount creation and configuration
@@ -140,7 +140,7 @@ ui:
   ## UI image configuration, image repository is defined in the global image section above
   image:
     repository: ghcr.io/hashgraph/hedera-sourcify/ui
-    tag: "test"
+    tag: "main"
     pullPolicy: "IfNotPresent"
 
   ## UI serviceAccount creation and configuration
