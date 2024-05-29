@@ -1,9 +1,12 @@
-name: Release Integration Environment
+name: Publish Images to GitHub Registry
 
 on:
   push:
+    # `main` tag is used for integration environment
     branches: [ main ]
+    # `v*` tags are used for production environment 
     tags: [ v* ]
+  # Manual trigger with custom release tag
   workflow_dispatch:
     inputs:
       version:
