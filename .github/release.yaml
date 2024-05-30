@@ -1,0 +1,25 @@
+# https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes#configuring-automatically-generated-release-notes
+
+changelog:
+  exclude:
+    labels:
+      - canceled
+      - duplicate
+      - question
+  categories:
+    - title: New Features 🎉
+      labels:
+        - enhancement
+    - title: Bug Fixes 🐛
+      labels:
+        - bug
+    - title: Breaking Changes 🛠
+      labels:
+        - breaking-change
+
+    - title: Dependency Upgrades
+      labels:
+        - dependencies
+    - title: Internal Changes 🏠
+      labels:
+        - "*"
