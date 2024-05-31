@@ -4,3 +4,6 @@
 [submodule "sourcify"]
 	path = sourcify
 	url = https://github.com/ethereum/sourcify.git
+[submodule "tools/foundry/lib/forge-std"]
+	path = tools/foundry/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
