@@ -3,7 +3,7 @@
 ## Foundry
 
 You can verify contracts using Foundry in Hedera using our verification service.
-Our verification service instance is located at `https://server-verify.hashscan.io`.
+Our public verification service instance is located at `https://server-verify.hashscan.io`.
 
 Once you have a running Foundry example, you can deploy and verify it with our verification service, for example
 
@@ -47,7 +47,7 @@ forge create --rpc-url http://localhost:7546 \
   --private-key <your_private_key> src/Counter.sol:Counter \
   --verify \
   --verifier sourcify \
-  --verifier-url http://localhost:5002
+  --verifier-url http://localhost:5555
 ```
 
 ## Hardhat
