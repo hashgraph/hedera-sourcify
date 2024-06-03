@@ -54,9 +54,14 @@ forge create --rpc-url http://localhost:7546 \
 
 You can also verify contracts using Hardhat with the [`hardhat-verify`](https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#verifying-on-sourcify) plugin using our verification service.
 
-> There is currently a minor issue that might confuse users but that does not affect Sourcify verification <https://github.com/NomicFoundation/hardhat/issues/4776>.
+> [!NOTE]
+> There is a minor issue that might confuse users but that does not affect Sourcify verification.
+> See <https://github.com/NomicFoundation/hardhat/issues/4776> for more details.
 
 Create a new Hardhat project, install its dependencies and use the following `hardhat.config.js`
+
+> [!TIP]
+> You can use the [Hardhat starter project](./hardhat/) to work with a custom Sourcify instance.
 
 ```js
 require("@nomicfoundation/hardhat-toolbox");
@@ -82,7 +87,7 @@ module.exports = {
 };
 ```
 
-> [!NOTE]
+> [!IMPORTANT]
 > Both `apiUrl` and `browserUrl` expect an URL without a trailing slash.
 > Having a trailing slash in the Sourcify URLs may cause unexpected errors.
 
