@@ -17,7 +17,7 @@ data:
   REPOSITORY_SERVER_PORT: {{ .Values.serverRepository.service.repository.port | quote }}
   REPOSITORY_SERVER_EXTERNAL_PORT: {{ .Values.serverRepository.service.repository.port | quote }}
   NODE_ENV: {{ .Values.serverRepository.config.NODE_ENV | default "development" }}
-  SOURCIFY_SERVER: {{ .Values.serverRepository.config.SERVER_URL }}
+  SOURCIFY_SERVER: "http://{{ template "sourcify.name" . }}-server:5555"
 ---
 apiVersion: v1
 kind: ConfigMap
