@@ -5,3 +5,32 @@
 *                                       @hashgraph/hedera-smart-contracts @hashgraph/dev-experience
 
 
+#########################
+#####  Core Files  ######
+#########################
+
+# NOTE: Must be placed last to ensure enforcement over all other rules
+
+# Protections for nvm
+**/.nvmrc                                       @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts @hashgraph/dev-experience
+
+# Typescript Protection
+**/package.json                                 @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts @hashgraph/dev-experience
+**/package-lock.json                            @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts @hashgraph/dev-experience
+**/tsconfig.json                                @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts @hashgraph/dev-experience
+
+# Protection Rules for Github Configuration Files and Actions Workflows
+/.github/                                       @hashgraph/release-engineering @hashgraph/release-engineering-managers
+/.github/workflows/                             @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts @hashgraph/dev-experience
+
+
+# Self-protection for root CODEOWNERS files (this file should not exist and should definitely require approval)
+/CODEOWNERS                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers
+
+# Protect the repository root files
+/README.md                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers  @hashgraph/hedera-smart-contracts @hashgraph/dev-experience
+**/LICENSE                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers
+
+# Git Ignore definitions
+**/.gitignore                                   @hashgraph/release-engineering @hashgraph/release-engineering-managers  @hashgraph/hedera-smart-contracts @hashgraph/dev-experience
+**/.gitignore.*                                 @hashgraph/release-engineering @hashgraph/release-engineering-managers  @hashgraph/hedera-smart-contracts @hashgraph/dev-experience

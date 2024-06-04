@@ -2,3 +2,6 @@
 
 # Placeholder for volume mount point for the repository.
 /data/
+
+# Ignore .idea
+**/.idea
