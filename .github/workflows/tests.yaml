@@ -14,14 +14,17 @@ jobs:
         uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
         with:
           egress-policy: audit
+
       - name: Checkout Code
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           submodules: true
+
       - name: Setup node
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 18
+
       - name: Apply Sourcify server patch customizations
         run: npm run server:patch
 
@@ -30,7 +33,9 @@ jobs:
         run: |
           npm ci
           npm run build:lerna
+
       - run: npm ci
+
       - run: npm run test:server
 
   server-local-node:
@@ -47,10 +52,12 @@ jobs:
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           submodules: true
+
       - name: Setup Node
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 18
+
       - name: Apply Sourcify server patch customizations
         run: npm run server:patch
 

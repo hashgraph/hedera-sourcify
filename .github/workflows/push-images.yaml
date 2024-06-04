@@ -36,8 +36,10 @@ jobs:
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           submodules: true
+
       - name: Apply Sourcify server patch customizations
         run: npm run server:patch
+
       - name: Apply Sourcify repository patch customizations
         run: npm run repository:patch
       
