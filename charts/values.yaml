@@ -77,12 +77,6 @@ serverRepository:
     SERVER_URL: "http://127.0.0.1:5555"
     REPOSITORY_SERVER_URL: "http://127.0.0.1:10000"
     NODE_ENV: "production"
-    repository:
-      {
-      "SERVER_URL": "http://127.0.0.1:5555",
-      "REPOSITORY_SERVER_URL": "http://127.0.0.1:10000",
-      "EXPLORER_URL": "http://127.0.0.1:8080",
-      }
     servers:
       - description: The current REST API server
         url: ""

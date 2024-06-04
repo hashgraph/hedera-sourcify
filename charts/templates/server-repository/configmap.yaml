@@ -12,10 +12,6 @@ metadata:
 data:
   SERVER_URL: {{ .Values.serverRepository.config.SERVER_URL }}
   REPOSITORY_SERVER_URL: {{ .Values.serverRepository.config.REPOSITORY_SERVER_URL }}
-  SERVER_PORT: {{ .Values.serverRepository.service.server.port | quote }}
-  SERVER_EXTERNAL_PORT: {{ .Values.serverRepository.service.server.port | quote }}
-  REPOSITORY_SERVER_PORT: {{ .Values.serverRepository.service.repository.port | quote }}
-  REPOSITORY_SERVER_EXTERNAL_PORT: {{ .Values.serverRepository.service.repository.port | quote }}
   NODE_ENV: {{ .Values.serverRepository.config.NODE_ENV | default "development" }}
   SOURCIFY_SERVER: "http://{{ template "sourcify.name" . }}-server:5555"
 ---
@@ -31,8 +27,6 @@ metadata:
   {{ toYaml .Values.serverRepository.annotations | indent 4 }}
   {{- end }}
 data:
-  config.json: |-
-  {{- .Values.serverRepository.config.repository | toJson  | nindent 4 }}
   servers.yaml: |-
   {{- .Values.serverRepository.config.servers | toYaml | nindent 4 }}
   sourcify-chains.json: |-
