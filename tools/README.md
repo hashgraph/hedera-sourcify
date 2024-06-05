@@ -2,8 +2,9 @@
 
 ## Foundry
 
-You can verify contracts using Foundry in Hedera using our verification service.
-Our verification service instance is located at `https://server-verify.hashscan.io`.
+You can verify contracts using Foundry in Hedera using [our verification service](https://github.com/hashgraph/hedera-sourcify/issues/122).
+See [_How to Deploy and Verify a Hedera Smart Contract with Foundry_](https://docs.hedera.com/hedera/tutorials/smart-contracts/foundry/deploy-and-verify-smart-contract) for more information.
+Our public verification service instance is located at `https://server-verify.hashscan.io`.
 
 Once you have a running Foundry example, you can deploy and verify it with our verification service, for example
 
@@ -17,7 +18,8 @@ forge create --rpc-url https://testnet.hashio.io/api \
 
 After the contract has been verified, you can check its sources in the verification repository, for example see `https://repository-verify.hashscan.io/contracts/full_match/296/0x559e79D4Edf86E772840eFc2ee4CFC37bB500f2F/`.
 
-Tracking issue <https://github.com/hashgraph/hedera-sourcify/issues/122>.
+If you want to use the Verifier UI with Foundry, you need to upload the source contracts and the metadata file.
+See [_Verifying Smart Contracts - The Metadata File_](https://docs.hedera.com/hedera/core-concepts/smart-contracts/verifying-smart-contracts-beta#the-metadata-file) for more details.
 
 ### Running the verification service locally
 
@@ -47,7 +49,7 @@ forge create --rpc-url http://localhost:7546 \
   --private-key <your_private_key> src/Counter.sol:Counter \
   --verify \
   --verifier sourcify \
-  --verifier-url http://localhost:5002
+  --verifier-url http://localhost:5555
 ```
 
 ## Hardhat
