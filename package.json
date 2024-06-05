@@ -11,7 +11,6 @@
     "test:server": "mocha test/server.test.js --exit",
     "test:hedera": "mocha test/hedera.test.js --exit",
     "server:patch": "cd sourcify && git apply --verbose ../server.patch",
-    "repository:patch": "cd h5ai-nginx && git apply --verbose ../repository.patch",
     "server:build": "cd sourcify && npm run build:lerna",
     "server:start": "cd sourcify && npm run server:start",
     "server:reset-previewnet": "./scripts/hedera-reset.sh previewnet",

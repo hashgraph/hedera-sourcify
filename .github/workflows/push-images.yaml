@@ -47,10 +47,7 @@ jobs:
 
       - name: Apply Sourcify server patch customizations
         run: npm run server:patch
-
-      - name: Apply Sourcify repository patch customizations
-        run: npm run repository:patch
-      
+ 
       - name: Get tag
         run: |
           if [[ "${{ github.event.inputs.version }}" ]]; then

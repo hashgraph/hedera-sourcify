@@ -27,11 +27,10 @@ These repo submodules are `sourcify` and `h5ai-nginx`, which corresponds to the 
 Instead of forking those repos, we attach them here directly in order to consume upstream updates more easily.
 Given that the `ui` changes are Hedera specific, we decided to keep our [`ui`](./ui/) fork with custom modifications.
 
-Apply the Hedera customization patch to both the `sourcify` and `h5ai-nginx` submodules **(execute this only once)**
+Apply the Hedera customization patch to the `sourcify` submodule **(execute this only once)**
 
 ```sh
 npm run server:patch
-npm run repository:patch
 ```
 
 ## Quick Start
