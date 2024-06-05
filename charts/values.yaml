@@ -27,6 +27,18 @@ serverRepository:
   podAnnotations: {}
   podSecurityContext: {}
 
+  ## server-repository resources configuration
+  repository:
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+  server:
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1024Mi
+
   ## server-repository service configuration
   service:
     server:
