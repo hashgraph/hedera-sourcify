@@ -1,8 +1,6 @@
 nameoOverride: ""
 fullnameOverride: ""
 imagePullSecrets: []
-image:
-  repository: "ghcr.io/hashgraph/hedera-sourcify"
 
 serverRepository:
   ## Deploy sourcify server-repository
@@ -29,6 +27,18 @@ serverRepository:
   podAnnotations: {}
   podSecurityContext: {}
 
+  ## server-repository resources configuration
+  repository:
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+  server:
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1024Mi
+
   ## server-repository service configuration
   service:
     server:
@@ -41,9 +51,11 @@ serverRepository:
   ## server-repository image configuration, image repository is defined in the global image section above
   image:
     server:
-      tag: "server-latest"
+      repository: ghcr.io/hashgraph/hedera-sourcify/server
+      tag: "main"
     repository:
-      tag: "repository-latest"  
+      repository: ghcr.io/hashgraph/hedera-sourcify/repository
+      tag: "main"
     pullPolicy: "IfNotPresent"
 
   ## server-repository serviceAccount creation and configuration
@@ -74,19 +86,33 @@ serverRepository:
 
   ## Configurations for the server-repository containers
   config:
-    REPOSITORY_PATH: "/data"
     SERVER_URL: "http://127.0.0.1:5555"
     REPOSITORY_SERVER_URL: "http://127.0.0.1:10000"
-    TESTING: true
-    NODE_ENV: "development"
-    UI_DOMAIN_NAME: verify.example.com
-    repository:
+    NODE_ENV: "production"
+    servers:
+      - description: The current REST API server
+        url: ""
+      - description: The production REST API server
+        url: "https://server-verify.hashscan.io"
+      - description: The staging REST API server
+        url: "https://server-sourcify.hedera-devops.com"
+      - description: Local development server address on default port 5555
+        url: "http://localhost:5555"
+    sourcifyChains:
       {
-      "SERVER_URL": "http://127.0.0.1:5555",
-      "REPOSITORY_SERVER_URL": "http://127.0.0.1:10000",
-      "EXPLORER_URL": "http://127.0.0.1:8080",
+        "295": {
+          "sourcifyName": "Hedera Mainnet",
+          "supported": true
+        },
+        "296": {
+          "sourcifyName": "Hedera Testnet",
+          "supported": true
+        },
+        "297": {
+          "sourcifyName": "Hedera Previewnet",
+          "supported": true
+        }
       }
-
 ui:
   ## Deploy sourcify ui
   enabled: true
@@ -119,7 +145,8 @@ ui:
 
   ## UI image configuration, image repository is defined in the global image section above
   image:
-    tag: "ui-latest"
+    repository: ghcr.io/hashgraph/hedera-sourcify/ui
+    tag: "main"
     pullPolicy: "IfNotPresent"
 
   ## UI serviceAccount creation and configuration
@@ -152,14 +179,13 @@ ui:
 
 reset:
   ## Previewnet reset job, default is to disable
-  previewnet_reset: 
+  previewnet_reset:
     enabled: false
   ## Testnet reset job, default is to disable
   testnet_reset:
-    enabled: false  
+    enabled: false
   ## Set default immage repository, tag, and pull policy
   image:
     repository: "bitnami/kubectl"
     tag: "1.28.7"
     pullPolicy: "IfNotPresent"
-
