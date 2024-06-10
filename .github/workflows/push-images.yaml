@@ -108,7 +108,8 @@ jobs:
           context: ./ui
           file: ./ui/Dockerfile
           platforms: linux/amd64, linux/arm64
-          push: true
+          # push: true
+          push: false # disabled push for testing
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/ui:${{env.TAG}}
 
       - name: Build and push SERVER image
@@ -126,7 +127,8 @@ jobs:
           # It adds instructions to include the reset network script into the container.
           file: ./Dockerfile.server
           platforms: linux/amd64, linux/arm64
-          push: true
+          # push: true
+          push: false # disabled push for testing
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/server:${{env.TAG}}
 
       - name: Build and Push REPOSITORY Image
@@ -139,12 +141,13 @@ jobs:
           # The `repository` service provides a link to open each verified contract in Remix.
           # However, for public self-hosted Sourcify instances (like in the case of Hedera) the _Open repo in Remix_ link does not work,
           # given the Remix plugin only fetches contracts from https://repo.sourcify.dev.
-          # 
+          #
           # When `HIDE_OPEN_IN_REMIX` is set to 1, a patch to remove the link is applied.
           # See https://github.com/sourcifyeth/h5ai-nginx/pull/5 for more details.
           build-args: |
             HIDE_OPEN_IN_REMIX=1
           file: ./h5ai-nginx/Dockerfile
           platforms: linux/amd64, linux/arm64
-          push: true
+          # push: true
+          push: false # disabled push for testing
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/repository:${{env.TAG}}
