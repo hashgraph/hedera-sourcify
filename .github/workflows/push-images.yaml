@@ -20,7 +20,7 @@ env:
 
 jobs:
   docker-image-publish:
-    runs-on: [self-hosted, Linux, medium, ephemeral]
+    runs-on: [self-hosted, Linux, large, ephemeral]
     permissions:
       contents: read
       id-token: write
