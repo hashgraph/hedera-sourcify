@@ -95,9 +95,9 @@ jobs:
           echo ::endgroup::
           
           echo "::group::Set Control Group Limits"
-            cgset -r cpu.shares=500 ${AGENT_GROUP_NAME}
-            cgset -r memory.limit_in_bytes=${AGENT_MEM_LIMIT} ${AGENT_GROUP_NAME}
-            cgset -r memory.memsw.limit_in_bytes=${AGENT_MEM_LIMIT} ${AGENT_GROUP_NAME}
+            sudo cgset -r cpu.shares=500 ${AGENT_GROUP_NAME}
+            sudo cgset -r memory.limit_in_bytes=${AGENT_MEM_LIMIT} ${AGENT_GROUP_NAME}
+            sudo cgset -r memory.memsw.limit_in_bytes=${AGENT_MEM_LIMIT} ${AGENT_GROUP_NAME}
           echo "::endgroup::"
           
           echo "::group::Move Runner Processes to Control Group"
