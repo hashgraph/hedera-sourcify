@@ -73,14 +73,14 @@ jobs:
 
       - name: Setup Control Groups
         run: |
+          set -x
           echo "::group::Get System Configuration"
             USR_ID="$(id -un)"
             GRP_ID="$(id -gn)"
             AGENT_MEM_LIMIT="2147483648"
             AGENT_GROUP_NAME="agent-${{ github.run_id }}"
-            echo ${USR_ID}
-            echo ${GRP_ID}
-            echo ${AGENT_GROUP_NAME}
+            DOCKER_MEM_LIMIT="30064771072"
+            DOCKER_GROUP_NAME="docker-${{ github.run_id }}"
           echo "::endgroup::"
           
           echo "::group::Install Control Group Tools"
@@ -91,13 +91,17 @@ jobs:
           echo "::endgroup::"
           
           echo "::group::Create Control Groups"
+            sudo cgcreate -g cpu,memory:${DOCKER_GROUP_NAME} -a ${USR_ID}:${GRP_ID} -t ${USR_ID}:${GRP_ID}
             sudo cgcreate -g cpu,memory:${AGENT_GROUP_NAME} -a ${USR_ID}:${GRP_ID} -t ${USR_ID}:${GRP_ID}
           echo ::endgroup::
           
           echo "::group::Set Control Group Limits"
-            sudo cgset -r cpu.shares=500 ${AGENT_GROUP_NAME}
-            sudo cgset -r memory.limit_in_bytes=${AGENT_MEM_LIMIT} ${AGENT_GROUP_NAME}
-            sudo cgset -r memory.memsw.limit_in_bytes=${AGENT_MEM_LIMIT} ${AGENT_GROUP_NAME}
+            cgset -r cpu.shares=768 ${DOCKER_GROUP_NAME}
+            cgset -r cpu.shares=500 ${AGENT_GROUP_NAME}
+            cgset -r memory.limit_in_bytes=${DOCKER_MEM_LIMIT} ${DOCKER_GROUP_NAME}
+            cgset -r memory.limit_in_bytes=${AGENT_MEM_LIMIT} ${AGENT_GROUP_NAME}
+            cgset -r memory.memsw.limit_in_bytes=${DOCKER_MEM_LIMIT} ${DOCKER_GROUP_NAME}
+            cgset -r memory.memsw.limit_in_bytes=${AGENT_MEM_LIMIT} ${AGENT_GROUP_NAME}
           echo "::endgroup::"
           
           echo "::group::Move Runner Processes to Control Group"
