@@ -99,8 +99,8 @@ jobs:
           echo ::endgroup::
           
           echo "::group::Set Control Group Limits"
-            cgset -r cpu.shares=768 ${DOCKER_GROUP_NAME}
-            cgset -r cpu.shares=500 ${AGENT_GROUP_NAME}
+            cgset -r cpu.weight=768 ${DOCKER_GROUP_NAME}
+            cgset -r cpu.weight=500 ${AGENT_GROUP_NAME}
             cgset -r memory.max=${DOCKER_MEM_LIMIT} ${DOCKER_GROUP_NAME}
             cgset -r memory.max=${AGENT_MEM_LIMIT} ${AGENT_GROUP_NAME}
             cgset -r memory.swap.max=${DOCKER_MEM_LIMIT} ${DOCKER_GROUP_NAME}
