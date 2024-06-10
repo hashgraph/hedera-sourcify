@@ -20,7 +20,7 @@ env:
 
 jobs:
   docker-image-publish:
-    runs-on: [self-hosted, Linux, large, ephemeral]
+    runs-on: [self-hosted, Linux, medium, ephemeral]
     permissions:
       contents: read
       id-token: write
@@ -79,7 +79,7 @@ jobs:
             GRP_ID="$(id -gn)"
             USER_SLICE="user.slice/user-$(id -u).slice"
             USER_SERVICE="${USER_SLICE}/user@$(id -u).service" 
-            DOCKER_MEM_LIMIT="30064771072"
+            DOCKER_MEM_LIMIT="6442450944"
             AGENT_MEM_LIMIT="2147483648"
             DOCKER_GROUP_NAME="${USER_SERVICE}/docker-${{ github.run_id }}"
             AGENT_GROUP_NAME="${USER_SERVICE}/agent-${{ github.run_id }}"
@@ -98,7 +98,7 @@ jobs:
           echo ::endgroup::
 
           echo "::group::Set Control Group Limits"
-            cgset -r cpu.weight=768 ${DOCKER_GROUP_NAME}
+            cgset -r cpu.weight=500 ${DOCKER_GROUP_NAME}
             cgset -r cpu.weight=500 ${AGENT_GROUP_NAME}
             cgset -r memory.max=${DOCKER_MEM_LIMIT} ${DOCKER_GROUP_NAME}
             cgset -r memory.max=${AGENT_MEM_LIMIT} ${AGENT_GROUP_NAME}
