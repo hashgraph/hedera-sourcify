@@ -79,6 +79,8 @@ jobs:
             AGENT_MEM_LIMIT="2147483648"
             AGENT_GROUP_NAME="agent-${{ github.run_id }}"
             echo ${USR_ID}
+            echo ${GRP_ID}
+            echo ${AGENT_GROUP_NAME}
           echo "::endgroup::"
           
           echo "::group::Install Control Group Tools"
