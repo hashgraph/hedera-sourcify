@@ -83,26 +83,26 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/ui:${{env.TAG}}
 
-      # - name: Build and push SERVER image
-      #   uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
-      #   with:
-      #     cache-from: type=gha,scope=build-server
-      #     cache-to: type=gha,mode=max,scope=build-server
+      - name: Build and push SERVER image
+        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
+        with:
+          cache-from: type=gha,scope=build-server
+          cache-to: type=gha,mode=max,scope=build-server
 
-      #     context: ./sourcify
+          context: ./sourcify
 
-      #     # The `scripts` context is used to `COPY` the reset network script into the `server` container.
-      #     # Use `additional_contexts` to access the `scripts` folder outside main context.
-      #     # See https://docs.docker.com/compose/compose-file/build/#additional_contexts for more details.
-      #     build-contexts: |
-      #       scripts=./scripts
+          # The `scripts` context is used to `COPY` the reset network script into the `server` container.
+          # Use `additional_contexts` to access the `scripts` folder outside main context.
+          # See https://docs.docker.com/compose/compose-file/build/#additional_contexts for more details.
+          build-contexts: |
+            scripts=./scripts
 
-      #     # The `Dockerfile.server` used here is basically the same as the one provided by Sourcify.
-      #     # It adds instructions to include the reset network script into the container.
-      #     file: ./Dockerfile.server
-      #     platforms: linux/amd64, linux/arm64
-      #     push: true
-      #     tags: ${{ env.REGISTRY }}/${{ github.repository }}/server:${{env.TAG}}
+          # The `Dockerfile.server` used here is basically the same as the one provided by Sourcify.
+          # It adds instructions to include the reset network script into the container.
+          file: ./Dockerfile.server
+          platforms: linux/amd64, linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/server:${{env.TAG}}
 
       # - name: Build and Push REPOSITORY Image
       #   uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
