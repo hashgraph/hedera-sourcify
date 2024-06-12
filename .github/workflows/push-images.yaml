@@ -104,25 +104,25 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/server:${{env.TAG}}
 
-      # - name: Build and Push REPOSITORY Image
-      #   uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
-      #   with:
-      #     cache-from: type=gha,scope=build-repository
-      #     cache-to: type=gha,mode=max,scope=build-repository
+      - name: Build and Push REPOSITORY Image
+        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
+        with:
+          cache-from: type=gha,scope=build-repository
+          cache-to: type=gha,mode=max,scope=build-repository
 
-      #     context: ./h5ai-nginx
+          context: ./h5ai-nginx
 
-      #     # From https://github.com/ethereum/sourcify/issues/1385
-      #     #
-      #     # The `repository` service provides a link to open each verified contract in Remix.
-      #     # However, for public self-hosted Sourcify instances (like in the case of Hedera) the _Open repo in Remix_ link does not work,
-      #     # given the Remix plugin only fetches contracts from https://repo.sourcify.dev.
-      #     # 
-      #     # When `HIDE_OPEN_IN_REMIX` is set to 1, a patch to remove the link is applied.
-      #     # See https://github.com/sourcifyeth/h5ai-nginx/pull/5 for more details.
-      #     build-args: |
-      #       HIDE_OPEN_IN_REMIX=1
-      #     file: ./h5ai-nginx/Dockerfile
-      #     platforms: linux/amd64, linux/arm64
-      #     push: true
-      #     tags: ${{ env.REGISTRY }}/${{ github.repository }}/repository:${{env.TAG}}
+          # From https://github.com/ethereum/sourcify/issues/1385
+          #
+          # The `repository` service provides a link to open each verified contract in Remix.
+          # However, for public self-hosted Sourcify instances (like in the case of Hedera) the _Open repo in Remix_ link does not work,
+          # given the Remix plugin only fetches contracts from https://repo.sourcify.dev.
+          # 
+          # When `HIDE_OPEN_IN_REMIX` is set to 1, a patch to remove the link is applied.
+          # See https://github.com/sourcifyeth/h5ai-nginx/pull/5 for more details.
+          build-args: |
+            HIDE_OPEN_IN_REMIX=1
+          file: ./h5ai-nginx/Dockerfile
+          platforms: linux/amd64, linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/repository:${{env.TAG}}
