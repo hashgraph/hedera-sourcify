@@ -74,6 +74,9 @@ jobs:
       - name: Build and push UI image
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
         with:
+          cache-from: type=gha,scope=build-ui
+          cache-to: type=gha,mode=max,scope=build-ui
+
           context: ./ui
           file: ./ui/Dockerfile
           platforms: linux/amd64, linux/arm64
@@ -83,6 +86,9 @@ jobs:
       - name: Build and push SERVER image
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
         with:
+          cache-from: type=gha,scope=build-server
+          cache-to: type=gha,mode=max,scope=build-server
+
           context: ./sourcify
 
           # The `scripts` context is used to `COPY` the reset network script into the `server` container.
@@ -101,6 +107,9 @@ jobs:
       - name: Build and Push REPOSITORY Image
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
         with:
+          cache-from: type=gha,scope=build-repository
+          cache-to: type=gha,mode=max,scope=build-repository
+
           context: ./h5ai-nginx
 
           # From https://github.com/ethereum/sourcify/issues/1385
