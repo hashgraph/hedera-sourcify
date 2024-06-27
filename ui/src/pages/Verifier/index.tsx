@@ -1,9 +1,9 @@
-import bytes from "bytes";
-import { useCallback, useContext, useEffect, useState } from "react";
-import Header from "../../components/Header";
-import Toast from "../../components/Toast";
-import { DOCS_URL } from "../../constants";
-import { Context } from "../../Context";
+import bytes from 'bytes';
+import { useCallback, useContext, useEffect, useState } from 'react';
+import Header from '../../components/Header';
+import Toast from '../../components/Toast';
+import { DOCS_URL } from '../../constants';
+import { Context } from '../../Context';
 import {
   Create2VerificationInput,
   DropzoneFile,
@@ -12,10 +12,10 @@ import {
   SendableContract,
   SessionResponse,
   VerificationInput,
-} from "../../types";
-import CheckedContractsView from "./CheckedContractsView";
-import FileUpload from "./FileUpload";
-import {configuration} from "../../utils/Configuration";
+} from '../../types';
+import CheckedContractsView from './CheckedContractsView';
+import FileUpload from './FileUpload';
+import { configuration } from '../../utils/Configuration';
 
 const UI_MAX_FILE_SIZE = 30 * 1024 * 1024;
 
@@ -31,8 +31,8 @@ const Verifier: React.FC = () => {
     async (URL: string, fetchOptions?: RequestInit) => {
       try {
         const rawRes: Response = await fetch(URL, {
-          credentials: "include",
-          method: fetchOptions?.method || "GET", // default GET
+          credentials: 'include',
+          method: fetchOptions?.method || 'GET', // default GET
           // mode: "cors",
           ...fetchOptions,
         });
@@ -45,7 +45,7 @@ const Verifier: React.FC = () => {
         setUnusedFiles([...res.unused]);
         setCheckedContracts([...res.contracts]);
         setAddedFiles([...res.files]);
-        setErrorMessage("");
+        setErrorMessage('');
         return res;
       } catch (e: any) {
         console.log(e);
@@ -59,14 +59,11 @@ const Verifier: React.FC = () => {
                 <>
                   <div>Possibly a CORS error, check the browser console.</div>
                   <div>
-                    See{" "}
-                    <a
-                      className="font-bold"
-                      href={DOCS_URL}
-                    >
+                    See{' '}
+                    <a className='font-bold' href={DOCS_URL}>
                       docs
-                    </a>{" "}
-                    for details{" "}
+                    </a>{' '}
+                    for details{' '}
                   </div>
                 </>
               )
@@ -102,16 +99,16 @@ const Verifier: React.FC = () => {
       }
       let filePath = file.path;
       // remove absolute path
-      if (file.path.startsWith("/")) filePath = file.path.substring(1);
+      if (file.path.startsWith('/')) filePath = file.path.substring(1);
       // If a zip, send a seperate request, since there's already no file path
       if (
-        file.type === "application/zip" ||
-        file.type === "application/x-zip-compressed"
+        file.type === 'application/zip' ||
+        file.type === 'application/x-zip-compressed'
       ) {
         const formData = new FormData();
-        formData.append("files", file);
+        formData.append('files', file);
         await fetchAndUpdate(configuration.addFilesUrl, {
-          method: "POST",
+          method: 'POST',
           body: formData,
         });
       } else {
@@ -120,17 +117,17 @@ const Verifier: React.FC = () => {
     }
     if (Object.keys(jsonBody.files).length > 0) {
       await fetchAndUpdate(configuration.addFilesUrl, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(jsonBody),
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       });
     }
   };
 
   const restartSession = async () => {
     await fetch(configuration.restartSessionUrl, {
-      credentials: "include",
-      method: "POST",
+      credentials: 'include',
+      method: 'POST',
     });
     setUnusedFiles([]);
     setCheckedContracts([]);
@@ -144,11 +141,11 @@ const Verifier: React.FC = () => {
    * @param sendable -
    */
   const verifyCheckedContract = async (sendable: VerificationInput) => {
-    console.log("Verifying checkedContract " + sendable.verificationId);
+    console.log('Verifying checkedContract ' + sendable.verificationId);
     return fetchAndUpdate(configuration.verifyValidatedUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         contracts: [sendable],
@@ -164,11 +161,11 @@ const Verifier: React.FC = () => {
   const verifyCreate2CheckedContract = async (
     sendable: Create2VerificationInput
   ) => {
-    console.log("Verifying create2 checkedContract " + sendable.verificationId);
+    console.log('Verifying create2 checkedContract ' + sendable.verificationId);
     return fetchAndUpdate(configuration.create2VerifyValidatedUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(sendable),
     });
@@ -180,11 +177,11 @@ const Verifier: React.FC = () => {
    * @param sendable -
    */
   const verifyCreate2Compile = async (verificationId: string) => {
-    console.log("Compiling create2 checkedContract " + verificationId);
+    console.log('Compiling create2 checkedContract ' + verificationId);
     return fetchAndUpdate(configuration.create2CompiledUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ verificationId }),
     });
@@ -195,21 +192,21 @@ const Verifier: React.FC = () => {
   }, [fetchAndUpdate]);
 
   return (
-    <div className="flex flex-col flex-1 pb-8 px-8 md:px-12 lg:px-24 bg-gray-100">
+    <div className='flex flex-col flex-1 pb-8 px-8 md:px-12 lg:px-24 bg-gray-100'>
       <Header />
       <Toast
         message={errorMessage}
         isShown={!!errorMessage}
-        dismiss={() => setErrorMessage("")}
+        dismiss={() => setErrorMessage('')}
       />
-      <div className="text-center">
-        <h1 className="text-3xl md:text-4xl font-bold">Verifier</h1>
-        <p className="mt-2">
+      <div className='text-center'>
+        <h1 className='text-3xl md:text-4xl font-bold'>Verifier</h1>
+        <p className='mt-2'>
           Verify smart contracts by recompiling with the Solidity source code
           and metadata.
         </p>
       </div>
-      <div className="flex flex-col md:flex-row flex-grow mt-6">
+      <div className='flex flex-col md:flex-row flex-grow mt-6'>
         <FileUpload
           handleFilesAdded={handleFiles}
           addedFiles={addedFiles}
@@ -227,7 +224,7 @@ const Verifier: React.FC = () => {
           verifyCreate2Compile={verifyCreate2Compile}
         />
       </div>
-      <div className="text-center text-xs italic mx-2 mt-1 text-gray-400">
+      <div className='text-center text-xs italic mx-2 mt-1 text-gray-400'>
         {configuration.termsOfServiceUrl && (
           <a href={configuration.termsOfServiceUrl}>See Terms of Service</a>
         )}
