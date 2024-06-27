@@ -1,17 +1,22 @@
-import React, { useState } from "react";
-import { useDropzone } from "react-dropzone";
-import { AiFillFileAdd, AiOutlineGithub, AiOutlinePlus, AiOutlineFileSearch } from "react-icons/ai";
-import { SiSolidity } from "react-icons/si";
-import { HiOutlineExclamation } from "react-icons/hi";
-import Button from "../../components/Button";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import { SessionResponse } from "../../types";
-import EtherscanInput from "./EtherscanInput";
-import RemoteInput from "./RemoteInput";
-import GitHubInput from "./GitHubInput";
-import ContractInput from "./ContractInput";
-import SolcJsonInput from "./SolcJsonInput";
-import { configuration } from "../../utils/Configuration";
+import React, { useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import {
+  AiFillFileAdd,
+  AiOutlineGithub,
+  AiOutlinePlus,
+  AiOutlineFileSearch,
+} from 'react-icons/ai';
+import { SiSolidity } from 'react-icons/si';
+import { HiOutlineExclamation } from 'react-icons/hi';
+import Button from '../../components/Button';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import { SessionResponse } from '../../types';
+import EtherscanInput from './EtherscanInput';
+import RemoteInput from './RemoteInput';
+import GitHubInput from './GitHubInput';
+import ContractInput from './ContractInput';
+import SolcJsonInput from './SolcJsonInput';
+import { configuration } from '../../utils/Configuration';
 
 enum ImportMethods {
   UPLOAD,
@@ -61,34 +66,46 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   const displayFiles = addedFiles.map((file) => {
     return (
-      <li className="mb-1" key={file}>
+      <li className='mb-1' key={file}>
         {file}
       </li>
     );
   });
   return (
-    <div className="pt-1 bg-ceruleanBlue-500 flex flex-grow basis-0 rounded-xl mx-2 mb-4 md:mb-0">
-      <div className="flex flex-col basis-0 flex-grow rounded-lg px-8 transition-all ease-in-out duration-300 bg-white overflow-hidden shadow-md">
-        <div className="mt-8 flex flex-col justify-center items-center text-center">
-          <h2 className="font-bold text-xl block">File Add Zone</h2>
+    <div className='pt-1 bg-ceruleanBlue-500 flex flex-grow basis-0 rounded-xl mx-2 mb-4 md:mb-0'>
+      <div className='flex flex-col basis-0 flex-grow rounded-lg px-8 transition-all ease-in-out duration-300 bg-white overflow-hidden shadow-md'>
+        <div className='mt-8 flex flex-col justify-center items-center text-center'>
+          <h2 className='font-bold text-xl block'>File Add Zone</h2>
           <p>
             Add the Solidity source files and metadata of all contracts you want
-            to verify (<span className="font-medium">*.sol</span> or <span className="font-medium">*.json</span>).
+            to verify (<span className='font-medium'>*.sol</span> or{' '}
+            <span className='font-medium'>*.json</span>).
+          </p>
+          <p>
+            It is important to use the same tool for generating metadata that
+            you use for compiling and deploying your smart contract.{' '}
+            <a
+              className='text-ceruleanBlue-500 hover:text-blue-500 font-semibold'
+              href='https://docs.hedera.com/hedera/core-concepts/smart-contracts/verifying-smart-contracts-beta#the-metadata-file'
+              target='_blank'
+            >
+              Learn more.
+            </a>
           </p>
         </div>
-        <div className="flex flex-row flex-wrap gap-3 mt-4 justify-center md:justify-start">
+        <div className='flex flex-row flex-wrap gap-3 mt-4 justify-center md:justify-start'>
           {configuration.remoteImport ? (
             <Button
               type={
                 importMethodSelected === ImportMethods.REMOTE
-                  ? "primary"
-                  : "secondary"
+                  ? 'primary'
+                  : 'secondary'
               }
               onClick={() => selectImportMethod(ImportMethods.REMOTE)}
-              className="text-sm"
+              className='text-sm'
             >
               <>
-                <AiOutlinePlus className="inline align-middle mr-1" />
+                <AiOutlinePlus className='inline align-middle mr-1' />
                 Import from remote
               </>
             </Button>
@@ -99,14 +116,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
             <Button
               type={
                 importMethodSelected === ImportMethods.GITHUB
-                  ? "primary"
-                  : "secondary"
+                  ? 'primary'
+                  : 'secondary'
               }
               onClick={() => selectImportMethod(ImportMethods.GITHUB)}
-              className="text-sm"
+              className='text-sm'
             >
               <>
-                <AiOutlineGithub className="inline align-middle mr-1" />
+                <AiOutlineGithub className='inline align-middle mr-1' />
                 Import from GitHub
               </>
             </Button>
@@ -117,14 +134,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
             <Button
               type={
                 importMethodSelected === ImportMethods.CONTRACT
-                  ? "primary"
-                  : "secondary"
+                  ? 'primary'
+                  : 'secondary'
               }
               onClick={() => selectImportMethod(ImportMethods.CONTRACT)}
-              className="text-sm"
+              className='text-sm'
             >
               <>
-                <AiOutlineFileSearch className="inline align-middle mr-1" />
+                <AiOutlineFileSearch className='inline align-middle mr-1' />
                 Import from Contract
               </>
             </Button>
@@ -135,14 +152,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
             <Button
               type={
                 importMethodSelected === ImportMethods.SOLIDITY_JSON
-                  ? "primary"
-                  : "secondary"
+                  ? 'primary'
+                  : 'secondary'
               }
               onClick={() => selectImportMethod(ImportMethods.SOLIDITY_JSON)}
-              className="text-sm"
+              className='text-sm'
             >
               <>
-                <SiSolidity className="inline align-middle mr-1" />
+                <SiSolidity className='inline align-middle mr-1' />
                 Import from Solidity JSON
               </>
             </Button>
@@ -150,13 +167,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
             <div />
           )}
         </div>
-        <div className="flex flex-grow flex-col pb-8">
+        <div className='flex flex-grow flex-col pb-8'>
           {importMethodSelected === ImportMethods.REMOTE && (
-            <div className="mt-4">
-              <p className="">
+            <div className='mt-4'>
+              <p className=''>
                 Import from remote file or zip (e.g. Github repo .zip)
               </p>
-              <div className="mt-1">
+              <div className='mt-1'>
                 <RemoteInput
                   fetchAndUpdate={fetchAndUpdate}
                   setIsLoading={setIsLoading}
@@ -166,11 +183,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
             </div>
           )}
           {importMethodSelected === ImportMethods.ETHERSCAN && (
-            <div className="mt-4">
-              <p className="">
+            <div className='mt-4'>
+              <p className=''>
                 Import from Etherscan (contract must be verified)
               </p>
-              <div className="mt-1">
+              <div className='mt-1'>
                 <EtherscanInput
                   fetchAndUpdate={fetchAndUpdate}
                   setIsLoading={setIsLoading}
@@ -180,9 +197,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
             </div>
           )}
           {importMethodSelected === ImportMethods.GITHUB && (
-            <div className="mt-4">
-              <p className="">Import from GitHub</p>
-              <div className="mt-1">
+            <div className='mt-4'>
+              <p className=''>Import from GitHub</p>
+              <div className='mt-1'>
                 <GitHubInput
                   fetchAndUpdate={fetchAndUpdate}
                   setIsLoading={setIsLoading}
@@ -192,12 +209,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
             </div>
           )}
           {importMethodSelected === ImportMethods.CONTRACT && (
-            <div className="mt-4">
-              <p className="">
+            <div className='mt-4'>
+              <p className=''>
                 Import from contract's metadata (files should be avaiable on
                 IPFS)
               </p>
-              <div className="mt-1">
+              <div className='mt-1'>
                 <ContractInput
                   fetchAndUpdate={fetchAndUpdate}
                   setIsLoading={setIsLoading}
@@ -207,11 +224,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
             </div>
           )}
           {importMethodSelected === ImportMethods.SOLIDITY_JSON && (
-            <div className="mt-4">
-              <p className="">
+            <div className='mt-4'>
+              <p className=''>
                 Import contracts from Solidity's Standard JSON Input
               </p>
-              <div className="mt-1">
+              <div className='mt-1'>
                 <SolcJsonInput
                   fetchAndUpdate={fetchAndUpdate}
                   setIsLoading={setIsLoading}
@@ -220,58 +237,58 @@ const FileUpload: React.FC<FileUploadProps> = ({
               </div>
             </div>
           )}
-          <div className="flex justify-end">
+          <div className='flex justify-end'>
             <button
               onClick={async () => {
                 setIsLoading(true);
                 await restartSession();
                 setIsLoading(false);
               }}
-              className="text-ceruleanBlue-500 font-medium hover:underline decoration-2 decoration-lightCoral-500 uppercase py-1 text-sm"
+              className='text-ceruleanBlue-500 font-medium hover:underline decoration-2 decoration-lightCoral-500 uppercase py-1 text-sm'
             >
               Clear Files
             </button>
           </div>
           <div
             {...getRootProps()}
-            className="flex flex-col flex-grow cursor-pointer"
+            className='flex flex-col flex-grow cursor-pointer'
           >
-            <div className="flex flex-col flex-grow border-dashed border-2 rounded-lg hover:bg-ceruleanBlue-100 border-ceruleanBlue-500 p-4 relative">
-              <input {...getInputProps()} type="file" />
+            <div className='flex flex-col flex-grow border-dashed border-2 rounded-lg hover:bg-ceruleanBlue-100 border-ceruleanBlue-500 p-4 relative'>
+              <input {...getInputProps()} type='file' />
               {metadataMissing && (
-                <div className="bg-red-100 text-red-700 text-center py-2 rounded-lg">
+                <div className='bg-red-100 text-red-700 text-center py-2 rounded-lg'>
                   <HiOutlineExclamation
-                    className="inline mr-2 text-red-700"
-                    size="1.25em"
+                    className='inline mr-2 text-red-700'
+                    size='1.25em'
                   />
-                  <p className="inline align-middle font-medium">
+                  <p className='inline align-middle font-medium'>
                     Metadata files missing!
                   </p>
-                  <p className="text-sm">Please add contract metadata.json</p>
+                  <p className='text-sm'>Please add contract metadata.json</p>
                 </div>
               )}
               {displayFiles.length ? (
                 <div>
-                  <h2 className="font-bold text-lg">
-                    Added Files{" "}
-                    <span className="font-normal">({displayFiles.length})</span>
+                  <h2 className='font-bold text-lg'>
+                    Added Files{' '}
+                    <span className='font-normal'>({displayFiles.length})</span>
                   </h2>
-                  <ul className="flex flex-col break-all list-outside ml-4 list-disc">
+                  <ul className='flex flex-col break-all list-outside ml-4 list-disc'>
                     {displayFiles}
                   </ul>
                 </div>
               ) : (
-                <div className="flex flex-col flex-grow justify-center items-center text-center">
-                  <AiFillFileAdd size="2em" className="text-ceruleanBlue-500" />
-                  <div className="mt-2">
+                <div className='flex flex-col flex-grow justify-center items-center text-center'>
+                  <AiFillFileAdd size='2em' className='text-ceruleanBlue-500' />
+                  <div className='mt-2'>
                     Drag and drop here
-                    <div style={{ lineHeight: "0.8em" }}> or </div>
-                    <span className="text-ceruleanBlue-500">browse</span>
+                    <div style={{ lineHeight: '0.8em' }}> or </div>
+                    <span className='text-ceruleanBlue-500'>browse</span>
                   </div>
                 </div>
               )}
               {/* Loading Overlay */}
-              {isLoading && <LoadingOverlay message="Checking contracts" />}
+              {isLoading && <LoadingOverlay message='Checking contracts' />}
             </div>
           </div>
         </div>
