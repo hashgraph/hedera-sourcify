@@ -20,7 +20,7 @@ env:
 
 jobs:
   docker-image-publish:
-    runs-on: [self-hosted, Linux, large, ephemeral]
+    runs-on: smart-contracts-linux-large
     permissions:
       contents: read
       id-token: write
