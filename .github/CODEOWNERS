@@ -22,7 +22,7 @@
 # Protection Rules for Github Configuration Files and Actions Workflows
 /.github/                                       @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers
 /.github/workflows/                             @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers
-/.github/dependabot.yml                                       @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts @hashgraph/dev-experience
+/.github/dependabot.yml                         @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts @hashgraph/dev-experience
 
 
 
