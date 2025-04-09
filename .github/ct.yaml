@@ -1,6 +1,5 @@
 remote: origin
 target: main
 chart-dirs:
-- charts
+- charts/hedera-sourcify
 helm-extra-args: --timeout 600s
-
