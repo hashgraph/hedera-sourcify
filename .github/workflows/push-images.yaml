@@ -152,7 +152,7 @@ jobs:
         uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112 # v4.3.0
 
       - name: Publish helm chart
-        uses: step-security/helm-gh-pages@e32a08830c96b9109c2f3daa9e60b657e63020e2 # v1.7.1
+        uses: step-security/helm-gh-pages@6cb0e3b0e19170f13e6b3a78e24d6bbf6b256c3d # v1.7.2
         with:
           target_dir: charts
           token: ${{ secrets.GITHUB_TOKEN }}
