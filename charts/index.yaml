@@ -2,13 +2,13 @@ apiVersion: v1
 entries:
   sourcify:
   - apiVersion: v2
-    created: "2025-07-28T12:32:03.733612401Z"
+    created: "2025-07-28T14:09:23.672642775Z"
     description: Helm chart of [hashgraph/hedera-sourcify](https://github.com/hashgraph/hedera-sourcify)
       repository service.
-    digest: ac2feb356472c611a9f2faa4a9ed93ee425eee4350c24ac57986f0b4fa0ff8ea
+    digest: 5167352932463b1e39b9426fa4dba1810f57a4792ddfb1693ea40aa296da8bc2
     name: sourcify
     type: application
     urls:
     - https://hashgraph.github.io/hedera-sourcify/charts/sourcify-0.4.0-SNAPSHOT.tgz
     version: 0.4.0-SNAPSHOT
-generated: "2025-07-28T12:32:03.732437592Z"
+generated: "2025-07-28T14:09:23.671408021Z"
