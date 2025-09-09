@@ -34,16 +34,16 @@
     "debug": "4.4.1"
   },
   "devDependencies": {
-    "@hashgraph/hedera-local": "^2.25.0",
-    "@hashgraph/sdk": "^2.43.0",
-    "chai": "^4.2.0",
-    "chai-http": "^4.3.0",
-    "config": "^3.3.11",
-    "dotenv": "^8.2.0",
-    "ethers": "^6.6.2",
+    "@hashgraph/hedera-local": "2.25.0",
+    "@hashgraph/sdk": "2.43.0",
+    "chai": "4.2.0",
+    "chai-http": "4.3.0",
+    "config": "3.3.11",
+    "dotenv": "8.2.0",
+    "ethers": "6.6.2",
     "ganache": "7.9.0",
-    "http-status-codes": "^2.1.4",
-    "mocha": "^11.1.0",
-    "rimraf": "^3.0.2"
+    "http-status-codes": "2.1.4",
+    "mocha": "11.1.0",
+    "rimraf": "3.0.2"
   }
 }
