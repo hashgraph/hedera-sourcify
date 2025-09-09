@@ -30,6 +30,9 @@
     "url": "https://github.com/hashgraph/hedera-sourcify/issues"
   },
   "homepage": "https://github.com/hashgraph/hedera-sourcify#readme",
+  "dependencies": {
+    "debug": "4.4.1"
+  },
   "devDependencies": {
     "@hashgraph/hedera-local": "^2.25.0",
     "@hashgraph/sdk": "^2.43.0",
