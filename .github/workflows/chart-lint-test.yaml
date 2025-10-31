@@ -11,6 +11,9 @@ on:
     paths:
       - 'charts/hedera-sourcify**'
 
+permissions:
+  contents: read
+
 jobs:
   lint-test:
     runs-on: smart-contracts-linux-medium
