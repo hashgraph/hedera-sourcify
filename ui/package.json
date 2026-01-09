@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/traverse": "^7.23.2",
+    "debug": "4.4.1",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/address": "^5.6.1",
     "@ethersproject/bytes": "^5.7.0",
