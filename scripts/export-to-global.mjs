@@ -549,7 +549,21 @@ async function main() {
 
   // Process each contract
   for (let i = 0; i < addresses.length; i++) {
-    await exportContract(config, exportLog, addresses[i], i, addresses.length);
+    try {
+      await exportContract(config, exportLog, addresses[i], i, addresses.length);
+    } catch (err) {
+      // Catch any unhandled errors (network failures, unexpected exceptions)
+      // to ensure the script continues processing remaining contracts
+      const address = addresses[i];
+      log(`[${i + 1}/${addresses.length}] ${shortenAddress(address)} - FATAL ERROR: ${err.message}`);
+      exportLog.contracts[address] = {
+        status: 'FAILED',
+        error: `Unhandled error: ${err.message}`,
+        timestamp: new Date().toISOString(),
+      };
+      updateStats(exportLog);
+      saveExportLog(exportLog, config.logFile);
+    }
 
     // Rate limiting delay (skip for last item)
     if (i < addresses.length - 1) {
