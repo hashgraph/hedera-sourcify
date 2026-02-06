@@ -206,13 +206,22 @@ async function fetchContractList(config) {
   const url = `${config.localApiUrl}/files/contracts/${config.chainId}`;
   logVerbose(config, `GET ${url}`);
 
-  const response = await fetch(url);
+  const response = await fetchWithRetry(url, undefined, config);
   if (!response.ok) {
     throw new Error(`Failed to fetch contract list: HTTP ${response.status}`);
   }
 
   const data = await response.json();
-  logVerbose(config, `Response: ${data.full?.length || 0} full, ${data.partial?.length || 0} partial`);
+  const fullCount = data.full?.length || 0;
+  const partialCount = data.partial?.length || 0;
+  logVerbose(config, `Response: ${fullCount} full, ${partialCount} partial`);
+
+  // Warn if either list has exactly 200 entries — may indicate the endpoint
+  // is silently truncating results (e.g. upstream Sourcify deprecation).
+  if (fullCount === 200 || partialCount === 200) {
+    log(`WARNING: Contract list has exactly 200 entries (full=${fullCount}, partial=${partialCount}).`);
+    log(`WARNING: This may indicate the API is truncating results. Verify all contracts are included.`);
+  }
 
   // Return addresses based on match type
   if (config.matchType === 'full_match') {
@@ -226,7 +235,7 @@ async function fetchContractFiles(config, address) {
   const url = `${config.localApiUrl}/files/any/${config.chainId}/${address}`;
   logVerbose(config, `GET ${url}`);
 
-  const response = await fetch(url);
+  const response = await fetchWithRetry(url, undefined, config);
   if (!response.ok) {
     throw new Error(`Failed to fetch contract files: HTTP ${response.status}`);
   }
@@ -246,7 +255,7 @@ async function checkAlreadyVerified(config, address) {
   logVerbose(config, `GET ${url}`);
 
   try {
-    const response = await fetch(url);
+    const response = await fetchWithRetry(url, undefined, config);
     logVerbose(config, `Response status: ${response.status}`);
 
     if (response.status === 200) {
@@ -272,11 +281,11 @@ async function submitForVerification(config, address, metadata, sources) {
   const body = { metadata, sources };
   logVerbose(config, `Request body sources: ${Object.keys(sources).join(', ')}`);
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-  });
+  }, config);
 
   const responseText = await response.text();
   logVerbose(config, `Response status: ${response.status}, body: ${responseText.substring(0, 500)}`);
@@ -300,7 +309,7 @@ async function pollVerificationStatus(config, verificationId) {
     logVerbose(config, `Polling attempt ${attempt + 1}/${DEFAULTS.pollMaxAttempts}`);
 
     try {
-      const response = await fetch(url);
+      const response = await fetchWithRetry(url, undefined, config);
       const data = await response.json();
 
       logVerbose(config, `Poll response: isJobCompleted=${data.isJobCompleted}, match=${data.contract?.match}`);
@@ -337,9 +346,59 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function fetchWithRetry(url, options = {}, config, maxRetries = 3) {
+  const retryableStatuses = [408, 429, 500, 502, 503, 504];
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+
+      // Success or non-retryable error - return immediately
+      if (response.ok || !retryableStatuses.includes(response.status)) {
+        return response;
+      }
+
+      // Retryable error - wait and retry if attempts remain
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 30000); // Exponential backoff, cap at 30s
+        const retryAfter = response.headers.get('Retry-After');
+        const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : delay;
+
+        logVerbose(config, `Retryable error ${response.status}, retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries})`);
+        await sleep(waitTime);
+        continue;
+      }
+
+      // Final attempt failed, return the error response
+      return response;
+
+    } catch (err) {
+      // Network error (timeout, DNS failure, connection refused)
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 30000);
+        logVerbose(config, `Network error: ${err.message}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+        await sleep(delay);
+        continue;
+      }
+
+      // Final attempt, throw the error
+      throw err;
+    }
+  }
+}
+
 function shortenAddress(address) {
   if (address.length <= 12) return address;
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+function recordContractResult(exportLog, logFile, address, contractEntry) {
+  exportLog.contracts[address] = {
+    ...contractEntry,
+    timestamp: new Date().toISOString(),
+  };
+  updateStats(exportLog);
+  saveExportLog(exportLog, logFile);
 }
 
 // ============================================================================
@@ -369,14 +428,11 @@ async function exportContract(config, exportLog, address, index, total) {
 
   if (existingCheck.verified) {
     log(`${prefix} - SKIPPED (already verified on global as ${existingCheck.matchType})`);
-    exportLog.contracts[address] = {
+    recordContractResult(exportLog, config.logFile, address, {
       status: 'SKIPPED',
       reason: 'Already verified on global',
       globalMatchType: existingCheck.matchType,
-      timestamp: new Date().toISOString(),
-    };
-    updateStats(exportLog);
-    saveExportLog(exportLog, config.logFile);
+    });
     return;
   }
 
@@ -387,14 +443,11 @@ async function exportContract(config, exportLog, address, index, total) {
     contractData = await fetchContractFiles(config, checksummedAddress);
   } catch (err) {
     log(`${prefix} - FAILED: ${err.message}`);
-    exportLog.contracts[address] = {
+    recordContractResult(exportLog, config.logFile, address, {
       status: 'FAILED',
       localMatchType: config.matchType,
       error: err.message,
-      timestamp: new Date().toISOString(),
-    };
-    updateStats(exportLog);
-    saveExportLog(exportLog, config.logFile);
+    });
     return;
   }
 
@@ -408,14 +461,11 @@ async function exportContract(config, exportLog, address, index, total) {
         metadata = JSON.parse(file.content);
       } catch (err) {
         log(`${prefix} - FAILED: Invalid metadata.json`);
-        exportLog.contracts[address] = {
+        recordContractResult(exportLog, config.logFile, address, {
           status: 'FAILED',
           localMatchType: config.matchType,
           error: `Invalid metadata.json: ${err.message}`,
-          timestamp: new Date().toISOString(),
-        };
-        updateStats(exportLog);
-        saveExportLog(exportLog, config.logFile);
+        });
         return;
       }
     } else {
@@ -426,27 +476,21 @@ async function exportContract(config, exportLog, address, index, total) {
 
   if (!metadata) {
     log(`${prefix} - FAILED: No metadata.json found`);
-    exportLog.contracts[address] = {
+    recordContractResult(exportLog, config.logFile, address, {
       status: 'FAILED',
       localMatchType: config.matchType,
       error: 'No metadata.json found',
-      timestamp: new Date().toISOString(),
-    };
-    updateStats(exportLog);
-    saveExportLog(exportLog, config.logFile);
+    });
     return;
   }
 
   if (Object.keys(sources).length === 0) {
     log(`${prefix} - FAILED: No source files found`);
-    exportLog.contracts[address] = {
+    recordContractResult(exportLog, config.logFile, address, {
       status: 'FAILED',
       localMatchType: config.matchType,
       error: 'No source files found',
-      timestamp: new Date().toISOString(),
-    };
-    updateStats(exportLog);
-    saveExportLog(exportLog, config.logFile);
+    });
     return;
   }
 
@@ -455,15 +499,12 @@ async function exportContract(config, exportLog, address, index, total) {
   // Step 3: Submit for verification (or dry-run)
   if (config.dryRun) {
     log(`${prefix} - DRY RUN: Would submit metadata + ${Object.keys(sources).length} source files`);
-    exportLog.contracts[address] = {
+    recordContractResult(exportLog, config.logFile, address, {
       status: 'SKIPPED',
       reason: 'Dry run - not submitted',
       localMatchType: config.matchType,
       sourceFiles: Object.keys(sources),
-      timestamp: new Date().toISOString(),
-    };
-    updateStats(exportLog);
-    saveExportLog(exportLog, config.logFile);
+    });
     return;
   }
 
@@ -472,14 +513,11 @@ async function exportContract(config, exportLog, address, index, total) {
 
   if (!submitResult.success) {
     log(`${prefix} - FAILED: ${submitResult.error}`);
-    exportLog.contracts[address] = {
+    recordContractResult(exportLog, config.logFile, address, {
       status: 'FAILED',
       localMatchType: config.matchType,
       error: submitResult.error,
-      timestamp: new Date().toISOString(),
-    };
-    updateStats(exportLog);
-    saveExportLog(exportLog, config.logFile);
+    });
     return;
   }
 
@@ -489,26 +527,21 @@ async function exportContract(config, exportLog, address, index, total) {
 
   if (pollResult.success) {
     log(`${prefix} - SUCCESS (${pollResult.matchType})`);
-    exportLog.contracts[address] = {
+    recordContractResult(exportLog, config.logFile, address, {
       status: 'SUCCESS',
       localMatchType: config.matchType,
       globalMatchType: pollResult.matchType,
       verificationId: submitResult.verificationId,
-      timestamp: new Date().toISOString(),
-    };
+    });
   } else {
     log(`${prefix} - FAILED: ${pollResult.error}`);
-    exportLog.contracts[address] = {
+    recordContractResult(exportLog, config.logFile, address, {
       status: 'FAILED',
       localMatchType: config.matchType,
       error: pollResult.error,
       verificationId: submitResult.verificationId,
-      timestamp: new Date().toISOString(),
-    };
+    });
   }
-
-  updateStats(exportLog);
-  saveExportLog(exportLog, config.logFile);
 }
 
 // ============================================================================
@@ -556,13 +589,10 @@ async function main() {
       // to ensure the script continues processing remaining contracts
       const address = addresses[i];
       log(`[${i + 1}/${addresses.length}] ${shortenAddress(address)} - FATAL ERROR: ${err.message}`);
-      exportLog.contracts[address] = {
+      recordContractResult(exportLog, config.logFile, address, {
         status: 'FAILED',
         error: `Unhandled error: ${err.message}`,
-        timestamp: new Date().toISOString(),
-      };
-      updateStats(exportLog);
-      saveExportLog(exportLog, config.logFile);
+      });
     }
 
     // Rate limiting delay (skip for last item)
