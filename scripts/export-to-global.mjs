@@ -6,7 +6,24 @@
  * to global Sourcify for verification. Fully API-based - no local filesystem access needed.
  *
  * USAGE:
+ * In the shell terminal:
+ *
  *   node scripts/export-to-global.mjs --chain-id <id> [options]
+ *
+ * Or inside a tmux session:
+ *
+ *   # Start a named session
+ *   tmux new -s sourcify-migration
+ *
+ *   # Inside the session, run the batch
+ *   node scripts/export-to-global.mjs --chain-id 296 --batch-size 1000
+ *
+ *   # Detach (keeps running in background)
+ *   Ctrl+B  then  D
+ *
+ *   # Later: reattach to check progress
+ *   tmux attach -t sourcify-migration
+ *
  *
  * EXAMPLES:
  *   # Dry run to see what would be exported
@@ -76,6 +93,7 @@ function parseArgs() {
     dryRun: false,
     verbose: false,
     delayMs: DEFAULTS.delayMs,
+    batchSize: null
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -104,6 +122,9 @@ function parseArgs() {
       case '--delay-ms':
         config.delayMs = parseInt(args[++i], 10);
         break;
+      case '--batch-size':
+        config.batchSize = parseInt(args[++i], 10);
+        break;
     }
   }
 
@@ -125,6 +146,10 @@ function validateConfig(config) {
 
   if (!['full_match', 'partial_match'].includes(config.matchType)) {
     errors.push('--match-type must be full_match or partial_match');
+  }
+
+  if (config.batchSize && (!Number.isInteger(config.batchSize) || config.batchSize <= 0)) {
+    errors.push('--batch-size must be a positive integer');
   }
 
   if (errors.length > 0) {
@@ -580,15 +605,35 @@ async function main() {
     return;
   }
 
+  // Filter out the already processed addresses - so the --batch-size count
+  // applies to contracts that still need work
+  // If no export-log-{chainId}.json file -> will read from addresses
+  const pendingAddresses = addresses.filter(
+      (addr) => exportLog.contracts[addr]?.reason != "Already verified on global" &&
+          exportLog.contracts[addr]?.status != "SUCCESS"
+  );
+
+  const alreadyDoneCount = addresses.length - pendingAddresses.length;
+
+  const processLimit = config.batchSize ?? pendingAddresses.length;
+  const addressesToProcess = pendingAddresses.slice(0, processLimit);
+
+  log(`Already done: ${alreadyDoneCount}, Pending: ${pendingAddresses.length}, Processing this run: ${addressesToProcess.length}`);
+
+  if (addressesToProcess.length === 0) {
+    log(`No contracts left to process. All done!`);
+    return;
+  }
+
   // Process each contract
-  for (let i = 0; i < addresses.length; i++) {
+  for (let i = 0; i < addressesToProcess.length; i++) {
     try {
-      await exportContract(config, exportLog, addresses[i], i, addresses.length);
+      await exportContract(config, exportLog, addressesToProcess[i], i, addressesToProcess.length);
     } catch (err) {
       // Catch any unhandled errors (network failures, unexpected exceptions)
       // to ensure the script continues processing remaining contracts
-      const address = addresses[i];
-      log(`[${i + 1}/${addresses.length}] ${shortenAddress(address)} - FATAL ERROR: ${err.message}`);
+      const address = addressesToProcess[i];
+      log(`[${i + 1}/${addressesToProcess.length}] ${shortenAddress(address)} - FATAL ERROR: ${err.message}`);
       recordContractResult(exportLog, config.logFile, address, {
         status: 'FAILED',
         error: `Unhandled error: ${err.message}`,
@@ -596,7 +641,7 @@ async function main() {
     }
 
     // Rate limiting delay (skip for last item)
-    if (i < addresses.length - 1) {
+    if (i < addressesToProcess.length - 1) {
       await sleep(config.delayMs);
     }
   }
