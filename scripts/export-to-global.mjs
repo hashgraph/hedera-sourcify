@@ -609,8 +609,8 @@ async function main() {
   // applies to contracts that still need work
   // If no export-log-{chainId}.json file -> will read from addresses
   const pendingAddresses = addresses.filter(
-      (addr) => exportLog.contracts[addr]?.reason != "Already verified on global" &&
-          exportLog.contracts[addr]?.status != "SUCCESS"
+      (addr) => exportLog.contracts[addr]?.reason !== "Already verified on global" &&
+          exportLog.contracts[addr]?.status !== "SUCCESS"
   );
 
   const alreadyDoneCount = addresses.length - pendingAddresses.length;
