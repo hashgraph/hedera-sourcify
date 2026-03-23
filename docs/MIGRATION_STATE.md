@@ -41,9 +41,50 @@ print(f\"Success: {s['success']}, Failed: {s['failed']}, Skipped: {s['skipped']}
 "
 ```
 
-## Known Issues / Failures to Investigate
+## Known Errors
 
-- (Add any FAILED contracts or recurring errors here)
+### 1. `compiler_error` — File outside of allowed directories
+
+**Cause:** Contracts that use deep relative imports (e.g. `../../../dependencies/openzeppelin/...`) are stored in local Sourcify with only the file basename as the source key. When Sourcify recompiles, the relative path escapes the sandbox root, producing:
+```
+ParserError: Source "dependencies/openzeppelin/contracts/SafeMath.sol" not found:
+File outside of allowed directories.
+```
+
+**Fix:** Submit sources keyed by their full path as declared in `metadata.sources` instead of just the basename. `retry-failed-exports.mjs` implements this via `resolveSourcePaths()`, which extracts the correct key from `file.path` in the local API response.
+
+**Status: Fixable.** Run `retry-failed-exports.mjs` against the affected contracts.
+
+---
+
+### 2. `missing_source` — Sources referenced in metadata but not fetchable
+
+**Cause:** The metadata references source files by GitHub URL (e.g. `https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/interfaces/IERC165.sol`). When sources are submitted keyed only by basename (`IERC165.sol`), Sourcify cannot match them to the metadata key and attempts to fetch from GitHub — which may fail or return a content hash mismatch.
+
+Local Sourcify stores files with their original full URL path embedded in the filesystem path (`sources/https:/github.com/...`). Extracting the key from `file.path` and normalising `https:/` → `https://` produces the exact key the metadata expects.
+
+**Fix:** Same `resolveSourcePaths()` fix as above — deriving the submission key from `file.path` rather than the basename resolves the mismatch.
+
+**Status: Fixable.** Run `retry-failed-exports.mjs` against the affected contracts.
+
+---
+
+### 3. `extra_file_input_bug` — Metadata hash matches, bytecode does not (Solidity 0.6.12)
+
+**Cause:** This is a known Sourcify bug ([sourcify#618](https://github.com/ethereum/sourcify/issues/618)) specific to Solidity `0.6.12+commit.27d51765` with the optimizer enabled.
+
+When a contract is originally compiled with extra source files beyond those listed in `metadata.sources` (e.g. other contracts in the same Hardhat project compiled in one batch), Solidity assigns AST IDs based on the full file set. Those AST IDs are embedded as placeholder offsets for immutable variables in the bytecode. When Sourcify recompiles using only `metadata.sources`, the AST IDs differ → the immutable offsets differ → the bytecode does not match, even though the metadata hash is correct.
+
+Affected compiler configuration observed on chain 296:
+- Solidity `0.6.12+commit.27d51765`
+- EVM version: `istanbul`
+- Optimizer: enabled, 200 runs
+
+**Fix:** Recompile with the full original set of source files, including the extra unused ones. The extra files were part of the original compilation but are not stored in local Sourcify — only files listed in `metadata.sources` are retained after verification. Without the original build artifacts (e.g. a Hardhat `build-info/*.json` containing the full `input.sources`), the exact original compilation cannot be reproduced.
+
+**Status: Not automatically fixable.** The deployer must provide the original Hardhat/Foundry build-info artifact. If available, pass the extra source files alongside `metadata.sources` when submitting to Sourcify.
+
+---
 
 ## Next Steps
 
