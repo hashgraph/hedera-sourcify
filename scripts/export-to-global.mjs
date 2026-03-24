@@ -46,6 +46,9 @@
  *   --local-api-url <url>    Local Sourcify API (default: https://server-verify.hashscan.io)
  *   --global-api-url <url>   Global Sourcify API (default: https://sourcify.dev/server)
  *   --log-file <path>        Export log path (default: ./export-log-{chainId}.json)
+ *   --batch-size <n>         Only process the next N pending contracts
+ *   --retry-failed           Re-process all FAILED contracts from the log (skips API fetch)
+ *   --retry-failed-contract  Re-process a single FAILED contract by address (implies --retry-failed)
  *   --dry-run                Log actions without submitting to API
  *   --verbose                Show detailed debug output
  *   --delay-ms <ms>          Delay between API requests (default: 1000)
@@ -93,7 +96,9 @@ function parseArgs() {
     dryRun: false,
     verbose: false,
     delayMs: DEFAULTS.delayMs,
-    batchSize: null
+    batchSize: null,
+    retryFailed: false,
+    retryFailedContract: null,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -124,6 +129,13 @@ function parseArgs() {
         break;
       case '--batch-size':
         config.batchSize = parseInt(args[++i], 10);
+        break;
+      case '--retry-failed':
+        config.retryFailed = true;
+        break;
+      case '--retry-failed-contract':
+        config.retryFailedContract = args[++i];
+        config.retryFailed = true;
         break;
     }
   }
@@ -427,6 +439,55 @@ function recordContractResult(exportLog, logFile, address, contractEntry) {
 }
 
 // ============================================================================
+// Source path resolution
+//
+// Fixes two distinct issues:
+//
+// 1. "File outside of allowed directories" (compiler_error)
+//    Contracts with deep relative imports (e.g. ../../../dependencies/...) fail
+//    when sources are keyed only by basename. Using the full path from
+//    metadata.sources keeps all files within the sandbox root.
+//
+// 2. extra_file_input_bug (Solidity 0.6.12 + optimizer)
+//    Extra files passed to the original compiler shift AST IDs, changing
+//    immutable placeholder positions in the bytecode. Sourcify can only
+//    reproduce the exact bytecode if all original compilation files are
+//    provided — including those not listed in metadata.sources.
+//    Files not found in metadata.sources are passed through under their
+//    original name so the full compilation context is reconstructed.
+// ============================================================================
+
+function resolveSourcePaths(files, metadata) {
+  const metadataSources = metadata?.sources || {};
+  const pathByBasename = {};
+  for (const fullPath of Object.keys(metadataSources)) {
+    const basename = fullPath.split('/').pop();
+    if (!(basename in pathByBasename)) {
+      pathByBasename[basename] = fullPath;
+    }
+  }
+
+  const sources = {};
+  for (const file of files) {
+    if (file.name === 'metadata.json') continue;
+    if (file.name === 'library-map.json') continue;
+
+    let key;
+    const sourcesMarker = '/sources/';
+    const markerIdx = file.path ? file.path.indexOf(sourcesMarker) : -1;
+    if (markerIdx !== -1) {
+      key = file.path.slice(markerIdx + sourcesMarker.length).replace(/^https:\/([^/])/, 'https://$1');
+    } else {
+      key = pathByBasename[file.name] ?? file.name;
+    }
+
+    sources[key] = file.content;
+  }
+
+  return sources;
+}
+
+// ============================================================================
 // Main Export Logic
 // ============================================================================
 
@@ -570,6 +631,124 @@ async function exportContract(config, exportLog, address, index, total) {
 }
 
 // ============================================================================
+// Retry Logic (--retry-failed)
+// Uses resolveSourcePaths to fix compiler_error and extra_file_input_bug.
+// ============================================================================
+
+async function retryContract(config, exportLog, address, index, total) {
+  const prefix = `[${index + 1}/${total}] ${shortenAddress(address)}`;
+
+  let checksummedAddress;
+  try {
+    checksummedAddress = getAddress(address);
+  } catch {
+    checksummedAddress = address;
+  }
+
+  log(`${prefix} - Fetching from local Sourcify...`);
+  let contractData;
+  try {
+    contractData = await fetchContractFiles(config, checksummedAddress);
+  } catch (err) {
+    log(`${prefix} - FAILED: ${err.message}`);
+    recordContractResult(exportLog, config.logFile, address, {
+      status: 'FAILED',
+      localMatchType: config.matchType,
+      error: err.message,
+    });
+    return;
+  }
+
+  let metadata = null;
+  const rawFiles = contractData.files || [];
+
+  for (const file of rawFiles) {
+    if (file.name === 'metadata.json') {
+      try {
+        metadata = JSON.parse(file.content);
+      } catch (err) {
+        log(`${prefix} - FAILED: Invalid metadata.json`);
+        recordContractResult(exportLog, config.logFile, address, {
+          status: 'FAILED',
+          localMatchType: config.matchType,
+          error: `Invalid metadata.json: ${err.message}`,
+        });
+        return;
+      }
+    }
+  }
+
+  if (!metadata) {
+    log(`${prefix} - FAILED: No metadata.json found`);
+    recordContractResult(exportLog, config.logFile, address, {
+      status: 'FAILED',
+      localMatchType: config.matchType,
+      error: 'No metadata.json found',
+    });
+    return;
+  }
+
+  const sources = resolveSourcePaths(rawFiles, metadata);
+
+  if (Object.keys(sources).length === 0) {
+    log(`${prefix} - FAILED: No source files found`);
+    recordContractResult(exportLog, config.logFile, address, {
+      status: 'FAILED',
+      localMatchType: config.matchType,
+      error: 'No source files found',
+    });
+    return;
+  }
+
+  logVerbose(config, `Files: metadata.json + ${Object.keys(sources).join(', ')}`);
+
+  if (config.dryRun) {
+    log(`${prefix} - DRY RUN: Would submit metadata + ${Object.keys(sources).length} source files`);
+    recordContractResult(exportLog, config.logFile, address, {
+      status: 'SKIPPED',
+      reason: 'Dry run - not submitted',
+      localMatchType: config.matchType,
+      sourceFiles: Object.keys(sources),
+    });
+    return;
+  }
+
+  log(`${prefix} - Submitting to global Sourcify (v2 API)...`);
+  const submitResult = await submitForVerification(config, checksummedAddress, metadata, sources);
+
+  if (!submitResult.success) {
+    log(`${prefix} - FAILED: ${submitResult.error}`);
+    recordContractResult(exportLog, config.logFile, address, {
+      status: 'FAILED',
+      localMatchType: config.matchType,
+      error: submitResult.error,
+    });
+    return;
+  }
+
+  log(`${prefix} - Polling for result (id: ${submitResult.verificationId})...`);
+  const pollResult = await pollVerificationStatus(config, submitResult.verificationId);
+
+  if (pollResult.success) {
+    log(`${prefix} - SUCCESS (${pollResult.matchType})`);
+    recordContractResult(exportLog, config.logFile, address, {
+      status: 'SUCCESS',
+      localMatchType: config.matchType,
+      globalMatchType: pollResult.matchType,
+      verificationId: submitResult.verificationId,
+    });
+  } else {
+    log(`${prefix} - FAILED: ${JSON.stringify(pollResult.error)}`);
+    recordContractResult(exportLog, config.logFile, address, {
+      status: 'FAILED',
+      localMatchType: config.matchType,
+      error: pollResult.error,
+      verificationId: submitResult.verificationId,
+    });
+  }
+}
+
+// ============================================================================
 // Entry Point
 // ============================================================================
 
@@ -584,65 +763,106 @@ async function main() {
   log(`Match type: ${config.matchType}`);
   log(`Log file:   ${config.logFile}`);
   if (config.dryRun) log(`DRY RUN MODE - no submissions will be made`);
+  if (config.retryFailed) log(`RETRY FAILED MODE - re-processing FAILED contracts from log`);
 
   // Load or create export log
   const exportLog = loadExportLog(config.logFile, config.chainId);
 
-  // Fetch contract list from local Sourcify
-  log(`Fetching contract list from local Sourcify...`);
-  let addresses;
-  try {
-    addresses = await fetchContractList(config);
-  } catch (err) {
-    log(`FATAL: Failed to fetch contract list: ${err.message}`);
-    process.exit(1);
-  }
+  if (config.retryFailed) {
+    // Retry mode: source addresses from FAILED log entries, use resolveSourcePaths
+    let failedAddresses = Object.entries(exportLog.contracts)
+      .filter(([, v]) => v.status === 'FAILED')
+      .map(([addr]) => addr);
 
-  log(`Found ${addresses.length} ${config.matchType} contracts to process`);
-
-  if (addresses.length === 0) {
-    log('No contracts found. Exiting.');
-    return;
-  }
-
-  // Filter out the already processed addresses - so the --batch-size count
-  // applies to contracts that still need work
-  // If no export-log-{chainId}.json file -> will read from addresses
-  const pendingAddresses = addresses.filter(
-      (addr) => exportLog.contracts[addr]?.reason !== "Already verified on global" &&
-          exportLog.contracts[addr]?.status !== "SUCCESS"
-  );
-
-  const alreadyDoneCount = addresses.length - pendingAddresses.length;
-
-  const processLimit = config.batchSize ?? pendingAddresses.length;
-  const addressesToProcess = pendingAddresses.slice(0, processLimit);
-
-  log(`Already done: ${alreadyDoneCount}, Pending: ${pendingAddresses.length}, Processing this run: ${addressesToProcess.length}`);
-
-  if (addressesToProcess.length === 0) {
-    log(`No contracts left to process. All done!`);
-    return;
-  }
-
-  // Process each contract
-  for (let i = 0; i < addressesToProcess.length; i++) {
-    try {
-      await exportContract(config, exportLog, addressesToProcess[i], i, addressesToProcess.length);
-    } catch (err) {
-      // Catch any unhandled errors (network failures, unexpected exceptions)
-      // to ensure the script continues processing remaining contracts
-      const address = addressesToProcess[i];
-      log(`[${i + 1}/${addressesToProcess.length}] ${shortenAddress(address)} - FATAL ERROR: ${err.message}`);
-      recordContractResult(exportLog, config.logFile, address, {
-        status: 'FAILED',
-        error: `Unhandled error: ${err.message}`,
-      });
+    if (config.retryFailedContract) {
+      const target = config.retryFailedContract.toLowerCase();
+      failedAddresses = failedAddresses.filter((addr) => addr.toLowerCase() === target);
+      if (failedAddresses.length === 0) {
+        log(`Error: contract ${config.retryFailedContract} not found in FAILED entries`);
+        process.exit(1);
+      }
     }
 
-    // Rate limiting delay (skip for last item)
-    if (i < addressesToProcess.length - 1) {
-      await sleep(config.delayMs);
+    log(`FAILED contracts to retry: ${failedAddresses.length}`);
+
+    if (failedAddresses.length === 0) {
+      log('No FAILED contracts found. Nothing to do.');
+      return;
+    }
+
+    for (let i = 0; i < failedAddresses.length; i++) {
+      try {
+        await retryContract(config, exportLog, failedAddresses[i], i, failedAddresses.length);
+      } catch (err) {
+        const address = failedAddresses[i];
+        log(`[${i + 1}/${failedAddresses.length}] ${shortenAddress(address)} - FATAL ERROR: ${err.message}`);
+        recordContractResult(exportLog, config.logFile, address, {
+          status: 'FAILED',
+          error: `Unhandled error: ${err.message}`,
+        });
+      }
+
+      if (i < failedAddresses.length - 1) {
+        await sleep(config.delayMs);
+      }
+    }
+  } else {
+    // Normal mode: fetch contract list from local Sourcify API
+    log(`Fetching contract list from local Sourcify...`);
+    let addresses;
+    try {
+      addresses = await fetchContractList(config);
+    } catch (err) {
+      log(`FATAL: Failed to fetch contract list: ${err.message}`);
+      process.exit(1);
+    }
+
+    log(`Found ${addresses.length} ${config.matchType} contracts to process`);
+
+    if (addresses.length === 0) {
+      log('No contracts found. Exiting.');
+      return;
+    }
+
+    // Filter out the already processed addresses - so the --batch-size count
+    // applies to contracts that still need to be processed
+    // If no export-log-{chainId}.json file -> will read from addresses
+    const pendingAddresses = addresses.filter(
+        (addr) => exportLog.contracts[addr]?.reason !== "Already verified on global" &&
+            exportLog.contracts[addr]?.status !== "SUCCESS"
+    );
+
+    const alreadyDoneCount = addresses.length - pendingAddresses.length;
+
+    const processLimit = config.batchSize ?? pendingAddresses.length;
+    const addressesToProcess = pendingAddresses.slice(0, processLimit);
+
+    log(`Already done: ${alreadyDoneCount}, Pending: ${pendingAddresses.length}, Processing this run: ${addressesToProcess.length}`);
+
+    if (addressesToProcess.length === 0) {
+      log(`No contracts left to process. All done!`);
+      return;
+    }
+
+    // Process each contract
+    for (let i = 0; i < addressesToProcess.length; i++) {
+      try {
+        await exportContract(config, exportLog, addressesToProcess[i], i, addressesToProcess.length);
+      } catch (err) {
+        // Catch any unhandled errors (network failures, unexpected exceptions)
+        // to ensure the script continues processing remaining contracts
+        const address = addressesToProcess[i];
+        log(`[${i + 1}/${addressesToProcess.length}] ${shortenAddress(address)} - FATAL ERROR: ${err.message}`);
+        recordContractResult(exportLog, config.logFile, address, {
+          status: 'FAILED',
+          error: `Unhandled error: ${err.message}`,
+        });
+      }
+
+      // Rate limiting delay (skip for last item)
+      if (i < addressesToProcess.length - 1) {
+        await sleep(config.delayMs);
+      }
     }
   }
 
