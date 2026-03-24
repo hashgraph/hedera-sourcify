@@ -4,18 +4,19 @@ Human-maintained log of migration runs. Update after each batch.
 Machine-level detail lives in `export-log-{chainId}.json`.
 
 ## Overview
-Last updated : 2026-03-17
+Last updated : 2026-03-24
 
 | Chain     | ID  | Full matches | Partial matches | Status    |
-|-----------|-----|---------|--------------|-----------|
-| Testnet   | 296 | 5484    | 418          | In progress |
-| Mainnet   | 295 | 831        | 203             | Not started |
+|-----------|-----|---------|-----------------|-----------|
+| Testnet   | 296 | 5630    | 427             | In progress |
+| Mainnet   | 295 | 842        | 204             | Not started |
 
 ## Run History
 
-| Date       | Engineer     | Chain | Match type | Amount | ✅ Success | ❌ Failed | Notes             |
-|------------|--------------|-------|------------|--------|-----------|----------|-------------------|
-| 2026-03-19 | @thomas.boot | 296 | full | 5484 | 46 | 0        | Initial migration |
+| Date       | Engineer     | Chain | Match type | Amount | ✅ Success | ❌ Failed | Notes           |
+|------------|--------------|-------|------------|--------|-----------|----------|-----------------|
+| 2026-03-19 | @thomas.boot | 296   | full       | 5484   | 5443      | 41       | First migration |
+| 2026-03-24 | @thomas.boot | 296   | partial    | 427    | 427       |          | First migration |
 
 ## How to Update This File
 
@@ -51,9 +52,9 @@ ParserError: Source "dependencies/openzeppelin/contracts/SafeMath.sol" not found
 File outside of allowed directories.
 ```
 
-**Fix:** Submit sources keyed by their full path as declared in `metadata.sources` instead of just the basename. `retry-failed-exports.mjs` implements this via `resolveSourcePaths()`, which extracts the correct key from `file.path` in the local API response.
+**Fix:** Submit sources keyed by their full path as declared in `metadata.sources` instead of just the basename. `node scripts/export-to-global.mjs --chain-id 296 --retry-failed` implements this via `resolveSourcePaths()`, which extracts the correct key from `file.path` in the local API response.
 
-**Status: Fixable.** Run `retry-failed-exports.mjs` against the affected contracts.
+**Status: Fixable.** Run `node scripts/export-to-global.mjs --chain-id 296 --retry-failed` against the affected contracts.
 
 ---
 
@@ -65,7 +66,7 @@ Local Sourcify stores files with their original full URL path embedded in the fi
 
 **Fix:** Same `resolveSourcePaths()` fix as above — deriving the submission key from `file.path` rather than the basename resolves the mismatch.
 
-**Status: Fixable.** Run `retry-failed-exports.mjs` against the affected contracts.
+**Status: Fixable.** Run `node scripts/export-to-global.mjs --chain-id 296 --retry-failed` against the affected contracts.
 
 ---
 
