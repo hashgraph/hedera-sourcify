@@ -17,6 +17,8 @@ Last updated : 2026-03-24
 |------------|--------------|-------|------------|--------|-----------|----------|-----------------|
 | 2026-03-19 | @thomas.boot | 296   | full       | 5484   | 5443      | 41       | First migration |
 | 2026-03-24 | @thomas.boot | 296   | partial    | 427    | 427       |          | First migration |
+| 2026-03-25 | @thomas.boot | 295   | full       | 842    | 841       | 1        | Pending job     |
+| 2026-03-25 | @thomas.boot | 295   | partial    | 204    | 204       |          |  |
 
 ## How to Update This File
 
