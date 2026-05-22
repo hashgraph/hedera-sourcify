@@ -464,6 +464,8 @@ function resolveSourcePaths(files, metadata) {
     const basename = fullPath.split('/').pop();
     if (!(basename in pathByBasename)) {
       pathByBasename[basename] = fullPath;
+    } else {
+      log(`Warning: basename collision for '${basename}': keeping '${pathByBasename[basename]}', ignoring '${fullPath}'`);
     }
   }
 
@@ -488,41 +490,15 @@ function resolveSourcePaths(files, metadata) {
 }
 
 // ============================================================================
-// Main Export Logic
+// Shared Fetch / Submit Helpers
 // ============================================================================
 
-async function exportContract(config, exportLog, address, index, total) {
-  const prefix = `[${index + 1}/${total}] ${shortenAddress(address)}`;
-
-  // Check if already successfully exported
-  if (exportLog.contracts[address]?.status === 'SUCCESS') {
-    log(`${prefix} - Already exported, skipping`);
-    return;
-  }
-
-  // Normalize address (checksummed)
-  let checksummedAddress;
-  try {
-    checksummedAddress = getAddress(address);
-  } catch {
-    checksummedAddress = address;
-  }
-
-  // Step 1: Check if already verified on global Sourcify
-  log(`${prefix} - Checking global Sourcify...`);
-  const existingCheck = await checkAlreadyVerified(config, checksummedAddress);
-
-  if (existingCheck.verified) {
-    log(`${prefix} - SKIPPED (already verified on global as ${existingCheck.matchType})`);
-    recordContractResult(exportLog, config.logFile, address, {
-      status: 'SKIPPED',
-      reason: 'Already verified on global',
-      globalMatchType: existingCheck.matchType,
-    });
-    return;
-  }
-
-  // Step 2: Fetch contract files from local Sourcify API
+/**
+ * Fetch contract files from local Sourcify and parse metadata.json.
+ * Records a FAILED entry and returns null on any error so callers can simply `if (!parsed) return`.
+ * @returns {{ rawFiles: object[], metadata: object } | null}
+ */
+async function fetchAndParseMetadata(config, exportLog, address, prefix, checksummedAddress) {
   log(`${prefix} - Fetching from local Sourcify...`);
   let contractData;
   try {
@@ -534,14 +510,12 @@ async function exportContract(config, exportLog, address, index, total) {
       localMatchType: config.matchType,
       error: err.message,
     });
-    return;
+    return null;
   }
 
-  // Parse metadata and sources from API response
+  const rawFiles = contractData.files || [];
   let metadata = null;
-  const sources = {};
-
-  for (const file of contractData.files || []) {
+  for (const file of rawFiles) {
     if (file.name === 'metadata.json') {
       try {
         metadata = JSON.parse(file.content);
@@ -552,11 +526,9 @@ async function exportContract(config, exportLog, address, index, total) {
           localMatchType: config.matchType,
           error: `Invalid metadata.json: ${err.message}`,
         });
-        return;
+        return null;
       }
-    } else {
-      // Source file - use filename as key
-      sources[file.name] = file.content;
+      break;
     }
   }
 
@@ -567,22 +539,19 @@ async function exportContract(config, exportLog, address, index, total) {
       localMatchType: config.matchType,
       error: 'No metadata.json found',
     });
-    return;
+    return null;
   }
 
-  if (Object.keys(sources).length === 0) {
-    log(`${prefix} - FAILED: No source files found`);
-    recordContractResult(exportLog, config.logFile, address, {
-      status: 'FAILED',
-      localMatchType: config.matchType,
-      error: 'No source files found',
-    });
-    return;
-  }
+  return { rawFiles, metadata };
+}
 
+/**
+ * Dry-run check, submit to global Sourcify, poll for result, and record outcome.
+ * Shared by exportContract and retryContract — sources keying is the caller's responsibility.
+ */
+async function submitAndRecord(config, exportLog, address, prefix, checksummedAddress, metadata, sources) {
   logVerbose(config, `Files: metadata.json + ${Object.keys(sources).join(', ')}`);
 
-  // Step 3: Submit for verification (or dry-run)
   if (config.dryRun) {
     log(`${prefix} - DRY RUN: Would submit metadata + ${Object.keys(sources).length} source files`);
     recordContractResult(exportLog, config.logFile, address, {
@@ -607,7 +576,6 @@ async function exportContract(config, exportLog, address, index, total) {
     return;
   }
 
-  // Step 4: Poll for verification result
   log(`${prefix} - Polling for result (id: ${submitResult.verificationId})...`);
   const pollResult = await pollVerificationStatus(config, submitResult.verificationId);
 
@@ -631,6 +599,60 @@ async function exportContract(config, exportLog, address, index, total) {
 }
 
 // ============================================================================
+// Main Export Logic
+// ============================================================================
+
+async function exportContract(config, exportLog, address, index, total) {
+  const prefix = `[${index + 1}/${total}] ${shortenAddress(address)}`;
+
+  if (exportLog.contracts[address]?.status === 'SUCCESS') {
+    log(`${prefix} - Already exported, skipping`);
+    return;
+  }
+
+  let checksummedAddress;
+  try {
+    checksummedAddress = getAddress(address);
+  } catch {
+    checksummedAddress = address;
+  }
+
+  log(`${prefix} - Checking global Sourcify...`);
+  const existingCheck = await checkAlreadyVerified(config, checksummedAddress);
+  if (existingCheck.verified) {
+    log(`${prefix} - SKIPPED (already verified on global as ${existingCheck.matchType})`);
+    recordContractResult(exportLog, config.logFile, address, {
+      status: 'SKIPPED',
+      reason: 'Already verified on global',
+      globalMatchType: existingCheck.matchType,
+    });
+    return;
+  }
+
+  const parsed = await fetchAndParseMetadata(config, exportLog, address, prefix, checksummedAddress);
+  if (!parsed) return;
+
+  const { rawFiles, metadata } = parsed;
+  const sources = {};
+  for (const file of rawFiles) {
+    if (file.name === 'metadata.json') continue;
+    sources[file.name] = file.content;
+  }
+
+  if (Object.keys(sources).length === 0) {
+    log(`${prefix} - FAILED: No source files found`);
+    recordContractResult(exportLog, config.logFile, address, {
+      status: 'FAILED',
+      localMatchType: config.matchType,
+      error: 'No source files found',
+    });
+    return;
+  }
+
+  await submitAndRecord(config, exportLog, address, prefix, checksummedAddress, metadata, sources);
+}
+
+// ============================================================================
 // Retry Logic (--retry-failed)
 // Uses resolveSourcePaths to fix compiler_error and extra_file_input_bug.
 // ============================================================================
@@ -645,49 +667,22 @@ async function retryContract(config, exportLog, address, index, total) {
     checksummedAddress = address;
   }
 
-  log(`${prefix} - Fetching from local Sourcify...`);
-  let contractData;
-  try {
-    contractData = await fetchContractFiles(config, checksummedAddress);
-  } catch (err) {
-    log(`${prefix} - FAILED: ${err.message}`);
+  log(`${prefix} - Checking global Sourcify...`);
+  const existingCheck = await checkAlreadyVerified(config, checksummedAddress);
+  if (existingCheck.verified) {
+    log(`${prefix} - SKIPPED (already verified on global as ${existingCheck.matchType})`);
     recordContractResult(exportLog, config.logFile, address, {
-      status: 'FAILED',
-      localMatchType: config.matchType,
-      error: err.message,
+      status: 'SKIPPED',
+      reason: 'Already verified on global',
+      globalMatchType: existingCheck.matchType,
     });
     return;
   }
 
-  let metadata = null;
-  const rawFiles = contractData.files || [];
+  const parsed = await fetchAndParseMetadata(config, exportLog, address, prefix, checksummedAddress);
+  if (!parsed) return;
 
-  for (const file of rawFiles) {
-    if (file.name === 'metadata.json') {
-      try {
-        metadata = JSON.parse(file.content);
-      } catch (err) {
-        log(`${prefix} - FAILED: Invalid metadata.json`);
-        recordContractResult(exportLog, config.logFile, address, {
-          status: 'FAILED',
-          localMatchType: config.matchType,
-          error: `Invalid metadata.json: ${err.message}`,
-        });
-        return;
-      }
-    }
-  }
-
-  if (!metadata) {
-    log(`${prefix} - FAILED: No metadata.json found`);
-    recordContractResult(exportLog, config.logFile, address, {
-      status: 'FAILED',
-      localMatchType: config.matchType,
-      error: 'No metadata.json found',
-    });
-    return;
-  }
-
+  const { rawFiles, metadata } = parsed;
   const sources = resolveSourcePaths(rawFiles, metadata);
 
   if (Object.keys(sources).length === 0) {
@@ -700,52 +695,7 @@ async function retryContract(config, exportLog, address, index, total) {
     return;
   }
 
-  logVerbose(config, `Files: metadata.json + ${Object.keys(sources).join(', ')}`);
-
-  if (config.dryRun) {
-    log(`${prefix} - DRY RUN: Would submit metadata + ${Object.keys(sources).length} source files`);
-    recordContractResult(exportLog, config.logFile, address, {
-      status: 'SKIPPED',
-      reason: 'Dry run - not submitted',
-      localMatchType: config.matchType,
-      sourceFiles: Object.keys(sources),
-    });
-    return;
-  }
-
-  log(`${prefix} - Submitting to global Sourcify (v2 API)...`);
-  const submitResult = await submitForVerification(config, checksummedAddress, metadata, sources);
-
-  if (!submitResult.success) {
-    log(`${prefix} - FAILED: ${submitResult.error}`);
-    recordContractResult(exportLog, config.logFile, address, {
-      status: 'FAILED',
-      localMatchType: config.matchType,
-      error: submitResult.error,
-    });
-    return;
-  }
-
-  log(`${prefix} - Polling for result (id: ${submitResult.verificationId})...`);
-  const pollResult = await pollVerificationStatus(config, submitResult.verificationId);
-
-  if (pollResult.success) {
-    log(`${prefix} - SUCCESS (${pollResult.matchType})`);
-    recordContractResult(exportLog, config.logFile, address, {
-      status: 'SUCCESS',
-      localMatchType: config.matchType,
-      globalMatchType: pollResult.matchType,
-      verificationId: submitResult.verificationId,
-    });
-  } else {
-    log(`${prefix} - FAILED: ${JSON.stringify(pollResult.error)}`);
-    recordContractResult(exportLog, config.logFile, address, {
-      status: 'FAILED',
-      localMatchType: config.matchType,
-      error: pollResult.error,
-      verificationId: submitResult.verificationId,
-    });
-  }
+  await submitAndRecord(config, exportLog, address, prefix, checksummedAddress, metadata, sources);
 }
 
 // ============================================================================
